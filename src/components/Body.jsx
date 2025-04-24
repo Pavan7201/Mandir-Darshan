@@ -1,6 +1,7 @@
 import React from "react";
 import "../css/body.css";
 import Banner from "./banner";
+import DevoteServices from "./DevoteServices";
 
 import Kanipakam from "../assets/Kanipakam.jpeg";
 import Kalahasti from "../assets/Kalahasti.jpeg";
@@ -41,6 +42,8 @@ const Body = () => {
       </div>
       <div>
         <Banner />
+        <hr />
+        <DevoteServices />
       </div>
     </>
   );

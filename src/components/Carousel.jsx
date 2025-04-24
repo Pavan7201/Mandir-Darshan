@@ -4,25 +4,25 @@ import templeData from "../components/TempleData";
 
 const Carousel = () => {
   const containerReference = useRef(null);
-  const [currentIndex, setCurrentIndex] = useState(5); // Start with the 6th image (index 5)
+  const [currentIndex, setCurrentIndex] = useState(5); 
 
   const scrollToIndex = (index) => {
     const container = containerReference.current;
     if (container) {
-      const slideWidth = container.offsetWidth / 3; // Get the width of each slide
+      const slideWidth = container.offsetWidth / 3; 
       container.scrollTo({
-        left: (index - 1) * slideWidth, // Center the image by scrolling 1 image left
+        left: (index - 1) * slideWidth,
         behavior: "smooth",
       });
     }
   };
 
   const handleLeft = () => {
-    setCurrentIndex((prev) => (prev === 0 ? templeData.length - 1 : prev - 1)); // Wrap around to the last image when on the first
+    setCurrentIndex((prev) => (prev === 0 ? templeData.length - 1 : prev - 1));
   };
 
   const handleRight = () => {
-    setCurrentIndex((prev) => (prev === templeData.length - 1 ? 0 : prev + 1)); // Loop back to first image when at the last one
+    setCurrentIndex((prev) => (prev === templeData.length - 1 ? 0 : prev + 1)); 
   };
 
   useEffect(() => {
