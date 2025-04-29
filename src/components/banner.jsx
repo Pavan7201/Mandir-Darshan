@@ -1,23 +1,24 @@
 import React from "react";
 import "../css/banner.css";
 import Bannar from "../assets/Banner.jpg";
-import Carousel from "./Carousel";
 
 const Banner = () => {
   return (
     <>
       <div className="banner-container">
-        <img src={Bannar} alt="Banner image" className="banner-image" />
+        <img
+          src={Bannar}
+          alt="Banner image"
+          className="banner-image"
+          loading="lazy"
+        />
         <div className="banner-caption">
           <h2>Experience the Divine Tranquility</h2>
           <p>
-            Explore the sacred temples of Andhra Pradesh and embrace the
-            spiritual heritage of India.
+            Explore the sacred temples and embrace the spiritual heritage of
+            India.
           </p>
         </div>
-      </div>
-      <div>
-        <Carousel />
       </div>
     </>
   );

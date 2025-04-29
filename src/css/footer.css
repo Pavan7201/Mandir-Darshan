@@ -1,8 +1,8 @@
 .footer {
-  background: linear-gradient(90deg, #f2c94c, #f2994a);
+  background-color: #7b3f00;
   padding: 1.5rem 2rem;
   text-align: center;
-  color: #800000;
+  color: #fefaf1;
   font-family: "Georgia", serif;
   font-size: 1rem;
   box-shadow: 0 -3px 8px rgba(0, 0, 0, 0.1);

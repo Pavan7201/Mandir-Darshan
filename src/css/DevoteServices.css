@@ -1,14 +1,17 @@
 #devote-services {
-  padding: 4rem 1rem;
-  background-color: rgba(247, 247, 232, 0.856);
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fefaf1;
+  padding: 0 1rem;
+  box-sizing: border-box;
 }
 
 .devote-section-container {
   max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
   text-align: center;
-  padding: 0 1rem;
 }
 
 .devote-heading {
@@ -26,14 +29,12 @@
 
 .devote-cards-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 2rem;
   margin-top: 2.5rem;
 }
 
 .devote-card {
-  position: relative;
-  display: inline-block;
   background-color: rgba(255, 242, 213, 0.959);
   padding: 1.5rem;
   border-radius: 1rem;
@@ -67,6 +68,7 @@
   margin-top: 0.5rem;
 }
 
+/* Dark Mode */
 body.dark #devote-services {
   background-color: #111827;
 }
@@ -110,4 +112,17 @@ body.dark .devote-card-description {
 
 .book-now-btn:focus {
   outline: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .devote-cards-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .devote-cards-container {
+    grid-template-columns: 1fr;
+  }
 }

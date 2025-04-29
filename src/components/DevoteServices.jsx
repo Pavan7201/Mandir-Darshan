@@ -40,7 +40,12 @@ const DevoteServices = () => {
     <section className="devote-services" id="devote-services">
       <div className="devote-section-container">
         <h2 className="devote-heading">Devote Services</h2>
-        <img src={lineDecor} alt="decorative line" className="line-decor-img" />
+        <img
+          loading="lazy"
+          src={lineDecor}
+          alt="decorative line"
+          className="line-decor-img"
+        />
         <div className="devote-cards-container">
           {services.map((service, index) => (
             <div key={index} className="devote-card">
