@@ -3,9 +3,10 @@
   width: 100%;
   height: clamp(50vh, 73vh, 85vh);
   overflow: hidden;
-  border-radius: 50px;
   padding: 0 3rem;
   margin: 0;
+  background-color: #f7edd6;
+  z-index: 0;
 }
 
 .banner-image {

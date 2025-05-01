@@ -15,12 +15,13 @@ const Body = () => {
             <div className="temple-name">{temple.name}</div>
           </button>
         ))}
-        <hr />
       </div>
+      <hr />
       <div>
         <Banner />
         <hr />
         <FeaturedTemples />
+        <hr />
         <DevoteServices />
       </div>
     </>

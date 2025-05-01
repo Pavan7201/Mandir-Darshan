@@ -1,11 +1,14 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import "../css/header.css";
 
 const Header = () => {
   return (
     <>
       <header className="header">
-        <h1 className="logo">Mandir Darshan</h1>
+        <Link to="/" className="logo-link">
+          <h1>Mandir Darshan</h1>
+        </Link>
         <div className="header-actions">
           <button className="btn dashboard-btn">
             <span>PUBLIC DASHBOARD</span>
@@ -23,12 +26,12 @@ const Header = () => {
 
       <header className="sub-header">
         <nav>
-          <a href="#home">Temples</a>
-          <a href="#about">Sevas & Darshanam</a>
-          <a href="#services">Donation</a>
-          <a href="#contact">Online Booking</a>
-          <a href="#media-room">Media Room</a>
-          <a href="#support">Support</a>
+          <Link to="/temples">Temples</Link>
+          <Link to="/sevas">Sevas & Darshanam</Link>
+          <Link to="/donation">Donation</Link>
+          <Link to="/booking">Online Booking</Link>
+          <Link to="/media">Media Room</Link>
+          <Link to="/support">Support</Link>
         </nav>
       </header>
     </>
