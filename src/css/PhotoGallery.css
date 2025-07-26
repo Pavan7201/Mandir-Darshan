@@ -1,0 +1,55 @@
+#Photo-Gallery {
+  height: 120vh;
+  background-color: #f7edd6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0rem 1.5rem;
+  box-sizing: border-box;
+}
+
+.Photo-section-container {
+  max-width: 1200px;
+  width: 100%;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.Photo-heading {
+  font-family: "Playfair Display", serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #a84300;
+}
+
+.line-decor-img {
+  display: block;
+  margin: -1rem auto 1rem;
+  max-width: 300px;
+  height: auto;
+}
+
+.Grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 200px;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.Grid-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.Grid-container img:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.Grid-container img:nth-child(6) {
+  grid-column: span 2;
+  grid-row: span 1;
+}

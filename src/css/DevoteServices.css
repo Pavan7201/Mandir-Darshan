@@ -15,6 +15,7 @@
 }
 
 .devote-heading {
+  font-family: "Playfair Display", serif;
   font-size: 2.5rem;
   font-weight: 700;
   color: #a84300;
@@ -68,7 +69,6 @@
   margin-top: 0.5rem;
 }
 
-/* Dark Mode */
 body.dark #devote-services {
   background-color: #111827;
 }

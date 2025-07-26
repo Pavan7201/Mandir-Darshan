@@ -4,6 +4,8 @@ import Banner from "./banner";
 import DevoteServices from "./DevoteServices";
 import { templeData } from "../components/TempleData";
 import FeaturedTemples from "./FeaturedTemples";
+import PhotoGallery from "./PhotoGallery";
+import Endowment from "./Endowment";
 
 const Body = () => {
   return (
@@ -19,10 +21,13 @@ const Body = () => {
       <hr />
       <div>
         <Banner />
-        <hr />
         <FeaturedTemples />
         <hr />
         <DevoteServices />
+        <hr />
+        <PhotoGallery />
+        <hr />
+        <Endowment />
       </div>
     </>
   );

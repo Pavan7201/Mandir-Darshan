@@ -15,7 +15,7 @@ const TemplePageBanner = () => {
           loading="lazy"
         />
         <div className="TemplePageBanner-caption">
-          <h2>Explore Temples Across India</h2>
+          <h2>Explore Temples Across Andhra Pradesh</h2>
           <p>
             Browse Spiritual places, learn histories, and book darshans
             instantly.
@@ -25,9 +25,7 @@ const TemplePageBanner = () => {
       <div className="temple-search-wrapper">
         <TempleSearch />
       </div>
-      <div>
-        <TemplesCards />
-      </div>
+      <TemplesCards />
     </div>
   );
 };

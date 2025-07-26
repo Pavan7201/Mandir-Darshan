@@ -1,0 +1,132 @@
+.faq-section {
+  background: #fdfaf1;
+  padding: 3rem 1rem;
+  min-height: 80vh;
+}
+
+.faq-heading {
+  font-size: 2rem;
+  color: #a84300;
+  font-family: "Cinzel", serif;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.line-decor {
+  width: 200px;
+  margin: 0 auto 2rem;
+  display: block;
+}
+
+.faq-container {
+  max-width: 100vw;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.faq-item {
+  margin-bottom: 1.3rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(145, 95, 8, 0.03);
+  overflow: hidden;
+}
+
+.faq-number-circle {
+  background-color: transparent;
+  color: maroon;
+  border: 2px solid maroon;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 0.95rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f7edd6;
+  color: maroon;
+  padding: 1rem 1.3rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s, color 0.2s;
+  font-family: "Open Sans", sans-serif;
+  font-weight: 500;
+  font-size: 1.2rem;
+  outline: none;
+}
+
+.faq-question-text {
+  flex-grow: 1;
+  text-align: left;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.faq-icon {
+  font-size: 1.5rem;
+  color: #e57200;
+  margin-left: 1rem;
+  width: 2rem;
+  display: flex;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.faq-answer {
+  font-family: "Roboto", sans-serif;
+  background: #fff;
+  padding: 0.9rem 1.5rem 1rem 3.5rem;
+  border-left: 3px solid maroon;
+  color: #5b3e12;
+  font-size: 1rem;
+  border-radius: 0 0 8px 8px;
+  position: relative;
+  line-height: 1.5;
+  animation: fadeInFAQ 0.25s ease;
+}
+
+.faq-answer-label {
+  font-weight: 700;
+  color: #000;
+  margin-right: 6px;
+}
+
+.faq-question:hover,
+.faq-question:focus {
+  background-color: maroon;
+  color: rgb(238, 208, 152);
+}
+
+.faq-question:hover .faq-number-circle,
+.faq-question:focus .faq-number-circle {
+  border-color: rgb(238, 208, 152);
+  color: rgb(238, 208, 152);
+  background-color: transparent;
+}
+
+.faq-question:hover .faq-icon,
+.faq-question:focus .faq-icon {
+  color: rgb(238, 208, 152);
+}
+
+@keyframes fadeInFAQ {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

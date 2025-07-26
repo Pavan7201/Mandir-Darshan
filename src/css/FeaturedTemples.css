@@ -1,5 +1,5 @@
 .featured-temples {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,6 +15,7 @@
 }
 
 .featured-heading {
+  font-family: "Playfair Display", serif;
   font-size: 2.5rem;
   color: #a84300;
   margin-bottom: 10px;
@@ -49,20 +50,20 @@
   border-radius: 10px;
 }
 
-/* Title and description */
 .featured-card-title {
-  font-size: 1.4rem;
+  font-family: "Playfair Display", serif;
+  font-size: 1.28rem;
   margin: 15px 0 8px;
   color: #d32f2f;
 }
 
 .featured-card-description {
-  font-size: 1rem;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.75rem;
   color: #666;
   margin-bottom: 15px;
 }
 
-/* Button */
 .book-now-btn {
   display: inline-block;
   padding: 10px 16px;
@@ -78,7 +79,6 @@
   background-color: #b71c1c;
 }
 
-/* Responsive tweaks */
 @media (max-width: 768px) {
   .featured-cards-container {
     grid-template-columns: 1fr 1fr;

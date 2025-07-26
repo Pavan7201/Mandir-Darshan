@@ -6,20 +6,7 @@
   font-family: "Georgia", serif;
   font-size: 1rem;
   box-shadow: 0 -3px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
   width: 100vw;
-}
-
-.footer::before {
-  content: "";
-  position: absolute;
-  top: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 4px;
-  background: black;
-  border-radius: 5px;
 }
 
 .footer p {

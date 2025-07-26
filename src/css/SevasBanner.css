@@ -1,0 +1,28 @@
+.Sevas-banner-section {
+  width: 100vw;
+  height: 50vh;
+  background-color: #fae5ba;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.SevasBanner-container {
+  text-align: center;
+  padding: 2rem;
+}
+
+.SevasBanner-caption h1 {
+  font-family: "Playfair Display", serif;
+  font-size: 3rem;
+  color: #a84300;
+}
+
+.SevasBanner-caption p {
+  font-family: "Crimson Pro", serif;
+  font-size: 1.2rem;
+  color: #444;
+  max-width: 300px;
+  margin: 0 auto;
+  letter-spacing: 0.5px;
+}

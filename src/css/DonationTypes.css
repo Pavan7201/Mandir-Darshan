@@ -1,0 +1,71 @@
+.DonationType-conatiner {
+  min-height: 100vh;
+  background: #f7edd6;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.DonationType-conatiner p {
+  font-family: "Cinzel", "Georgia", serif;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  letter-spacing: 0.5px;
+  line-height: 1.5;
+}
+
+.DonationType-heading {
+  font-size: 2.2rem;
+  color: #a84300;
+  letter-spacing: 1px;
+  font-family: "Cinzel", serif;
+}
+
+.searchbar-container {
+  position: relative;
+  width: 60vw;
+  margin: 1rem auto;
+}
+
+.searchbar-label {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.3rem;
+  user-select: none;
+  display: flex;
+  color: #333;
+  white-space: nowrap;
+}
+
+.searchbar-input {
+  width: 100%;
+  padding: 0.8rem 2.6rem 0.8rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+}
+
+.searchbar-button {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.searchbar-button svg {
+  position: absolute;
+  right: 0.5rem;
+  transform: translateY(0%);
+  width: 25px; /* desired icon width */
+  height: 25px; /* desired icon height */
+  color: #555; /* icon color */
+  display: block; /* avoid extra whitespace */
+  pointer-events: none; /* so clicks target button itself */
+  user-select: none;
+}

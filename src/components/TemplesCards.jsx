@@ -1,9 +1,8 @@
-import React from "react";
 import lineDecor from "../HeadingDesign/Design 2.png";
 import { templeData } from "./TempleData";
 import "../css/TemplesCards.css";
 
-const FeaturedTemples = () => {
+const TemplesCards = () => {
   return (
     <>
       <section className="temples" id="temples">
@@ -16,11 +15,29 @@ const FeaturedTemples = () => {
             loading="lazy"
           />
           <div className="temple-cards-container">
-            {templeData.slice(11).map((Temple, index) => (
+            {templeData.map((Temple, index) => (
               <div key={index} className="temple-card">
-                <img loading="lazy" src={Temple.image}></img>
+                {Temple.image && (
+                  <img loading="lazy" src={Temple.image} alt={Temple.name} />
+                )}
                 <h3 className="temple-card-title">{Temple.name}</h3>
-                <p className="temple-card-description">{Temple.location}</p>
+                {Temple.deity && (
+                  <p className="temple-card-deity">{Temple.deity}</p>
+                )}
+                {Temple.caption && (
+                  <p className="temple-card-caption">{Temple.caption}</p>
+                )}
+                {Temple.location && (
+                  <p className="temple-card-location">{Temple.location}</p>
+                )}
+                {Temple.hours && (
+                  <div className="temple-card-footer">
+                    <p className="temple-card-time">&#128339; {Temple.hours}</p>
+                    <a href="#" className="Visit-link">
+                      Visit Temple
+                    </a>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -30,4 +47,4 @@ const FeaturedTemples = () => {
   );
 };
 
-export default FeaturedTemples;
+export default TemplesCards;

@@ -1,23 +1,48 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import Homepage from "./Pages/Homepage";
 import TemplesPage from "./Pages/TemplesPage";
 import Footer from "./components/Footer";
 import "./App.css";
 import Header from "./components/Header";
+import NotFoundPage from "./Pages/NotFoundPage";
+import Sevas from "./Pages/Sevas";
+import DonationPage from "./Pages/DonationPage";
+
+function AppRoutes() {
+  const location = useLocation();
+
+  const layoutRoutes = ["/", "/temples"];
+  const showLayout = layoutRoutes.some((path) =>
+    location.pathname.startsWith(path)
+  );
+
+  return (
+    <div className="App">
+      {showLayout && <Header />}
+      <Routes>
+        <Route path="/" element={<Homepage />} />
+        <Route path="/Temples" element={<TemplesPage />} />
+        <Route path="/Sevas" element={<Sevas />} />
+        <Route path="/Donation" element={<DonationPage />} />
+        <Route path="/Bookings" element={<NotFoundPage />} />
+        <Route path="/Media" element={<NotFoundPage />} />
+        <Route path="/Support" element={<NotFoundPage />} />
+      </Routes>
+      {showLayout && <Footer />}
+    </div>
+  );
+}
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Header />
-        <Routes>
-          <Route path="/Mandir-Darshan" element={<Homepage />} />
-          <Route path="/" element={<Homepage />} />
-          <Route path="/temples" element={<TemplesPage />} />
-        </Routes>
-        <Footer />
-      </div>
+    <Router basename="/Mandir-Darshan">
+      <AppRoutes />
     </Router>
   );
 }
