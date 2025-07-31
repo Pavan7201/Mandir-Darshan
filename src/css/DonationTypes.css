@@ -61,11 +61,10 @@
 .searchbar-button svg {
   position: absolute;
   right: 0.5rem;
-  transform: translateY(0%);
-  width: 25px; /* desired icon width */
-  height: 25px; /* desired icon height */
-  color: #555; /* icon color */
-  display: block; /* avoid extra whitespace */
-  pointer-events: none; /* so clicks target button itself */
+  transform: translateY(0%); 
+  height: 25px;
+  color: #555; 
+  display: block;
+  pointer-events: none;
   user-select: none;
 }

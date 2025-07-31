@@ -2,7 +2,7 @@ import "../css/SevasBanner.css";
 import SevasCard from "./SevasCard";
 
 const SevasBanner = ({
-  title = "Sevas & Darshanam",
+  title = "Sevas & Bookings",
   subtitle = "Dharmo Rakshathi Rakshithah",
   showSevasCard = true,
 }) => {

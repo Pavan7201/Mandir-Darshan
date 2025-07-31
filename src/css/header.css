@@ -1,17 +1,48 @@
+.header-hover-trigger {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 6rem;
+  z-index: 100;
+  background: transparent;
+  cursor: pointer;
+}
+
+.header-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  transition: transform 0.35s cubic-bezier(.8,.2,.2,1), opacity 0.35s;
+  will-change: transform, opacity;
+  z-index: 1200;
+  position: sticky;
+  top: 0;
+}
+
+.header-wrapper.hide {
+  transform: translateY(-120%);
+  opacity: 0;
+  pointer-events: none;
+}
+
 .header {
-  background: #fffdd0;
-  padding: 0rem 2rem;
+  background-color: rgba(128, 0, 0, 0.811);
+  padding: 0rem 3rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  border-radius: 0 0 5rem 5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 .header h1 {
   font-family: "Tiro Devanagari Sanskrit", serif;
   font-size: 2rem;
-  color: #a84300;
+  color: rgb(240, 230, 189);
 }
 
 .logo-link {
@@ -52,20 +83,22 @@
 }
 
 .signin-btn {
-  background-color: #f26a2e;
-  color: white;
+  background-color: rgb(240, 230, 189);
+  color: maroon;
   font-weight: 600;
   font-size: 0.8rem;
+  border: 1px solid maroon;
 }
 
 .signin-btn:hover {
-  background-color: #d6531f;
-  color: white;
+  background-color: transparent;
+  color:rgb(240, 230, 189) ;
+  border: 1px solid rgb(240, 230, 189);
 }
 
 .dashboard-btn {
   background-color: transparent;
-  color: black;
+  color:rgb(240, 230, 189) ;
   padding: 0.5rem 0.5rem;
   font-size: 0.75rem;
 }
@@ -80,19 +113,42 @@
 }
 
 .sub-header {
-  background-color: #fefaf1;
+  background-color: #f7edd6db;
   padding: 0.5rem 2rem;
   text-align: center;
+  width: 80%;
+  border-radius: 0 0 4rem 4rem;
+  cursor: pointer;
 }
 
 .sub-header nav a {
+  position: relative;
+  display: inline-block;
   margin: 0 1rem;
   text-decoration: none;
-  color: #333333;
+  color: rgba(59, 58, 58, 0.963);
   font-weight: 500;
-  transition: color 0.3s;
+  transition: all color 0.3s ease-in-out;
 }
 
-.sub-header nav a:hover {
-  color: #800000;
+.sub-header nav a:hover,.sub-header nav a:focus{
+  color: maroon;
 }
+
+.sub-header nav a::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -7.5px;
+  height: 2px;
+  width: 0;
+  background-color: maroon;
+  transform: translateX(-50%);
+  transition: width 0.3s ease;
+}
+
+.sub-header nav a:hover::after,.sub-header nav a:focus::after  {
+  width: 100%;
+}
+
+

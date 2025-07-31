@@ -28,7 +28,7 @@ const sevas = [
 const SevasCard = () => {
   return (
     <section className="sevas-section">
-      <h2 className="sevas-heading">Sevas & Darshanam</h2>
+      <h2 className="sevas-heading">Sevas & Booking</h2>
       <img
         src={lineDecor}
         alt="decorative line"
@@ -46,7 +46,8 @@ const SevasCard = () => {
                 View More <span className="arrow">&#x203A;</span>
               </a>
               <button className="Book-Now-btn">
-                Book Now <span className="arrow">&#8594;</span>
+                <span>Book Now</span>
+                <span className="arrow">&#8594;</span>
               </button>
             </div>
           </div>

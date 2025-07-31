@@ -23,12 +23,7 @@ const Faq = ({ faqs = [] }) => {
   return (
     <section className="faq-section">
       <h2 className="faq-heading">FAQ's</h2>
-      <img
-        src={lineDecor}
-        alt="decorative line"
-        className="line-decor"
-        loading="lazy"
-      />
+      <img src={lineDecor} alt="decorative line" className="line-decor-img" loading="lazy" />
       <div className="faq-container">
         {faqs.map((item, index) => (
           <div className="faq-item" key={index}>

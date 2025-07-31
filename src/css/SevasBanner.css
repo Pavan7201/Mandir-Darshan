@@ -1,10 +1,16 @@
 .Sevas-banner-section {
-  width: 100vw;
-  height: 50vh;
-  background-color: #fae5ba;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  width: 100vw;
+  height: 65vh;
+  background-image: 
+    linear-gradient(to top, #f0e8f6 2%, transparent 30%),
+    url('../assets/D3.jpg');
+  background-size: cover;
+  background-position: 50% 40%;
+  background-repeat: no-repeat;
+  filter: hue-rotate(100deg) saturate(1.8);
 }
 
 .SevasBanner-container {
@@ -15,7 +21,8 @@
 .SevasBanner-caption h1 {
   font-family: "Playfair Display", serif;
   font-size: 3rem;
-  color: #a84300;
+  color: black;
+  filter: hue-rotate(250deg) saturate(1.8);
 }
 
 .SevasBanner-caption p {

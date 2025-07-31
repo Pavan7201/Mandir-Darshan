@@ -13,7 +13,7 @@ const DonationPage = () => {
       <section>
         <DonationTypes />
       </section>
-      <Faq faqs={faqData.slice(3)} />
+      <Faq faqs={faqData.slice(3,6)} />
     </>
   );
 };

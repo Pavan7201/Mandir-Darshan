@@ -1,4 +1,3 @@
-import React from "react";
 import "../css/body.css";
 import Banner from "./banner";
 import DevoteServices from "./DevoteServices";
@@ -14,7 +13,16 @@ const Body = () => {
         {templeData.slice(0, 11).map((temple, index) => (
           <button className="bttn" key={index}>
             <img loading="lazy" src={temple.image} alt={temple.name} />
-            <div className="temple-name">{temple.name}</div>
+            <div className="temple-name">{(() => {
+    const words = temple.name.trim().split(" ");
+    if (words[0].length > 3) {
+      return words[0];
+    } else if (words[0].length === 3) {
+      return `${words[0]} ${words[1]}`;
+    } else {
+      return words[1];
+    }
+  })()}</div>
           </button>
         ))}
       </div>

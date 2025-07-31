@@ -10,9 +10,10 @@ import TemplesPage from "./Pages/TemplesPage";
 import Footer from "./components/Footer";
 import "./App.css";
 import Header from "./components/Header";
-import NotFoundPage from "./Pages/NotFoundPage";
 import Sevas from "./Pages/Sevas";
 import DonationPage from "./Pages/DonationPage";
+import MediaRoomPage from "./Pages/MediaRoomPage";
+import SupportPage from "./Pages/SupportPage";
 
 function AppRoutes() {
   const location = useLocation();
@@ -30,9 +31,8 @@ function AppRoutes() {
         <Route path="/Temples" element={<TemplesPage />} />
         <Route path="/Sevas" element={<Sevas />} />
         <Route path="/Donation" element={<DonationPage />} />
-        <Route path="/Bookings" element={<NotFoundPage />} />
-        <Route path="/Media" element={<NotFoundPage />} />
-        <Route path="/Support" element={<NotFoundPage />} />
+        <Route path="/Media" element={<MediaRoomPage/>} />
+        <Route path="/Support" element={<SupportPage />} />
       </Routes>
       {showLayout && <Footer />}
     </div>

@@ -1,6 +1,6 @@
 .sevas-section {
   min-height: 100vh;
-  background: #f7edd6;
+  background-color: #f7edd6;
   padding: 3rem 1rem;
   text-align: center;
 }
@@ -17,7 +17,7 @@
   flex-wrap: wrap;
   justify-content: space-evenly;
   gap: 1em;
-  padding: 1rem 0;
+  padding: 2rem 1rem;
 }
 
 .seva-card {
@@ -31,6 +31,43 @@
   flex-direction: column;
   align-items: center;
   transition: box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.seva-card::before {
+  content: "";
+  position: absolute;
+  top: -10%;
+  left: -75%;
+  width: 25%;
+  height: 110%;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(30deg);
+  opacity: 1;
+  transition: opacity 1s;
+  pointer-events: none;
+}
+
+.seva-card:hover::before {
+  animation: shine 1.2s ease-in-out;
+  opacity: 1;
+}
+
+@keyframes shine {
+  0% {
+    left: -50%;
+  }
+  100% {
+    left: 130%;
+  }
 }
 
 .seva-card:hover {
@@ -70,12 +107,13 @@
 .view-more-btn {
   background: transparent;
   color: #e57200;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-family: inherit;
   letter-spacing: 0.5px;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
+  gap: 0.5rem;
   cursor: pointer;
   text-decoration: none;
   padding: 0;
@@ -83,8 +121,8 @@
   border: none;
   line-height: 0.5;
   vertical-align: middle;
-  background: none;
   margin-top: 0.5rem;
+  z-index: 1;
 }
 
 .view-more-btn .arrow {
@@ -99,32 +137,65 @@
 }
 
 .Book-Now-btn {
-  display: flex;
+  position: relative;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 0.5rem 0.5rem;
-  border: none;
-  background-color: rgba(128, 0, 0, 0.856);
-  color: white;
+  padding: 0.6rem 1.2rem;
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
+  color: maroon;
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
-  border-radius: 5px;
-  margin-top: 0.5rem;
+  overflow: hidden;
 }
 
-.Book-Now-btn:hover {
+.Book-Now-btn:before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
   background-color: maroon;
-  color: white;
+  clip-path: polygon(0% 0%, 50% 50%, 0% 100%);
+  animation: rotate 2s linear infinite;
+  border-radius: 50%;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.Book-Now-btn::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background-color: rgb(247, 227, 188);
+  border-radius: 4px;
+  z-index: 1;
+}
+
+.Book-Now-btn:hover::before {
+  opacity: 1;
+}
+
+.Book-Now-btn span,
+.Book-Now-btn .arrow {
+  position: relative;
+  z-index: 2;
+  color: maroon;
 }
 
 .Book-Now-btn .arrow {
-  color: orange;
-  font-size: 1rem;
+  font-size: 1.2rem;
   transition: transform 0.2s ease;
 }
 
-.Book-Now-btn .arrow:hover {
+.Book-Now-btn:hover .arrow {
   transform: translateX(4px);
 }
+
+

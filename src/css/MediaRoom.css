@@ -1,0 +1,124 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.Media-Room {
+  background: #f7edd6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+}
+
+.Media-section-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  max-width: 1200px;
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+
+.Media-heading {
+  font-family: "Playfair Display", serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #a84300;
+  margin: 1rem 0 0;
+}
+
+.line-decor-img {
+  max-width: 300px;
+  height: auto;
+  margin: 0;
+}
+
+.media-room {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 2rem;
+  position: relative;
+  justify-items: center;
+  padding: 2rem 1rem;
+}
+
+.media-card{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  min-width: 200px;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  background-color: rgba(255, 242, 213, 0.959);
+  padding: 1rem;
+  flex: 0 1 calc(25% - 2rem);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  cursor:pointer;
+  overflow: hidden;
+}
+
+.media-card::after {
+  content: "";
+  height: 99%;
+  width: 99%;
+  position: absolute;
+  background-color: rgb(255, 242, 213);
+  border-radius: 12px;
+  z-index: 0;
+}
+
+.media-card:hover::before{
+  content: "";
+  background-image: conic-gradient(maroon 90deg, transparent 90deg);
+  width:150%;
+  height:150%;
+  border-radius: 12px;
+  position: absolute;
+  animation: rotate 2s infinite linear;
+}
+
+@keyframes rotate {
+  0%{
+    transform: rotate(0);
+  }
+  100%{
+    transform: rotate(360deg);
+  }
+}
+
+.media-video {
+  width: 30%;
+  margin: 0 auto 0.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  filter: sepia(1) saturate(5) hue-rotate(-50deg);
+  z-index: 1;
+}
+
+.media-title {
+  font-size: 1.25rem;
+  margin: 0.5rem 0;
+  color: #d32f2f;
+  z-index: 1;
+
+}
+
+.media-description {
+  text-align: center;
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 0.5rem;
+  z-index: 1;
+}

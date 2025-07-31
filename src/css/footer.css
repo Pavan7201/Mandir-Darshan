@@ -1,12 +1,13 @@
 .footer {
-  background-color: #7b3f00;
+  background-color: rgb(128, 0, 0);
   padding: 1.5rem 2rem;
   text-align: center;
-  color: #fefaf1;
+  color: rgb(240, 230, 189);
   font-family: "Georgia", serif;
   font-size: 1rem;
-  box-shadow: 0 -3px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -3px 8px rgba(212, 195, 195, 0.1);
   width: 100vw;
+  border-radius: 5rem 5rem 0 0;
 }
 
 .footer p {

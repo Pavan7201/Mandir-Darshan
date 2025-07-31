@@ -60,8 +60,8 @@ const DevoteServices = () => {
               <h3 className="devote-card-title">{service.title}</h3>
               <p className="devote-card-description">{service.description}</p>
 
-              <a href="#Book-Now" className="book-now-btn">
-                {service.type}
+              <a href="#Book-Now" className="Devote-btn">
+                <span>{service.type}</span>
               </a>
             </div>
           ))}

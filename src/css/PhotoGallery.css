@@ -22,13 +22,6 @@
   color: #a84300;
 }
 
-.line-decor-img {
-  display: block;
-  margin: -1rem auto 1rem;
-  max-width: 300px;
-  height: auto;
-}
-
 .Grid-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
