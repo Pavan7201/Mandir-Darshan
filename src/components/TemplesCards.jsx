@@ -7,16 +7,16 @@ const TemplesCards = () => {
     <>
       <section className="temples" id="temples">
         <div className="temple-section-container">
-          <h2 className="temple-heading">Temples</h2>
+          <h2 className="temple-heading animate-on-scroll">Temples</h2>
           <img
             src={lineDecor}
             alt="decorative line"
-            className="line-decor-img"
+            className="line-decor-img animate-on-scroll"
             loading="lazy"
           />
           <div className="temple-cards-container">
             {templeData.map((Temple, index) => (
-              <div key={index} className="temple-card">
+              <div key={index} className="temple-card animate-on-scroll">
                 {Temple.image && (
                   <img loading="lazy" src={Temple.image} alt={Temple.name} />
                 )}

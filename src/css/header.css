@@ -3,7 +3,7 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 6rem;
+  height: 4rem;
   z-index: 100;
   background: transparent;
   cursor: pointer;
@@ -19,6 +19,14 @@
   z-index: 1200;
   position: sticky;
   top: 0;
+  transform: translateY(-100%);
+  opacity: 0;
+}
+
+.header-wrapper.loaded {
+  transform: translateY(0%);
+  opacity: 1;
+  transition: transform 0.6s ease-out, opacity 0.6s ease-out;
 }
 
 .header-wrapper.hide {
@@ -28,15 +36,15 @@
 }
 
 .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background-color: rgba(128, 0, 0, 0.811);
   padding: 0rem 3rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
   border-radius: 0 0 5rem 5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
+  gap: 1rem;
 }
 
 .header h1 {
@@ -45,8 +53,22 @@
   color: rgb(240, 230, 189);
 }
 
-.logo-link {
+.logo-img {
+  display: inline-block;
+  padding: 0 1rem;
+  border-radius: 8px;
+  transition: background 0.2s, box-shadow 0.2s;
   text-decoration: none;
+}
+
+.logo-img img {
+  display: block;
+  height: 5rem;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  margin: 0;
+  padding: 0;
 }
 
 .header-actions {
@@ -59,6 +81,7 @@
 .search-signin {
   display: flex;
   gap: 1rem;
+  justify-content: center;
   align-items: center;
   padding-bottom: 0.7rem;
 }
@@ -113,41 +136,38 @@
 }
 
 .sub-header {
-  background-color: #f7edd6db;
-  padding: 0.5rem 2rem;
-  text-align: center;
-  width: 80%;
-  border-radius: 0 0 4rem 4rem;
-  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex: 1;
 }
 
-.sub-header nav a {
+.sub-header .nav-link {
   position: relative;
-  display: inline-block;
-  margin: 0 1rem;
   text-decoration: none;
-  color: rgba(59, 58, 58, 0.963);
+  color: rgb(247, 232, 173);
   font-weight: 500;
-  transition: all color 0.3s ease-in-out;
+  transition: color 0.3s ease-in-out;
+  white-space: nowrap;
+  text-align: center;
+  margin-top: 2rem;
 }
 
-.sub-header nav a:hover,.sub-header nav a:focus{
-  color: maroon;
-}
-
-.sub-header nav a::after {
+.sub-header .nav-link::after {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: -7.5px;
-  height: 2px;
+  bottom: -5px;
+  height: 1.5px;
   width: 0;
-  background-color: maroon;
+  background-color: rgb(247, 232, 173);
   transform: translateX(-50%);
   transition: width 0.3s ease;
 }
 
-.sub-header nav a:hover::after,.sub-header nav a:focus::after  {
+.sub-header .nav-link:hover::after,
+.sub-header .nav-link:focus::after,
+.sub-header .nav-link.active::after {
   width: 100%;
 }
 

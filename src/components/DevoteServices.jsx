@@ -35,20 +35,20 @@ const services = [
   },
 ];
 
-const DevoteServices = () => {
+const DevoteServices = ({className=""}) => {
   return (
     <section className="devote-services" id="devote-services">
       <div className="devote-section-container">
-        <h2 className="devote-heading">Devote Services</h2>
+        <h2 className={`devote-heading ${className}`}>Devote Services</h2>
         <img
           loading="lazy"
           src={lineDecor}
           alt="decorative line"
-          className="line-decor-img"
+          className={`line-decor-img ${className}`}
         />
         <div className="devote-cards-container">
           {services.map((service, index) => (
-            <div key={index} className="devote-card">
+            <div key={index} className={`devote-card ${className}`}>
               <video
                 src={service.icon}
                 className="devote-icon"

@@ -1,10 +1,9 @@
-import React from "react";
-import lineDecor from "../HeadingDesign/Design 2.png";
-import "../css/Endowment.css";
+import lineDecor from "../HeadingDesign/Design 2.png";import "../css/Endowment.css";
 import Chandrababu_Naidu from "../assets/Chandrababu Naidu.jpg";
 import Sri_Anam_Ramanarayana_Reddy from "../assets/Sri Anam Ramanarayana Reddy.png";
 import Sri_K_Ramachandra_Mohan from "../assets/Sri K. Ramachandra Mohan.jpeg";
 import Sri_Vadarevu_Vinay_Chand from "../assets/Sri Vadarevu Vinay Chand.jpeg";
+import "../Animation/Animate.css"
 
 const images = [
   {
@@ -33,23 +32,23 @@ const images = [
   },
 ];
 
-const Endowment = () => {
+const Endowment = ({className=""}) => {
   return (
     <section className="Endowment" id="Endowment">
       <div className="Endowment-section-container">
-        <h2 className="Endowment-heading">
+        <h2 className={`Endowment-heading ${className}`}>
           Government of Andhra Pradesh - Endowment Department
         </h2>
         <img
           loading="lazy"
           src={lineDecor}
           alt="decorative line"
-          className="line-decor-img"
+          className={`line-decor-img ${className}`}
         />
 
         <div className="card-wrapper">
           {images.map((img) => (
-            <div className="profile-card" key={img.name}>
+            <div className={`profile-card ${className}`} key={img.name}>
               <img className="profile-img" src={img.src} alt={img.alt} />
               <h5>{img.name}</h5>
               <p>{img.position}</p>

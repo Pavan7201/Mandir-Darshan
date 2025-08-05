@@ -25,24 +25,25 @@ const sevas = [
   },
 ];
 
-const SevasCard = () => {
+const SevasCard = ({AnimateOnScroll=""}) => {
   return (
     <section className="sevas-section">
-      <h2 className="sevas-heading">Sevas & Booking</h2>
+      <div className="sevas-heading-overlay"></div>
+      <h2 className={`sevas-heading ${AnimateOnScroll}`}>Sevas & Booking</h2>
       <img
         src={lineDecor}
         alt="decorative line"
-        className="line-decor-img"
+        className={`line-decor-img ${AnimateOnScroll}`}
         loading="lazy"
       />
-      <div className="sevas-cards-container">
+      <div className={`sevas-cards-container ${AnimateOnScroll}`}>
         {sevas.map((seva, idx) => (
           <div className="seva-card" key={idx}>
             <img src={seva.image} alt={seva.title} className="seva-card-img" />
-            <h3 className="seva-card-title">{seva.title}</h3>
-            <p className="seva-card-caption">{seva.caption}</p>
-            <div className="seva-card-actions">
-              <a className="view-more-btn">
+            <h3 className={`seva-card-title ${AnimateOnScroll}`}>{seva.title}</h3>
+            <p className={`seva-card-caption ${AnimateOnScroll}`}>{seva.caption}</p>
+            <div className={`seva-card-actions ${AnimateOnScroll}`}>
+              <a className={`view-more-btn ${AnimateOnScroll}`}>
                 View More <span className="arrow">&#x203A;</span>
               </a>
               <button className="Book-Now-btn">

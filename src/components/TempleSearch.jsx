@@ -22,7 +22,7 @@ const TempleSearch = () => {
   };
 
   return (
-    <div className="temple-search-container">
+    <div className="temple-search-container animate-on-scroll">
       <input
         type="text"
         placeholder="Search temples..."

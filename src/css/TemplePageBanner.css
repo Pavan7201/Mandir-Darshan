@@ -12,6 +12,14 @@
 .temple-banner-section {
   background-color: #f7edd6;
   padding-bottom: 2rem;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.temple-banner-section.animate {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .TemplePageBanner-image {

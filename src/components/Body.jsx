@@ -9,7 +9,7 @@ import Endowment from "./Endowment";
 const Body = () => {
   return (
     <>
-      <div className="image">
+      <div className="image animate-on-scroll">
         {templeData.slice(0, 11).map((temple, index) => (
           <button className="bttn" key={index}>
             <img loading="lazy" src={temple.image} alt={temple.name} />
@@ -26,16 +26,16 @@ const Body = () => {
           </button>
         ))}
       </div>
-      <hr />
+      <hr className="animate-on-scroll" />
       <div>
-        <Banner />
-        <FeaturedTemples />
+        <Banner className="animate-on-scroll" />
+        <FeaturedTemples className="animate-on-scroll" />
         <hr />
-        <DevoteServices />
+        <DevoteServices className="animate-on-scroll" />
         <hr />
-        <PhotoGallery />
+        <PhotoGallery className="animate-on-scroll" />
         <hr />
-        <Endowment />
+        <Endowment className="animate-on-scroll" />
       </div>
     </>
   );

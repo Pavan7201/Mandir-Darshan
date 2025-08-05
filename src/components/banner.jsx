@@ -1,11 +1,10 @@
-import React from "react";
 import "../css/banner.css";
 import Bannar from "../assets/Banner.jpg";
 
-const Banner = () => {
+const Banner = ({ className = "" }) => {
   return (
     <>
-      <div className="banner-container">
+      <section className={`banner-container ${className}`}>
         <img
           src={Bannar}
           alt="Banner image"
@@ -19,7 +18,7 @@ const Banner = () => {
             India.
           </p>
         </div>
-      </div>
+      </section>
     </>
   );
 };

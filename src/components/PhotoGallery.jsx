@@ -1,4 +1,3 @@
-import React from "react";
 import lineDecor from "../HeadingDesign/Design 2.png";
 import "../css/PhotoGallery.css";
 import p1 from "../assets/p1.webp";
@@ -21,20 +20,20 @@ const images = [
   { src: p9, alt: "picture 9" },
 ];
 
-const PhotoGallery = () => {
+const PhotoGallery = ({className=""}) => {
   return (
     <section className="Photo-Gallery" id="Photo-Gallery">
       <div className="Photo-section-container">
-        <h2 className="Photo-heading">Photo Galllery</h2>
+        <h2 className={`Photo-heading ${className}`}>Photo Gallery</h2>
         <img
           loading="lazy"
           src={lineDecor}
           alt="decorative line"
-          className="line-decor-img"
+          className={`line-decor-img ${className}`}
         />
         <div className="Grid-container">
           {images.map((img, index) => {
-            return <img key={index} src={img.src} alt={img.alt} />;
+            return <img className={`${className}`} key={index} src={img.src} alt={img.alt} />;
           })}
         </div>
       </div>

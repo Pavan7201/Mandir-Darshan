@@ -1,12 +1,15 @@
-import React from "react";
 import Body from "../components/Body";
+import { useEffect } from "react";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 const Homepage = () => {
-  return (
-    <div>
-      <Body />
-    </div>
-  );
+  useScrollAnimation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  return <Body />;
 };
 
 export default Homepage;

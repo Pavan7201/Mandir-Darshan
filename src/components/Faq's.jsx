@@ -2,31 +2,31 @@ import React, { useState, useRef } from "react";
 import "../css/Faq's.css";
 import lineDecor from "../HeadingDesign/Design 2.png";
 
-const Faq = ({ faqs = [] }) => {
+const Faq = ({ faqs = [], AnimateOnScroll="" }) => {
   const [activeIndex, setActiveIndex] = useState(null);
   const faqRefs = useRef([]);
 
   const toggleFaq = (index) => {
-    if (activeIndex === index) {
-      setActiveIndex(null);
-      if (faqRefs.current[index]) {
-        faqRefs.current[index].blur();
-      }
-    } else {
-      setActiveIndex(index);
-      if (faqRefs.current[index]) {
-        faqRefs.current[index].focus();
-      }
+  if (activeIndex === index) {
+    setActiveIndex(null);
+    if (faqRefs.current[index]) {
+      faqRefs.current[index].blur();
     }
-  };
+  } else {
+    setActiveIndex(index);
+    if (faqRefs.current[index]) {
+      faqRefs.current[index].focus({ preventScroll: true });
+    }
+  }
+};
 
   return (
     <section className="faq-section">
-      <h2 className="faq-heading">FAQ's</h2>
-      <img src={lineDecor} alt="decorative line" className="line-decor-img" loading="lazy" />
+      <h2 className={`faq-heading ${AnimateOnScroll}`}>FAQ's</h2>
+      <img src={lineDecor} alt="decorative line" className={`line-decor-img ${AnimateOnScroll}`} loading="lazy" />
       <div className="faq-container">
         {faqs.map((item, index) => (
-          <div className="faq-item" key={index}>
+          <div className={`faq-item ${AnimateOnScroll}`} key={index}>
             <div
               className="faq-question"
               ref={(el) => (faqRefs.current[index] = el)}

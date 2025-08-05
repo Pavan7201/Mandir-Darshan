@@ -1,12 +1,22 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import {useLocation} from "react-router-dom"
 import "../css/TemplePageBanner.css";
 import Banner from "../assets/TemplesPageBanner.jpg";
 import TempleSearch from "./TempleSearch";
 import TemplesCards from "../components/TemplesCards";
 
 const TemplePageBanner = () => {
+  const [animate, setAnimate] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    setAnimate(false); 
+    const timeout = setTimeout(() => setAnimate(true), 10); 
+    return () => clearTimeout(timeout);
+  }, [location]);
+
   return (
-    <div className="temple-banner-section">
+    <div className={`temple-banner-section ${animate ? "animate" : ""}`}>
       <div className="TemplePagebanner-container">
         <img
           src={Banner}

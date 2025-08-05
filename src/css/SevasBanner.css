@@ -1,21 +1,32 @@
 .Sevas-banner-section {
+  position: relative;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 60vh;
+}
+
+.banner-bg-img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100vw;
   height: 65vh;
-  background-image: 
-    linear-gradient(to top, #f0e8f6 2%, transparent 30%),
-    url('../assets/D3.jpg');
-  background-size: cover;
-  background-position: 50% 40%;
-  background-repeat: no-repeat;
+  object-fit: cover;
+  background: linear-gradient(to top, #f0e8f6 2%, transparent 30%);
   filter: hue-rotate(100deg) saturate(1.8);
 }
 
-.SevasBanner-container {
-  text-align: center;
-  padding: 2rem;
+.banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 65vh;
+  background: linear-gradient(to top, #f7edd6 1%, transparent 10%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .SevasBanner-caption h1 {
@@ -23,6 +34,7 @@
   font-size: 3rem;
   color: black;
   filter: hue-rotate(250deg) saturate(1.8);
+  text-align: center;
 }
 
 .SevasBanner-caption p {
@@ -32,4 +44,5 @@
   max-width: 300px;
   margin: 0 auto;
   letter-spacing: 0.5px;
+  text-align: center;
 }
