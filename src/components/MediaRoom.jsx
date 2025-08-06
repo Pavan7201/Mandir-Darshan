@@ -26,7 +26,7 @@ const MediaRoom = ({ cardsToShow, title="Media Room", AnimateOnScroll="" }) => {
                 muted
                 playsInline
               />
-              <h3 className={`media-title${AnimateOnScroll}`}>{title}</h3>
+              <h3 className={`media-title ${AnimateOnScroll}`}>{title}</h3>
               <p className={`media-description ${AnimateOnScroll}`}>{description}</p>
               <a href={link} className="view-more-btn">
                 View More <span className="arrow">&#x203A;</span>

@@ -5,8 +5,9 @@
   overflow: hidden;
   padding: 0 3rem;
   margin: 0;
-  background-color: #f7edd6;
+  background-color: var(--bg-color);
   z-index: 0;
+  transition: background-color 0.8s ease-in-out;
 }
 
 .banner-image {
@@ -20,13 +21,6 @@
   position: relative;
 }
 
-.banner-caption h2 {
-  font-family: "Playfair Display", serif;
-  font-size: clamp(1.5rem, 4vw, 3rem);
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-}
-
 .banner-caption {
   position: absolute;
   top: 50%;
@@ -37,9 +31,44 @@
   z-index: 1;
 }
 
+.banner-caption h2 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
 .banner-caption p {
   font-family: "Crimson Pro", serif;
   font-size: clamp(1rem, 2.5vw, 1.2rem);
   font-weight: 300;
   color: black;
+}
+
+@media (max-width: 768px) {
+  .banner-container {
+    padding: 0 1rem;
+    height: 50vh;
+  }
+
+  .banner-image {
+    border-radius: 10px;
+  }
+
+  .banner-caption {
+    min-width: 200px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-70%, -70%);
+    padding: 0;
+  }
+
+  .banner-caption h2{
+      font-size: 1.2rem;
+  }
+
+  .banner-caption p {
+    font-size: 0.9rem;
+    color: #333;
+  }
 }

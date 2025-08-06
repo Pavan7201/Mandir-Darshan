@@ -10,11 +10,11 @@
 }
 
 .temple-banner-section {
-  background-color: #f7edd6;
+  background:var(--bg-color);
   padding-bottom: 2rem;
   opacity: 0;
   transform: scale(0.95);
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  transition: opacity 0.8s ease, transform 0.8s ease, background 0.8s ease-in-out;
 }
 
 .temple-banner-section.animate {
@@ -73,23 +73,44 @@
 @media (max-width: 768px) {
   .TemplePagebanner-container {
     height: 250px;
+    width: 100%;
+    border-radius: 0 0 25px 25px;
+    box-shadow: none;
   }
 
   .TemplePageBanner-caption {
-    padding: 1rem;
-    transform: translate(-50%, -120%);
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    transform: translate(10%, -90%);
+    padding: 1rem 2rem;
+    margin: 0;
+  }
+
+  .TemplePageBanner-image{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(1.8px) contrast(1) saturate(1.2);
+    transition: all 0.3s ease-in-out;
+
   }
 
   .TemplePageBanner-caption h2 {
     font-size: 1.5rem;
+    margin-bottom: 0.5rem;
   }
 
   .TemplePageBanner-caption p {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    color: black;
   }
 
   .temple-search-wrapper {
-    top: -30px;
+    top: -25px;
     padding: 0 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }
+

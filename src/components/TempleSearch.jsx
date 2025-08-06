@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "../css/TempleSearch.css";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 
 const TempleSearch = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,19 +20,28 @@ const TempleSearch = () => {
       state,
       sortBy,
     });
-    // Need to Update search/filter logic once i get an api to fetch the data
+    // TODO: Implement search/filter logic
   };
 
   return (
-    <div className="temple-search-container animate-on-scroll">
-      <input
-        type="text"
-        placeholder="Search temples..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="temple-search-input"
-      />
-
+    <section className="temple-search-container animate-on-scroll">
+      <div className="temple-search-input-wrapper">
+        <input
+          type="text"
+          placeholder="Search temples..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="temple-search-input"
+        />
+        <button
+          className="temple-search-icon-button"
+          onClick={handleSearch}
+          aria-label="Search"
+          type="button"
+        >
+          <FontAwesomeIcon icon={faMagnifyingGlass} />
+        </button>
+      </div>
       <div
         className={`custom-select-wrapper ${
           activeDropdown === "category" ? "open" : ""
@@ -50,7 +61,6 @@ const TempleSearch = () => {
           <option value="devi">Devi</option>
         </select>
       </div>
-
       <div
         className={`custom-select-wrapper ${
           activeDropdown === "state" ? "open" : ""
@@ -71,7 +81,6 @@ const TempleSearch = () => {
           <option value="maharashtra">Maharashtra</option>
         </select>
       </div>
-
       <div
         className={`custom-select-wrapper ${
           activeDropdown === "sort" ? "open" : ""
@@ -90,11 +99,7 @@ const TempleSearch = () => {
           <option value="location">Location</option>
         </select>
       </div>
-
-      <button className="temple-search-button" onClick={handleSearch}>
-        Search
-      </button>
-    </div>
+    </section>
   );
 };
 

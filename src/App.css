@@ -1,3 +1,69 @@
+body.dark {
+  --bg-color: #121212;
+  --header-color:#2a2a2a;
+  --text-color: #f0e6bd;
+  --heading-color:#f7edd6;
+  --card-color: #2a2a2a;
+  --primary-color: #800000;
+  --secondary-color: orange;
+  --faq-color: #f0e6bd;
+  --link-hover: #ffffff;
+  --box-shadow:0 4px 12px #f1efea2b;
+  --card-shadow: 0 6px 15px rgb(5, 5, 5);
+  --card-hover-shadow:0 10px 20px #f0e6bd2e;
+  --card-title-color:#dfd6b5;
+  --description-color:#8b8981;
+  --card-boder-animate:conic-gradient(#f7edd6 90deg, transparent 90deg);
+  --devote-card-icon-filter: brightness(83.5%) saturate(100%) invert(100%) hue-rotate(0deg) contrast(100%);
+  --button-bg-color:rgb(77, 75, 73);
+  --diety-color:rgba(246, 181, 136, 0.649);
+  --location-color:rgb(229, 229, 168);
+  --faq-q-color:black;
+  --q-hover-focus-bg-color:#f7edd6;
+  --q-hover-focus-color:maroon;
+
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+body {
+  --bg-color: #f7edd6;
+  --header-color:rgba(128, 0, 0, 0.811);
+  --text-color: #333;
+  --heading-color:#a84300;
+  --card-color: rgb(255, 242, 213);
+  --primary-color: maroon;
+  --secondary-color: orange;
+  --faq-color: maroon;
+  --link-hover: black;
+  --box-shadow:0 4px 12px rgba(0, 0, 0, 0.1);
+  --card-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  --card-hover-shadow:0 10px 20px rgba(0, 0, 0, 0.15);
+  --card-title-color:#d32f2f;
+  --description-color:#333;
+  --card-boder-animate:conic-gradient(maroon 90deg, transparent 90deg);
+  --devote-card-icon-filter: sepia(1) saturate(5) hue-rotate(-50deg);
+  --button-bg-color:rgb(248, 221, 169);
+  --diety-color:black;
+  --location-color:#222121;
+  --faq-q-color:rgb(249, 231, 200);
+  --q-hover-focus-bg-color:maroon;
+  --q-hover-focus-color:rgb(238, 208, 152);
+
+}
+
+body.dark header,
+body.dark footer {
+  background-color: var(--header-color);
+}
+
+body,
+header,
+footer {
+  transition: background-color 0.8s ease-in-out, color 0.3s ease-in-out;
+}
+
+
 * {
   margin: 0;
   padding: 0;
@@ -5,11 +71,7 @@
 }
 
 body {
-  background-color: #fefaf1;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
-  height: 100vh;
-  overflow-x: hidden;
   scroll-behavior: smooth;
 }
 

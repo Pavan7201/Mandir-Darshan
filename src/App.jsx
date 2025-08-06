@@ -14,6 +14,8 @@ import DonationPage from "./Pages/DonationPage";
 import MediaRoomPage from "./Pages/MediaRoomPage";
 import SupportPage from "./Pages/SupportPage";
 
+import { ThemeProvider } from "./ThemeContext";
+
 function AppRoutes() {
   const location = useLocation();
 
@@ -28,7 +30,7 @@ function AppRoutes() {
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/Temples" element={<TemplesPage />} />
-        <Route path="/Sevas" element={<Sevas />} />
+        <Route path="/Sevas-&-Booking" element={<Sevas />} />
         <Route path="/Donation" element={<DonationPage />} />
         <Route path="/Media" element={<MediaRoomPage/>} />
         <Route path="/Support" element={<SupportPage />} />
@@ -40,9 +42,11 @@ function AppRoutes() {
 
 function App() {
   return (
+    <ThemeProvider>
     <Router basename="/Mandir-Darshan">
       <AppRoutes />
     </Router>
+    </ThemeProvider>
   );
 }
 

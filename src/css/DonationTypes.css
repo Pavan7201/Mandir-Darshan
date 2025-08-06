@@ -1,8 +1,9 @@
 .DonationType-conatiner {
   min-height: 100vh;
-  background: #f7edd6;
+  background-color: var(--bg-color);
   padding: 3rem 1rem;
   text-align: center;
+  transition: background-color 0.8s ease-in-out;
 }
 
 .DonationType-conatiner p {
@@ -11,11 +12,12 @@
   margin-bottom: 2rem;
   letter-spacing: 0.5px;
   line-height: 1.5;
+  color:var(--text-color);
 }
 
 .DonationType-heading {
   font-size: 2.2rem;
-  color: #a84300;
+  color: var(--heading-color);
   letter-spacing: 1px;
   font-family: "Cinzel", serif;
 }
@@ -34,17 +36,20 @@
   margin-bottom: 0.3rem;
   user-select: none;
   display: flex;
-  color: #333;
+  color:var(--text-color);
   white-space: nowrap;
+  transition: color 0.8s ease-in-out;
 }
 
 .searchbar-input {
+  background-color: var(--bg-color);
   width: 100%;
   padding: 0.8rem 2.6rem 0.8rem 1rem;
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 0.5rem;
   box-sizing: border-box;
+  transition: background-color 0.8s ease-in-out;
 }
 
 .searchbar-button {
@@ -65,6 +70,69 @@
   height: 25px;
   color: #555; 
   display: block;
-  pointer-events: none;
   user-select: none;
+}
+
+@media (max-width: 768px) {
+  .DonationType-conatiner {
+    padding: 2rem 1rem;
+  }
+
+  .DonationType-heading {
+    font-size: 1.8rem;
+  }
+
+  .DonationType-conatiner p {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .searchbar-container {
+    width: 80vw;
+  }
+
+  .searchbar-label {
+    font-size: 1rem;
+  }
+
+  .searchbar-input {
+    font-size: 0.95rem;
+    padding: 0.7rem 2.4rem 0.7rem 0.9rem;
+  }
+
+  .searchbar-button svg {
+    height: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .DonationType-conatiner {
+    padding: 1.5rem 0.8rem;
+  }
+
+  .DonationType-heading {
+    font-size: 1.5rem;
+  }
+
+  .DonationType-conatiner p {
+    font-size: 0.9rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .searchbar-container {
+    width: 100%;
+  }
+
+  .searchbar-label {
+    font-size: 0.95rem;
+  }
+
+  .searchbar-input {
+    font-size: 0.9rem;
+    padding: 0.65rem 2.2rem 0.65rem 0.9rem;
+  }
+
+  .searchbar-button svg {
+    height: 20px;
+  }
 }

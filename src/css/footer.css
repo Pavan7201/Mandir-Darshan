@@ -22,3 +22,19 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+@media (max-width: 768px) {
+  .footer {
+    border-radius: 0; 
+    font-size: 0.9rem;
+    padding: 1rem 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer {
+    border-radius: 0; 
+    font-size: 0.75rem;
+    padding: 1rem 1rem;
+  }
+}

@@ -12,7 +12,48 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
 
-.temple-search-input,
+.temple-search-input-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  flex: 1 1 200px;
+}
+
+.temple-search-input {
+  width: 100%;
+  padding: 0.65rem 2.5rem 0.65rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #d4a373;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s;
+  background-color: #fffdf9;
+  text-align: left;
+}
+
+.temple-search-input:focus {
+  border-color: rgb(238, 144, 76);
+  box-shadow: 0 0 0 2px rgba(163, 90, 0, 0.2);
+}
+
+.temple-search-icon-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #a35a00;
+  font-size: 1.2rem;
+  padding: 0;
+  transition: color 0.2s ease-in-out;
+}
+
+.temple-search-icon-button:hover {
+  color: #f26a2e;
+}
+
 .temple-search-select {
   padding: 0.65rem;
   font-size: 1rem;
@@ -26,15 +67,10 @@
   text-align: center;
 }
 
-.temple-search-input:focus,
 .temple-search-select:focus {
   border-color: rgb(238, 144, 76);
   box-shadow: 0 0 0 2px rgba(163, 90, 0, 0.2);
-}
-
-.temple-search-select:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(163, 90, 0, 0.2);
 }
 
 .temple-search-select option {
@@ -43,36 +79,40 @@
   font-size: 1rem;
 }
 
-.temple-search-button {
-  padding: 0.65rem;
-  font-size: 1rem;
-  border: 1px solid #d4a373;
-  border-radius: 8px;
-  background-color: #f26a2e;
-  color: white;
-  cursor: pointer;
-  min-width: 200px;
+.custom-select-wrapper {
   flex: 1 1 200px;
-  text-align: center;
-  transition: background-color 0.2s ease-in-out, box-shadow 0.2s;
-}
-
-.temple-search-button:hover {
-  background-color: black;
-  box-shadow: 0 0 0 2px rgba(163, 90, 0, 0.2);
-}
-
-@media (max-width: 480px) {
-  .temple-search-button {
-    font-size: 0.95rem;
-    min-width: 100%;
-  }
 }
 
 @media (max-width: 768px) {
   .temple-search-container {
+    min-width: 60%;
     padding: 1rem;
     gap: 0.75rem;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+  }
+
+  .temple-search-wrapper{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    margin:2rem 0 0rem 0;
+    padding: 0;
+  }
+
+  .temple-search-input-wrapper{
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .temple-search-select{
+    display: none;
+  }
+
+  .custom-select-wrapper {
+    display: none;
   }
 }
 

@@ -1,15 +1,17 @@
 .sevas-section {
   min-height: 100vh;
-  background-color: #f7edd6;
+  background-color: var(--bg-color);
   padding: 3rem 1rem;
   text-align: center;
+  transition: background-color 0.8s ease-in-out;
 }
 
 .sevas-heading {
   font-size: 2.2rem;
-  color: #a84300;
+  color: var(--heading-color);
   letter-spacing: 1px;
   font-family: "Cinzel", serif;
+  /* transition: color 0.8s ease-in-out; */
 }
 
 .sevas-cards-container {
@@ -21,7 +23,7 @@
 }
 
 .seva-card {
-  background: rgba(255, 242, 213, 0.959);
+  background: var(--card-color);
   border-radius: 14px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
   padding: 1.5rem 1rem 2rem 1rem;
@@ -35,6 +37,7 @@
   overflow: hidden;
   cursor: pointer;
   overflow: hidden;
+  transition: background-color 0.8s ease-in-out;
 }
 
 .seva-card::before {
@@ -85,14 +88,14 @@
   font-family: "Roboto", sans-serif;
   font-size: 1.28rem;
   margin: 15px 0 8px;
-  color: #d32f2f;
+  color: var(--card-title-color);
   font-weight: 500;
 }
 
 .seva-card-caption {
   font-family: "Roboto", sans-serif;
   font-size: 0.8rem;
-  color: #666;
+  color:var(--description-color);
   letter-spacing: 0.8px;
 }
 
@@ -106,7 +109,7 @@
 
 .view-more-btn {
   background: transparent;
-  color: #e57200;
+  color: var(--secondary-color);
   font-size: 0.9rem;
   font-family: inherit;
   letter-spacing: 0.5px;
@@ -123,13 +126,15 @@
   vertical-align: middle;
   margin-top: 0.5rem;
   z-index: 1;
+  transition: color 0.8s ease-in-out;
 }
 
 .view-more-btn .arrow {
-  color: black;
+  color: var(--secondary-color);
   font-size: 2rem;
   transition: transform 0.2s ease;
   margin-bottom: 0.4rem;
+  transition: color 0.8s ease-in-out;
 }
 
 .view-more-btn:hover .arrow {
@@ -145,7 +150,6 @@
   padding: 0.6rem 1.2rem;
   font-weight: 600;
   font-size: 0.85rem;
-  color: maroon;
   background-color: transparent;
   border: none;
   border-radius: 6px;
@@ -160,22 +164,23 @@
   left: -50%;
   width: 200%;
   height: 200%;
-  background-color: maroon;
+  background-color: var(--text-color);
   clip-path: polygon(0% 0%, 50% 50%, 0% 100%);
   animation: rotate 2s linear infinite;
   border-radius: 50%;
   z-index: 0;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, background-color 0.8s ease-in-out;
 }
 
 .Book-Now-btn::after {
   content: "";
   position: absolute;
   inset: 2px;
-  background-color: rgb(247, 227, 188);
+  background-color:var(--button-bg-color);
   border-radius: 4px;
   z-index: 1;
+  transition: background-color 0.8s ease-in-out;
 }
 
 .Book-Now-btn:hover::before {
@@ -186,7 +191,8 @@
 .Book-Now-btn .arrow {
   position: relative;
   z-index: 2;
-  color: maroon;
+  color: var(--text-color);
+  transition: color 0.8s ease-in-out;
 }
 
 .Book-Now-btn .arrow {
@@ -198,4 +204,74 @@
   transform: translateX(4px);
 }
 
+@media (max-width: 768px) {
+  .sevas-heading {
+    font-size: 1.8rem;
+  }
 
+  .seva-card-title {
+    font-size: 1.1rem;
+  }
+
+  .seva-card-caption {
+    font-size: 0.75rem;
+  }
+
+  .Book-Now-btn {
+    font-size: 0.8rem;
+  }
+
+  .Book-Now-btn .arrow {
+    font-size: 1rem;
+  }
+
+  .view-more-btn {
+    font-size: 0.85rem;
+  }
+
+  .view-more-btn .arrow {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sevas-cards-container{
+    padding: 1rem;
+  }
+
+  .seva-card{
+    padding: 1rem;
+  }
+
+  .sevas-heading {
+    font-size: 1.5rem;
+  }
+
+  .seva-card-img{
+    height: 150px;
+  }
+
+  .seva-card-title {
+    font-size: 1rem;
+  }
+
+  .seva-card-caption {
+    font-size: 0.7rem;
+  }
+
+  .Book-Now-btn {
+    font-size: 0.75rem;
+  }
+
+  .Book-Now-btn .arrow {
+    font-size: 0.95rem;
+  }
+
+  .view-more-btn {
+    font-size: 0.8rem;
+  }
+
+  .view-more-btn .arrow {
+    font-size: 1.4rem;
+  }
+}

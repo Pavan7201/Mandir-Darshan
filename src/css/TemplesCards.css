@@ -3,10 +3,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f7edd6;
+  background-color: var(--bg-color);
   text-align: center;
   padding: 0 20px;
   box-sizing: border-box;
+  transition: background-color 0.8s ease-in-out;
 }
 
 .temple-section-container {
@@ -17,9 +18,10 @@
 .temple-heading {
   font-family: "Playfair Display", serif;
   font-size: 2.5rem;
-  color: #a84300;
+  color: var(--heading-color);
   margin-bottom: 10px;
   font-weight: bold;
+  transition: color 0.8s ease-in-out;
 }
 
 .temple-cards-container {
@@ -33,13 +35,13 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: rgba(255, 242, 213, 0.959);
+  background-color: var(--card-color);
   border-radius: 12px;
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
   padding: 1rem;
   text-align: center;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.8s ease-in-out;
   overflow: hidden;
   min-height: 380px;
 }
@@ -60,16 +62,18 @@
   font-family: "Playfair Display", serif;
   font-size: 1.28rem;
   margin: 0.5rem 0;
-  color: #d32f2f;
+  color: var(--card-title-color);
+  transition: color 0.8s ease-in-out;
 }
 
 .temple-card-deity {
   font-family: "Cinzel", serif;
   font-size: 1rem;
   margin: 0.5rem 0;
-  color: black;
+  color: var(--diety-color);
   text-align: left;
   font-weight: 600;
+  transition: color 0.8s ease-in-out;
 }
 
 .temple-card-caption {
@@ -77,9 +81,10 @@
   font-size: 1rem;
   letter-spacing: 0.5px;
   font-weight: 500;
-  color: #3d3c3cc7;
+  color: var(--description-color);
   margin-bottom: 15px;
   text-align: left;
+  transition: color 0.8s ease-in-out;
 }
 
 .temple-card-location {
@@ -87,8 +92,9 @@
   font-size: 0.75rem;
   letter-spacing: 0.2px;
   text-align: left;
-  color: #222121;
+  color: var(--location-color);
   margin-bottom: 0.5rem;
+  transition: color 0.8s ease-in-out;
 }
 
 .temple-card-footer {
@@ -109,23 +115,102 @@
 
 .Visit-link {
   font-size: 0.8rem;
-  color: orange;
+  color: var(--secondary-color);
   text-decoration: underline;
   white-space: nowrap;
+  transition: color 0.8s ease-in-out;
 }
 
 @media (max-width: 768px) {
+  .temples{
+    padding-bottom: 2rem;
+  }
   .temple-cards-container {
     grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem 0.5rem;
+  }
+
+  .temple-card {
+    min-height: 320px;
+    padding: 1rem;
+  }
+
+  .temple-card img {
+    align-self: center;
+    width: 90%;
+    height: 170px;
+  }
+
+  .temple-card-title {
+    margin-bottom: 0;
+    font-size: 1rem;
+  }
+
+  .temple-card-deity{
+    font-size: 0.85rem;
+  }
+  .temple-card-caption{
+    font-size: 0.8rem;
+  }
+  .temple-card-time {
+    font-size: 0.7rem;
+  }
+
+  .temple-card-location{
+    font-size: 0.75rem;
+  }
+
+  .Visit-link {
+    font-size: 0.7rem;
   }
 }
 
 @media (max-width: 480px) {
+.temples{
+  padding:1rem;
+}
+
   .temple-cards-container {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+    padding: 0.5rem 0.25rem;
+  }
+
+  .temple-heading{
+    font-size: 1.75rem;
+    margin: 0;
+  }
+
+  .temple-card {
+    min-height: 280px;
+    padding: 0.8rem;
   }
 
   .temple-card img {
-    height: 150px;
+    height: 120px;
+  }
+
+  .temple-card-title {
+    margin-bottom: 0;
+    font-size: 1rem;
+  }
+
+  .temple-card-deity{
+    font-size: 0.85rem;
+  }
+  .temple-card-caption{
+    font-size: 0.8rem;
+  }
+  .temple-card-time {
+    font-size: 0.7rem;
+  }
+
+  .temple-card-location{
+    font-size: 0.75rem;
+  }
+
+  .Visit-link {
+    font-size: 0.65rem;
   }
 }

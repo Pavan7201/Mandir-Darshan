@@ -5,12 +5,13 @@
 }
 
 .Media-Room {
-  background: #f7edd6;
+  background-color: var(--bg-color);
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   width: 100%;
+  transition: background-color 0.8s ease-in-out;
 }
 
 .Media-section-container {
@@ -29,7 +30,7 @@
   font-family: "Playfair Display", serif;
   font-size: 2.5rem;
   font-weight: 700;
-  color: #a84300;
+  color: var(--heading-color);
   margin: 1rem 0 0;
 }
 
@@ -60,7 +61,7 @@
   min-width: 200px;
   margin-bottom: 2rem;
   border-radius: 12px;
-  background-color: rgba(255, 242, 213, 0.959);
+  background-color:transparent;
   padding: 1rem;
   flex: 0 1 calc(25% - 2rem);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -74,14 +75,14 @@
   height: 99%;
   width: 99%;
   position: absolute;
-  background-color: rgb(255, 242, 213);
+  background-color:var(--card-color);
   border-radius: 12px;
   z-index: 0;
 }
 
 .media-card:hover::before{
   content: "";
-  background-image: conic-gradient(maroon 90deg, transparent 90deg);
+  background-image: var(--card-boder-animate);
   width:150%;
   height:150%;
   border-radius: 12px;
@@ -103,22 +104,75 @@
   margin: 0 auto 0.5rem;
   border-radius: 50%;
   object-fit: cover;
-  filter: sepia(1) saturate(5) hue-rotate(-50deg);
+  filter: var(--devote-card-icon-filter);
   z-index: 1;
 }
 
 .media-title {
   font-size: 1.25rem;
   margin: 0.5rem 0;
-  color: #d32f2f;
+  color: var(--card-title-color);
   z-index: 1;
-
 }
 
 .media-description {
   text-align: center;
   font-size: 1rem;
-  color: #555;
+  color: var(--description-color);
   margin-bottom: 0.5rem;
   z-index: 1;
+}
+
+@media (max-width: 768px){
+  .Media-section-container{
+    padding: 1rem;
+  }
+
+  .media-room{
+    align-items: center;
+    padding: 0;
+  }
+
+  .Media-heading{
+    font-size: 2rem;
+  }
+
+  .media-video{
+    margin: 0;
+  }
+
+  .media-description{margin: 0;
+    font-size: 1rem;
+  }
+
+  .view-more-btn{
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px){
+  .Media-section-container{
+    padding: 1rem;
+  }
+
+  .media-room{
+    align-items: center;
+    padding: 0;
+  }
+
+  .Media-heading{
+    font-size: 1.75rem;
+  }
+
+  .media-video{
+    margin: 0;
+  }
+
+  .media-description{margin: 0;
+    font-size: 0.8rem;
+  }
+
+  .view-more-btn{
+    font-size: 0.75rem;
+  }
 }
