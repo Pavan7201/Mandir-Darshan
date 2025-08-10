@@ -1,0 +1,259 @@
+.login-section {
+  height: 86vh;
+  background-color: var(--bg-color);
+}
+
+.login-page {
+  display: flex;
+  align-items: center; 
+  justify-content: space-evenly;
+  height: 100%;
+}
+
+.login-left {
+  flex: 0.2;
+}
+
+.login-right {
+  position: relative;
+  flex: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-right img {
+  border-radius: 8px;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.login-right::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 0; right: 0;
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 2;
+  background-image: 
+    linear-gradient(to right, var(--bg-color), transparent 45%, transparent 45%, var(--bg-color)),
+    linear-gradient(to bottom, var(--bg-color), transparent 30%, transparent 90%, var(--bg-color));
+}
+
+.login-right:hover::before {
+  opacity: 1;
+}
+
+
+.login-container {
+  background: transparent;
+  padding: 20px;
+  width: 350px;
+  color: var(--login-color);
+}
+
+@font-face {
+  font-family: 'Alika Misely';
+  src: url('../Fonts/alika/AlikaMisely.ttf') format('truetype');
+  font-weight: normal;
+  font-style:normal;
+}
+
+.login-container h2 {
+  font-family: 'Alika Misely', serif;
+  letter-spacing: 3px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.login-container label {
+  display: block;
+  margin: 8px 0 4px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.login-container input {
+  padding: 10px;
+  border: 1px solid var(--login-color);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text-color);
+  outline: none;
+  font-size: 1rem;
+}
+
+.login-container input::placeholder {
+  color: var(--faq-color);
+}
+
+.mobile-input {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--faq-color);
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.country-flag {
+  width: 24px;
+  height: 24px;
+  margin: 0 8px;
+}
+
+.country-code {
+  padding: 0 6px;
+  font-size: 1rem;
+  color: var(--text-color);
+  border-left: 1px solid var(--faq-color);
+}
+
+.mobile-input input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding-left: 0;
+  color: var(--text-color);
+  font-size: 1rem;
+}
+
+.password-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.password-input input {
+  width: 100%;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  color: var(--text-color);
+}
+
+.login-container button {
+  background-color:var(--faq-color);
+  color: var(--q-hover-focus-color);
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 8px;
+  font-weight: bold;
+  border: 1px solid var(--faq-color);
+  transition: 0.3s ease;
+}
+
+.login-container button:hover {
+  background-color: transparent;
+  color:var(--q-hover-focus-bg-color);
+}
+
+.forgot-password {
+  margin-top: 10px;
+  text-align: left;
+}
+
+.forgot-password-link {
+  font-size: 0.81rem;
+  color: var(--q-hover-focus-bg-color);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--faq-color);
+  margin: 16px 0;
+}
+
+.signup-prompt {
+  text-align: left;
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+
+.signup-link {
+  font-family: 'Alika Misely', serif;
+  letter-spacing: 1px;
+  font-size: 1.2rem;
+  color:var(--q-hover-focus-bg-color);
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.signup-link:hover{
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 1024px) {
+  .login-page {
+    flex-direction: row;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .login-left {
+    flex: unset;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .login-right {
+    flex: unset;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .login-container {
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .login-page {
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .login-right {
+    display: none;
+  }
+
+  .login-left {
+    width: 100%;
+  }
+
+  .login-container {
+    width: 100%;
+    max-width: none;
+    padding: 16px;
+  }
+
+  .mobile-input {
+    font-size: 0.9rem;
+  }
+
+  .login-container h2 {
+    font-size: 1.4rem;
+  }
+
+  .login-container input,
+  .login-container button {
+    font-size: 0.95rem;
+  }
+
+  .signup-prompt{
+    font-size: 1rem;
+  }
+}

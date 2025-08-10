@@ -1,0 +1,339 @@
+.signup-section {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background:linear-gradient(to bottom, var(--signup-bg));
+  background-blend-mode: light;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.8s ease-in-out;
+  margin-bottom: 2rem;
+}
+
+.signup-section::before {
+  content: '';
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  top: 00%;
+  left: 5%;
+  border-radius: 70% 40% 75% 45% / 50% 60% 40% 50%;
+  background: linear-gradient(20deg,var(--small-circle));
+  filter: blur(60px);
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.blurred-circle {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.circle-large {
+  width: 400px;
+  height: 350px;
+  top: 0%;
+  left: 40%;
+  transform: translate(-50%, -30%);
+  position: absolute;
+  background: linear-gradient(180deg, var(--large-circle));
+  border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%;
+  filter: blur(70px);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.circle-medium {
+  width: 250px;
+  height: 250px;
+  top: 50%;
+  left: 65%;
+  filter: blur(100px);
+  transform: translate(-50%, -50%);
+  border-radius: 70% 40% 55% 45% / 50% 60% 40% 50%;
+  background: linear-gradient(120deg, var(--medium-circle));
+}
+
+.signup-page {
+  max-width: 500px;
+  width: 40%;
+  display: flex;
+  gap: 30px;
+}
+
+.signup-left {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.signup-container {
+  background:transparent;
+  padding:1rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px var(--signup-box-shadow);
+  width: 100%;
+  max-width: 500px;
+}
+
+.signup-container h2 {
+  font-family: 'Alika Misely', serif;
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 2rem;
+  color: var(--signup-header);
+}
+
+.signup-name-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.name-input {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.name-input label {
+  font-weight: 500;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color:var(--signup-text);
+}
+
+.name-input input {
+  padding: 10px 12px;
+  border: 1px solid var(--signup-input);
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease;
+  background: transparent;
+  color:var(--signup-input)
+
+}
+
+.signup-mobile-input {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--signup-input);
+  border-radius: 6px;
+  padding: 0 8px;
+  margin-bottom: 15px;
+  background: transparent;
+}
+
+.signup-flag {
+  width: 24px;
+  height: auto;
+  margin-right: 6px;
+}
+
+.signup-code {
+  margin-right: 6px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.mobile-label,.password-label,.confirm-password-label{
+  color:var(--signup-text);
+}
+
+.signup-mobile-input input {
+  border: none;
+  outline: none;
+  flex: 1;
+  padding: 10px;
+  font-size: 14px;
+  background: transparent;
+  color: var(--signup-input);
+}
+
+.signup-password-input {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--signup-input);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.signup-password-input input {
+  border: none;
+  flex: 1;
+  padding: 10px 12px;
+  outline: none;
+  font-size: 14px;
+  background: transparent;
+  color: var(--signup-input);
+}
+
+.signup-eye-icon {
+  cursor: pointer;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  color: #555;
+  transition: color 0.2s ease;
+}
+
+.signup-eye-icon:hover {
+  color:var(--signup-input);
+}
+
+.signup-button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  background: var(--signup-bg-button);
+  border-radius: 6px;
+  color: black;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  margin-top: 10px;
+  border: 1px solid var(--signup-button);
+  padding: 10px;
+}
+
+.signup-button[type="submit"]:hover {
+  background: transparent;
+  border: 1px solid var(--signup-button);
+  color:var(--signup-button);
+}
+
+.signup-divider {
+  margin: 20px 0;
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+.signup-login-prompt {
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+}
+
+.signup-login-link {
+  font-family: 'Alika Misely', serif;
+  font-size: 1rem;
+  letter-spacing: 1.2px;
+  color: var(--signup-button);
+  text-decoration: none;
+  font-weight: 500;
+} 
+
+.signup-login-link:hover {
+  text-decoration: underline;
+}
+
+@media screen and (max-width: 1024px) {
+  .signup-page {
+    flex-direction: column;
+    width: 100%;
+    max-width: 700px;
+    align-items: center;
+  }
+
+  .signup-left {
+    justify-content: center;
+  }
+
+  .signup-container {
+    max-width: 100%;
+    padding: 1.5rem;
+  }
+
+  .circle-large {
+    width: 220px;
+    height: 200px;
+    left: 50%;
+    top: 5%;
+    transform: translate(-50%, -20%);
+    filter: blur(50px);
+  }
+
+  .circle-medium {
+    width: 140px;
+    height: 140px;
+    left: 65%;
+    top: 55%;
+    filter: blur(80px);
+  }
+
+  .signup-section::before {
+    width: 120px;
+    height: 120px;
+    top: 10%;
+    left: 10%;
+    filter: blur(40px);
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .signup-section {
+    padding: 20px 10px;
+    align-items: center;
+  }
+
+  .signup-page {
+    width: 100%;
+    gap: 15px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .signup-container {
+    width: 100%;
+    max-width: none;
+    padding: 16px;
+    box-shadow: none;
+  }
+
+  .signup-name-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .signup-container h2 {
+    font-size: 1.4rem;
+    margin-bottom: 10px ;
+  }
+
+  .signup-button[type="submit"] {
+    font-size: 1rem;
+    padding: 10px;
+  }
+
+  .circle-large {
+    width: 250px;
+    height: 200px;
+    top: 20%;
+    filter: blur(40px);
+  }
+
+  .circle-medium {
+    left: 80%;
+    top: 0%;
+    width: 180px;
+    height: 180px;
+    filter: blur(60px);
+  }
+
+  .signup-section::before {
+    left: 0;
+    top: 0%;
+    width: 150px;
+    height: 150px;
+    filter: blur(30px);
+  }
+}
+

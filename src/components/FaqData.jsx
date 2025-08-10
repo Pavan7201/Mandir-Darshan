@@ -65,4 +65,20 @@ export const faqData = [
     question: "Do you offer chat support?",
     answer: "Yes. Mail us to endow-eoanna@gov.in for support.",
   },
+  {
+  "id": 13,
+  "question": "What are the required proofs for registration?",
+  "answer": "You need to provide any one of the following ID proofs for registration:\n\n- Aadhaar Card\n- Voter ID Card\n- Ration Card\n- PAN Card\n- Passport\n\nAfter registering with any of the above ID proofs, the pilgrim must carry the original ID proof (the same one submitted during registration) at the time of the visit."
+},
+
+  {
+    id: 14,
+    question: "What is the age limit for registration?",
+    answer: "All people 12 years & above can register on the devasthanam website.",
+  },
+  {
+  "id": 15,
+  "question": "What should I do if I forget my password?",
+  "answer": "You can reset your password using your registered mobile number or email ID. To reset your password, follow the steps below:\n1. Click on 'Forgot Password' on the login page.\n2. You will be redirected to the 'Reset Your Password' screen.\n3. Enter your registered mobile number.\n4. Click 'Continue'.\n5. A One-Time Password (OTP) will be sent to your registered email ID or mobile number.\n6. Enter the OTP and click 'Continue'.\n7. You will be redirected to the password reset screen.\n8. Enter your new password.\n9. Re-enter your new password for confirmation.\n10. Click 'Continue' to complete the process.\n\nYou can now sign in with your new password."
+},
 ];

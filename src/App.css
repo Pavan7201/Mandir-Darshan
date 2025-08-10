@@ -21,6 +21,18 @@ body.dark {
   --faq-q-color:black;
   --q-hover-focus-bg-color:#f7edd6;
   --q-hover-focus-color:maroon;
+  --login-color:#f7edd6;
+  --signup-bg:transparent;
+  --small-circle:red, orange, yellow;
+  --medium-circle:rgb(240, 200, 0), rgba(143, 13, 13, 0.651), rgb(14, 7, 8);
+  --large-circle:red, rgb(255, 238, 1), rgb(226, 21, 21), rgb(35, 31, 31);
+  --signup-box-shadow:rgba(250, 113, 0, 0.194);
+  --signup-header:#f0e6bd;
+  --signup-text:#f5e29aa7;
+  --signup-input:#f0e6bd;
+  --signup-button:yellow;
+  --signup-bg-button:rgb(243, 243, 136);
+
 
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -49,7 +61,17 @@ body {
   --faq-q-color:rgb(249, 231, 200);
   --q-hover-focus-bg-color:maroon;
   --q-hover-focus-color:rgb(238, 208, 152);
-
+  --login-color:maroon;
+  --signup-bg:rgba(160, 160, 236, 0.78) 0%, white 100%;
+  --small-circle:rgb(54, 169, 211), violet, rgb(243, 158, 172);
+  --medium-circle:rgb(124, 124, 224), rgba(238, 86, 238, 0.651), rgba(255, 192, 203, 0.695);
+  --large-circle:rgb(136, 136, 223), purple, violet, pink;
+  --signup-box-shadow:rgba(0, 0, 0, 0.08);
+  --signup-header:purple;
+  --signup-text:purple;
+  --signup-input:black;
+  --signup-button:purple;
+  --signup-bg-button:rgb(210, 187, 210);
 }
 
 body.dark header,

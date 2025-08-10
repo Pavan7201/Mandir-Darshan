@@ -87,7 +87,7 @@ const Header = () => {
         <header className="header">
           <FontAwesomeIcon
             icon={faBars}
-            className="menu-toggle"
+            className="menu-toggle fade-in delay-1"
             role="button"
             tabIndex={0}
             aria-label="Toggle menu"
@@ -105,8 +105,10 @@ const Header = () => {
           </NavLink>
 
           {isMobile && (
-            <div className="mobile-header-actions">
+            <div className="mobile-header-actions fade-in delay-3">
+              <NavLink to="/Login" className="nav-link">
               <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
+              </NavLink>
             </div>
           )}
 
@@ -139,10 +141,10 @@ const Header = () => {
                   placeholder="Search Temples"
                   className="search-bar fade-in delay-3"
                 />
-                <button className="signin-btn fade-in delay-4">
+                <NavLink to="/Login" className="signin-btn fade-in delay-4 nav-link">
                   <span className="signin-text">DEVOTE SIGN IN</span>
                   <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
-                </button>
+                </NavLink>
               </div>
             </div>
           )}

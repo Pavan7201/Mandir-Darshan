@@ -13,7 +13,7 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 65vh;
+  height: 60vh;
   object-fit: cover;
   background: linear-gradient(to top, #f0e8f6 2%, transparent 30%);
   filter: hue-rotate(100deg) saturate(1.8);
@@ -71,12 +71,12 @@
 @media (max-width: 480px) {
   .Sevas-banner-section {
     height: 45vh;
-    padding: 0 1rem;
+    padding: 0;
   }
 
   .banner-bg-img,
   .banner-overlay {
-    height: 50vh;
+    height: 45vh;
   }
 
   .SevasBanner-caption h1 {

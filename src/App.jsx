@@ -15,11 +15,13 @@ import MediaRoomPage from "./Pages/MediaRoomPage";
 import SupportPage from "./Pages/SupportPage";
 
 import { ThemeProvider } from "./ThemeContext";
+import LoginPage from "./Pages/LoginPage";
+import SignUpPage from "./Pages/SignUpPage";
 
 function AppRoutes() {
   const location = useLocation();
 
-  const layoutRoutes = ["/", "/temples"];
+  const layoutRoutes = ["/"];
   const showLayout = layoutRoutes.some((path) =>
     location.pathname.startsWith(path)
   );
@@ -34,7 +36,10 @@ function AppRoutes() {
         <Route path="/Donation" element={<DonationPage />} />
         <Route path="/Media" element={<MediaRoomPage/>} />
         <Route path="/Support" element={<SupportPage />} />
+        <Route path="/Login" element={<LoginPage/>} />
+        <Route path="/SignUp" element={<SignUpPage />} />
       </Routes>
+      
       {showLayout && <Footer />}
     </div>
   );

@@ -11,7 +11,6 @@
   color: var(--heading-color);
   letter-spacing: 1px;
   font-family: "Cinzel", serif;
-  /* transition: color 0.8s ease-in-out; */
 }
 
 .sevas-cards-container {
@@ -205,6 +204,10 @@
 }
 
 @media (max-width: 768px) {
+  .sevas-section{
+    padding: 1rem;
+  }
+
   .sevas-heading {
     font-size: 1.8rem;
   }
@@ -240,6 +243,7 @@
   }
 
   .seva-card{
+    overflow: visible;
     padding: 1rem;
   }
 
@@ -275,3 +279,20 @@
     font-size: 1.4rem;
   }
 }
+
+@media (hover: none) and (pointer: coarse) {
+  .seva-card:hover::before {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+
+  .view-more-btn:hover .arrow,
+  .Book-Now-btn:hover .arrow {
+    transform: none !important;
+  }
+
+  .Book-Now-btn:hover::before {
+    opacity: 0 !important;
+  }
+}
+

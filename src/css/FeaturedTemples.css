@@ -112,4 +112,14 @@
   }
 }
 
+@media (hover: none) and (pointer: coarse) {
+  .featured-card:hover {
+    transform: none !important;
+    box-shadow:none;
+  }
+
+}
+
+
+
 

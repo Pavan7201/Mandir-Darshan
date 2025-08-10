@@ -49,7 +49,6 @@
   grid-row: span 1;
 }
 
-/* 📱 Tablets & small desktops (481px to 768px) */
 @media (max-width: 768px) and (min-width: 481px) {
   #Photo-Gallery {
     height: auto;
@@ -80,7 +79,6 @@
   }
 }
 
-/* 📱 Mobile phones (≤ 480px) */
 @media (max-width: 480px) {
   #Photo-Gallery {
     height: auto;
