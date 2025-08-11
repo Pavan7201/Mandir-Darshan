@@ -89,6 +89,76 @@
   width: 300px;
 }
 
+.welcome-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  background-color:var(--bg-color);
+  border: 1px solid #ccc;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  z-index: 999;
+  border-radius: 6px;
+  padding: 8px 0;
+  min-width: 120px;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  padding: 8px 8px;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: maroon;
+  color: rgb(236, 208, 156);
+}
+
+.delete-account-btn {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.delete-account-btn:hover {
+  background-color: #b71c1c;
+}
+
+
+.welcome-text {
+  padding: 0.1rem 0.3rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  background-color: #F0E6BD;
+  color: #200000;
+  font-weight: 600;
+  font-size:0.8rem;
+  border: 1px solid maroon;
+  text-decoration: none;
+}
+
+.welcome-text .avatar-icon {
+  font-size: 20px;
+}
+
 .signin-btn {
   padding: 0.1rem 0.3rem;
   border: none;
@@ -208,6 +278,105 @@
   align-items: flex-start;
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: all;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.modal-content {
+  background: rgb(239, 214, 166);
+  padding: 24px;
+  border-radius: 20px;
+  text-align: center;
+  width: 500px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.modal-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.yes-btn {
+  background-color: maroon;
+  color: rgb(239, 214, 166);
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background-color: #ccc;
+  color: black;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.welcome-container-mobile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.welcome-container-mobile .avatar-icon {
+  font-size: 2.2rem;
+  color: rgb(238, 213, 167);
+  align-self: flex-end;
+}
+
+.welcome-container-mobile span {
+  font-size: 0.85rem;
+  margin: 0px !important;
+  color: rgb(238, 213, 167);
+  font-weight: 500;
+}
+
+.dropdown-menu button {
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #333;
+  transition: background 0.2s ease;
+}
+
+.dropdown-menu button:hover {
+  background: #f5f5f5;
+}
+
+.logout-btn {
+  color: #b71c1c;
+  font-weight: 500;
+}
+
+.delete-account-btn {
+  border-radius: 4px;
+  margin-top: 5px;
+  font-weight: 500;
+}
+
 @media (max-width: 768px) {
   .header {
     display: flex;
@@ -300,6 +469,24 @@
     align-items: flex-start;
     padding: 1rem 0;
   }
+
+  .modal-content {
+    width: 90%;
+    padding: 20px;
+  }
+
+  .modal-actions {
+    flex-direction: row;
+    justify-content: center;
+    gap: 0.8rem;
+  }
+
+  .yes-btn,
+  .cancel-btn {
+    padding: 8px 14px;
+    font-size: 0.9rem;
+  }
+
 }
 
 @media (max-width: 480px) {
@@ -332,6 +519,34 @@
   .theme-toggle-mobile {
     padding: 1rem 0;
   }
+
+  .dropdown-menu {
+    top: 117%;
+    right: 0%;
+    transform: translateX(14%);
+  }
+
+  .modal-content {
+    font-size: 0.9rem;
+    width: 80%;
+    padding: 16px;
+    border-radius: 12px;
+    font-style: normal;
+  }
+
+  .modal-actions {
+    flex-direction: row;
+    gap: 0.6rem;
+  }
+
+  .yes-btn,
+  .cancel-btn {
+    align-self: center;
+    width: 50%;
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+
 }
 
 @media screen and (min-width: 768px) and (max-width: 1024px) {

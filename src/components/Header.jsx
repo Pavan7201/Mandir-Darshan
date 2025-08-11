@@ -1,34 +1,82 @@
-import { useState, useEffect, useRef } from "react";
-import { NavLink } from "react-router-dom";
+import { useState, useEffect, useRef, useContext } from "react";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import "../css/header.css";
 import MandirLogo from "../assets/logo.png";
-import { faBars } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCircle } from '@fortawesome/free-regular-svg-icons';
+import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUserCircle } from "@fortawesome/free-regular-svg-icons";
 import ThemeToggle from "../components/ThemeToggle";
+import { AuthContext } from "../AuthContext";
 
 const Header = () => {
-  const [Hide, setHide] = useState(false);
-  const [Hovered, SetHovered] = useState(false);
+  const [hide, setHide] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
 
+
+  const { auth, setUser, logout, loading } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
   const headerRef = useRef();
   const menuRef = useRef();
   const toggleRef = useRef();
+
+  const handleDeleteClick = () => setShowDeleteDialog(true);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setDropdownOpen(false);
+      sessionStorage.setItem("justLoggedOut", "true");
+      navigate("/Login", { replace: true });
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
+  };
+
+  const confirmDeleteAccount = async () => {
+    try {
+      const res = await fetch("http://localhost:4000/api/delete-account", {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${auth?.token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || "Failed to delete account");
+        return;
+      }
+
+      setUser(null);
+      localStorage.removeItem("auth");
+      setDropdownOpen(false);
+      setShowDeleteDialog(false);
+      navigate("/SignUp", { replace: true });
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      alert("An error occurred while deleting your account. Please try again.");
+    }
+  };
+
+  const toggleMenu = () => setMenuOpen((prev) => !prev);
+
+  const showHeader = hovered || !hide;
 
   useEffect(() => {
     const handleScroll = () => {
       const isTablet = window.innerWidth <= 768;
       const triggerY = window.innerHeight * 0.2;
-      if (isTablet) {
-        setHide(false);
-      } else {
-        setHide(window.scrollY > triggerY && !Hovered);
-      }
+      setHide(!isTablet && window.scrollY > triggerY && !hovered);
     };
-
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 480);
     };
@@ -39,7 +87,7 @@ const Header = () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
     };
-  }, [Hovered]);
+  }, [hovered]);
 
   useEffect(() => {
     setTimeout(() => setLoaded(true), 100);
@@ -60,28 +108,48 @@ const Header = () => {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuOpen]);
 
-  const showHeader = Hovered || !Hide;
+  useEffect(() => {
+    if (menuRef.current && isMobile) {
+      menuRef.current.toggleAttribute("inert", !menuOpen);
+    } else if (menuRef.current) {
+      menuRef.current.removeAttribute("inert");
+    }
+  }, [menuOpen, isMobile]);
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
+  useEffect(() => {
+    if (location.pathname === "/") {
+      setShowWelcome(true);
+      const timer = setTimeout(() => {
+        setShowWelcome(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!menuOpen && document.activeElement && menuRef.current?.contains(document.activeElement)) {
+      toggleRef.current?.focus();
+    }
+  }, [menuOpen]);
+
+  useEffect(() => {
+    document.body.classList.toggle("modal-open", showDeleteDialog);
+  }, [showDeleteDialog]);
 
   return (
     <>
       <div
         className="header-hover-trigger"
-        onMouseEnter={() => SetHovered(true)}
+        onMouseEnter={() => setHovered(true)}
       ></div>
 
       <div
         className={`header-wrapper${showHeader ? "" : " hide"}${loaded ? " loaded" : ""}`}
-        onMouseEnter={() => SetHovered(true)}
-        onMouseLeave={() => SetHovered(false)}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
         ref={headerRef}
       >
         <header className="header">
@@ -91,29 +159,62 @@ const Header = () => {
             role="button"
             tabIndex={0}
             aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+            aria-controls="main-navigation"
             onClick={toggleMenu}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                toggleMenu();
-              }
+              if (["Enter", " "].includes(e.key)) toggleMenu();
             }}
             ref={toggleRef}
           />
 
-          <NavLink to="/" className="logo-img fade-in delay-1">
-            <img src={MandirLogo} alt="Mandir Logo" />
-          </NavLink>
+          <NavLink
+  to="/"
+  onClick={(e) => {
+    e.preventDefault();
+    sessionStorage.setItem("justLogoClick", "true");
+    navigate("/");
+  }}
+  className="logo-img fade-in delay-1"
+>
+  <img src={MandirLogo} alt="Mandir Logo" />
+</NavLink>
+
 
           {isMobile && (
             <div className="mobile-header-actions fade-in delay-3">
-              <NavLink to="/Login" className="nav-link">
-              <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
-              </NavLink>
+              {!loading && auth?.user ? (
+                <div className="welcome-container-mobile" style={{ textAlign: "center" }}>
+                  <div
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    style={{ cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center" }}
+                  >
+                    <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
+                    <span style={{ fontSize: "0.85rem", marginTop: "4px" }}>
+  {showWelcome ? `Welcome ${auth.user?.firstName || "User"}` : auth.user?.firstName || "User"}
+</span>
+                  </div>
+
+                  {dropdownOpen && (
+                    <div className="dropdown-menu">
+                      <button className="logout-btn" onClick={handleLogout}>Logout</button>
+                      <button className="delete-account-btn" onClick={handleDeleteClick}>
+                        Delete Account
+                      </button> 
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <NavLink to="/Login" className="nav-link">
+                  <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
+                </NavLink>
+              )}
             </div>
           )}
 
           <nav
             ref={menuRef}
+            id="main-navigation"
             className={`sub-header fade-in delay-2 ${menuOpen ? "menu-open" : ""}`}
           >
             <NavLink to="/Temples" className="nav-link" onClick={() => setMenuOpen(false)}>Temples</NavLink>
@@ -141,15 +242,52 @@ const Header = () => {
                   placeholder="Search Temples"
                   className="search-bar fade-in delay-3"
                 />
-                <NavLink to="/Login" className="signin-btn fade-in delay-4 nav-link">
-                  <span className="signin-text">DEVOTE SIGN IN</span>
-                  <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
-                </NavLink>
+
+                {!loading && auth?.user ? (
+                  <div className="welcome-container fade-in delay-4">
+                    <div
+                      className="welcome-text"
+                      onClick={() => setDropdownOpen(!dropdownOpen)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <span className="signin-text">
+  {showWelcome ? `Welcome ${auth.user?.firstName || "User"}` : auth.user?.firstName || "User"}
+</span>
+                      <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
+                    </div>
+
+                    {dropdownOpen && (
+                      <div className="dropdown-menu">
+                        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+                        <button className="delete-account-btn" onClick={handleDeleteClick}>
+                          Delete Account
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <NavLink to="/Login" className="signin-btn fade-in delay-4 nav-link">
+                    <span className="signin-text">DEVOTE SIGN IN</span>
+                    <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
+                  </NavLink>
+                )}
               </div>
             </div>
           )}
         </header>
       </div>
+
+      {showDeleteDialog && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Are you sure you want to delete your account?</h3>
+            <div className="modal-actions">
+              <button className="yes-btn" onClick={confirmDeleteAccount}>Yes</button>
+              <button className="cancel-btn" onClick={() => setShowDeleteDialog(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

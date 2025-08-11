@@ -5,13 +5,26 @@ import { templeData } from "../components/TempleData";
 import FeaturedTemples from "./FeaturedTemples";
 import PhotoGallery from "./PhotoGallery";
 import Endowment from "./Endowment";
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../AuthContext";
+
 
 const Body = () => {
+  const { auth } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const handleClick = (TempleLink) => {
+    if (!auth?.user) {
+      navigate("/SignUp"); 
+    } else {
+      navigate(TempleLink);
+    }
+  };
   return (
     <>
       <section className="section animate-on-scroll">
         {templeData.slice(0, 11).map((temple, index) => (
-          <button className="bttn" key={index}>
+          <button className="bttn" key={index} onClick={() => handleClick(temple.link)}>
             <img loading="lazy" src={temple.image} alt={temple.name} />
             <div className="temple-name">{(() => {
     const words = temple.name.trim().split(" ");

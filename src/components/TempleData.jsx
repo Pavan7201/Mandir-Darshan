@@ -24,6 +24,7 @@ export const templeData = [
     caption:
       "Where miracles unfold and wishes come true. Visit the self-manifested idol of Lord Ganesha.",
     hours: "5:00 AM – 9:00 PM",
+    link: "/NotFound",
   },
   {
     id: "2",
@@ -34,6 +35,7 @@ export const templeData = [
     caption:
       "The Kashi of South India – experience divine grace through Rahu‑Ketu dosha remedies.",
     hours: "5:00 AM – 9:00 PM",
+    link: "/NotFound",
   },
   {
     id: "3",
@@ -44,6 +46,7 @@ export const templeData = [
     caption:
       "One of the 12 Jyotirlingas – a journey into ancient spirituality nestled in scenic hills.",
     hours: "5:00 AM – 9:00 PM",
+    link: "/NotFound",
   },
   {
     id: "4",
@@ -54,6 +57,7 @@ export const templeData = [
     caption:
       "A fusion of Lord Vishnu and Narasimha—Simhachalam radiates spiritual power and ancient Dravidian architecture.",
     hours: "5:00 AM – 9:00 PM",
+    link: "/NotFound",
   },
   {
     id: "5",
@@ -64,6 +68,7 @@ export const templeData = [
     caption:
       "Home to crystal‑clear holy springs, Mahanandi offers tranquility and a refreshing spiritual retreat.",
     hours: "5:00 AM – 9:00 PM",
+    link: "/NotFound",
   },
   {
     id: "6",
@@ -74,6 +79,7 @@ export const templeData = [
     caption:
       "Seek the blessings of Lord Hanuman in this powerful temple, known for its spiritual energy and healing prayers.",
     hours: "5:00 AM – 9:00 PM",
+    link: "/NotFound",
   },
   {
     id: "7",
@@ -84,6 +90,7 @@ export const templeData = [
     caption:
       "A sacred space of devotion where thousands gather to seek blessings from Goddess Lakshmi Tirupathamma.",
     hours: "5:00 AM – 9:00 PM",
+    link: "/NotFound",
   },
   {
     id: "8",
@@ -94,6 +101,7 @@ export const templeData = [
     caption:
       "Perched on a hilltop, Annavaram offers divine views and the grace of Lord Satyanarayana for your life’s vows.",
     hours: "5:00 AM – 9:00 PM",
+    link: "/NotFound",
   },
   {
     id: "9",
@@ -104,6 +112,7 @@ export const templeData = [
     caption:
       "Known as 'Chinna Tirupati', Dwaraka Tirumala is a serene destination for Lord Venkateswara’s devotees.",
     hours: "5:00 AM – 9:00 PM",
+    link: "/NotFound",
   },
   {
     id: "10",
@@ -114,6 +123,7 @@ export const templeData = [
     caption:
       "The heartbeat of Vizag—Kanaka Mahalakshmi is worshipped with deep faith for prosperity and protection.",
     hours: "5:00 AM – 9:00 PM",
+    link: "/NotFound",
   },
   {
     id: "11",
@@ -124,6 +134,7 @@ export const templeData = [
     caption:
       "Nestled on Indrakeeladri hill, Durga Amma blesses millions—an icon of strength, beauty, and spiritual power.",
     hours: "5:00 AM – 9:00 PM",
+    link: "/NotFound",
   },
   {
     id: "12",

@@ -1,5 +1,7 @@
-import React from "react";
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import "../css/DevoteServices.css";
+import { AuthContext } from "../AuthContext";
 import Seva from "../assets/Seva.mp4";
 import Donate from "../assets/Donate.mp4";
 import Accommodation from "../assets/Accommodation.mp4";
@@ -9,33 +11,46 @@ import lineDecor from "../HeadingDesign/Design 2.png";
 const services = [
   {
     title: "Seva",
-    description:
-      "Participate in daily rituals and services offered to the deity.",
+    description: "Participate in daily rituals and services offered to the deity.",
     type: "Book Now",
+    link: "/Sevas-&-Booking",
     icon: Seva,
   },
   {
     title: "E-Hundi",
     description: "Contribute your donations online through our secure portal.",
     type: "Donate Now",
+    link: "/Donation",
     icon: Donate,
   },
   {
     title: "Accommodation",
     description: "Book rooms or guesthouses for a comfortable stay.",
     type: "Book Now",
+    link: "/Notfound",
     icon: Accommodation,
   },
   {
     title: "Our Village Our Temple",
-    description:
-      "Explore the heritage and stories behind our village and temple.",
+    description: "Explore the heritage and stories behind our village and temple.",
     type: "Donate Now",
+    link: "/Donation",
     icon: Temple,
   },
 ];
 
-const DevoteServices = ({className=""}) => {
+const DevoteServices = ({ className = "" }) => {
+  const { auth } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleClick = (serviceLink) => {
+    if (!auth?.user) {
+      navigate("/SignUp"); 
+    } else {
+      navigate(serviceLink);
+    }
+  };
+
   return (
     <section className="devote-services" id="devote-services">
       <div className="devote-section-container">
@@ -58,11 +73,16 @@ const DevoteServices = ({className=""}) => {
                 playsInline
               />
               <h3 className="devote-card-title">{service.title}</h3>
-              <p className="devote-card-description">{service.description}</p>
+              <p className="devote-card-description">
+                {service.description}
+              </p>
 
-              <a href="#Book-Now" className="Devote-btn">
+              <button
+                className="Devote-btn"
+                onClick={() => handleClick(service.link)}
+              >
                 <span>{service.type}</span>
-              </a>
+              </button>
             </div>
           ))}
         </div>

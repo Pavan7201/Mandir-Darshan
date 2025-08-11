@@ -9,7 +9,6 @@
   position: relative;
   overflow: hidden;
   transition: background 0.8s ease-in-out;
-  margin-bottom: 2rem;
 }
 
 .signup-section::before {
@@ -187,6 +186,23 @@
 
 .signup-eye-icon:hover {
   color:var(--signup-input);
+}
+
+.signup-error {
+  color: #d93025;
+  font-size: 14px;
+  animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .signup-button[type="submit"] {
