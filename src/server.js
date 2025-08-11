@@ -4,10 +4,13 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 const PORT = 4000;
-const JWT_SECRET = "your_jwt_secret";
+const JWT_SECRET = process.env.JWT_SECRET;
+const MONGODB_URI = process.env.MONGODB_URI;
 
 app.use(
   cors({
@@ -19,7 +22,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 mongoose
-  .connect("mongodb+srv://Pavan7201:Projects@cluster0.rlsnirz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+  .connect(MONGODB_URI)
   .then(() => console.log("✅ Connected to MongoDB Atlas"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
