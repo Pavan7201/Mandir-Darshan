@@ -12,21 +12,27 @@ const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
-
+const allowedOrigin = "https://pavan7201.github.io";
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
+      if (origin === allowedOrigin) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
       }
-      return callback(null, false);
     },
     credentials: true,
+    optionsSuccessStatus: 200
   })
 );
+
+app.options("*", cors({
+  origin: allowedOrigin,
+  credentials: true
+}));
+
 
 app.use(express.json());
 app.use(cookieParser());
