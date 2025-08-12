@@ -8,55 +8,50 @@ import Faq from "../components/Faq's";
 import { faqData } from "../components/FaqData";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 import { AuthContext } from "../AuthContext";
+import API_BASE_URL from "../config/apiConfig";
+
 
 const LoginPage = () => {
   useScrollAnimation();
-
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { setUser } = useContext(AuthContext);
-
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     if (mobile.length !== 10) {
       setError("Please enter a valid 10-digit mobile number.");
       return;
     }
-
     setIsLoading(true);
     setError("");
-
     try {
-      const res = await fetch("http://localhost:4000/api/login", {
+      const res = await fetch(`${API_BASE_URL}/api/login`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mobile, password }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
         setError(data.error || "Login failed");
         setIsLoading(false);
         return;
       }
-
       if (data.user) {
         setUser(data.user);
       } else {
-        const userRes = await fetch("http://localhost:4000/api/me", { credentials: "include" });
+        const userRes = await fetch(`${API_BASE_URL}/api/me`, {
+          credentials: "include",
+        });
         const userData = await userRes.json();
         setUser(userData);
       }
       sessionStorage.removeItem("justLoggedOut");
-
       navigate("/");
     } catch {
       setError("An error occurred. Please try again.");
@@ -82,12 +77,13 @@ const LoginPage = () => {
                     id="mobile"
                     placeholder="Enter mobile number"
                     value={mobile}
-                    onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
+                    onChange={(e) =>
+                      setMobile(e.target.value.replace(/\D/g, ""))
+                    }
                     maxLength="10"
                     required
                   />
                 </div>
-
                 <label htmlFor="password">Password</label>
                 <div className="password-input">
                   <input
@@ -105,22 +101,17 @@ const LoginPage = () => {
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </span>
                 </div>
-
                 {error && <div className="login-error">{error}</div>}
-
                 <button type="submit" disabled={isLoading}>
                   {isLoading ? "Logging in..." : "Login"}
                 </button>
               </form>
-
               <div className="forgot-password">
                 <Link to="/forgot-password" className="forgot-password-link">
                   Forgot Password?
                 </Link>
               </div>
-
               <hr className="divider" />
-
               <div className="signup-prompt">
                 <span>Don't have an account? </span>
                 <Link to="/SignUp" className="signup-link">
@@ -129,13 +120,11 @@ const LoginPage = () => {
               </div>
             </div>
           </div>
-
           <div className="login-right animate-on-scroll">
             <img src={loginBanner} alt="Mandir Darshan" loading="lazy" />
           </div>
         </div>
       </section>
-
       <section>
         <hr />
         <Faq className="animate-on-scroll" faqs={faqData.slice(12)} />

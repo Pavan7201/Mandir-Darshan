@@ -9,26 +9,25 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const JWT_SECRET = process.env.JWT_SECRET;
-const MONGODB_URI = process.env.MONGODB_URI;
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://Pavan7201.github.io"
-];
+const JWT_SECRET = process.env.JWT_SECRET || "changeme";
+const MONGODB_URI = process.env.MONGODB_URI || "";
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
+
 
 app.use(
   cors({
     origin: function (origin, callback) {
       if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
       }
+      return callback(null, false);
     },
     credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -60,10 +59,13 @@ const authenticateUserMiddleware = (req, res, next) => {
   }
 };
 
+app.get("/", (req, res) => {
+  res.send("Backend is running 🚀");
+});
+
 app.post("/api/signup", async (req, res) => {
   try {
     const { firstName, middleName, lastName, mobile, password } = req.body;
-
     if (!firstName || !lastName || !mobile || !password) {
       return res.status(400).json({ error: "All required fields must be filled." });
     }
@@ -74,24 +76,14 @@ app.post("/api/signup", async (req, res) => {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-
-    const user = new User({
-      firstName,
-      middleName,
-      lastName,
-      mobile,
-      passwordHash,
-    });
-
+    const user = new User({ firstName, middleName, lastName, mobile, passwordHash });
     await user.save();
 
-    const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 3600000,
     });
@@ -106,7 +98,6 @@ app.post("/api/signup", async (req, res) => {
 app.post("/api/login", async (req, res) => {
   try {
     const { mobile, password } = req.body;
-
     if (!mobile || !password) {
       return res.status(400).json({ error: "Mobile and password are required" });
     }
@@ -117,36 +108,30 @@ app.post("/api/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
 
-    const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 3600000,
     });
 
     res.json({
-  message: "Login successful",
-  user: {
-    _id: user._id,
-    firstName: user.firstName,
-    middleName: user.middleName,
-    lastName: user.lastName,
-    mobile: user.mobile
-  }
-});
+      message: "Login successful",
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        middleName: user.middleName,
+        lastName: user.lastName,
+        mobile: user.mobile
+      }
+    });
 
   } catch (error) {
-    console.error(error);
+    console.error("Login error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-});
-
-app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
 });
 
 app.post("/api/logout", (req, res) => {
@@ -180,6 +165,6 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
   }
 });
 
-app.listen(PORT, () =>
-  console.log(`Server running on port ${PORT}`)
-);
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});

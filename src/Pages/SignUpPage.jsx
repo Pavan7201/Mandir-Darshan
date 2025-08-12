@@ -5,13 +5,12 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import IndiaFlag from "../assets/India-flag.png";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 import { AuthContext } from "../AuthContext";
+import API_BASE_URL from "../config/apiConfig";
 
 const SignupPage = () => {
   useScrollAnimation();
-
   const { setUser } = useContext(AuthContext);
   const navigate = useNavigate();
-
   const [form, setForm] = useState({
     firstName: "",
     middleName: "",
@@ -26,8 +25,7 @@ const SignupPage = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const strongPasswordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,9 +44,7 @@ const SignupPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const { firstName, lastName, mobile, password, confirmPassword } = form;
-
     if (mobile.length !== 10) {
       return setError("Please enter a valid 10-digit mobile number.");
     }
@@ -60,37 +56,32 @@ const SignupPage = () => {
     if (password !== confirmPassword) {
       return setError("Passwords do not match.");
     }
-
     setError("");
     setIsLoading(true);
-
     try {
-      const res = await fetch("http://localhost:4000/api/signup", {
-  method: "POST",
-  credentials: "include",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    firstName,
-    middleName: form.middleName,
-    lastName,
-    mobile,
-    password,
-  }),
-});
-
-const data = await res.json();
-if (!res.ok) {
-  return setError(data.error || "Signup failed");
-}
-
-const userRes = await fetch("http://localhost:4000/api/me", { credentials: "include" });
-const userData = await userRes.json();
-setUser(userData);
-
-navigate("/");
-
-    } catch (err) {
-      console.error("Unexpected signup error:", err);
+      const res = await fetch(`${API_BASE_URL}/api/signup`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName,
+          middleName: form.middleName,
+          lastName,
+          mobile,
+          password,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return setError(data.error || "Signup failed");
+      }
+      const userRes = await fetch(`${API_BASE_URL}/api/me`, {
+        credentials: "include",
+      });
+      const userData = await userRes.json();
+      setUser(userData);
+      navigate("/");
+    } catch {
       setError("An unexpected error occurred.");
     } finally {
       setIsLoading(false);
@@ -108,7 +99,6 @@ navigate("/");
             onSubmit={handleSubmit}
           >
             <h2>Sign Up</h2>
-
             <div className="signup-name-row">
               <div className="name-input">
                 <label htmlFor="firstName">First Name *</label>
@@ -140,7 +130,6 @@ navigate("/");
                 />
               </div>
             </div>
-
             <label className="mobile-label" htmlFor="mobile">
               Mobile Number *
             </label>
@@ -156,7 +145,6 @@ navigate("/");
                 onChange={handleChange}
               />
             </div>
-
             <label className="password-label" htmlFor="password">
               Password *
             </label>
@@ -178,11 +166,7 @@ navigate("/");
             {passwordStrengthError && (
               <div className="signup-error">{passwordStrengthError}</div>
             )}
-
-            <label
-              className="confirm-password-label"
-              htmlFor="confirmPassword"
-            >
+            <label className="confirm-password-label" htmlFor="confirmPassword">
               Confirm Password *
             </label>
             <div className="signup-password-input">
@@ -210,9 +194,7 @@ navigate("/");
             >
               {isLoading ? "Signing Up..." : "Sign Up"}
             </button>
-
             <hr className="signup-divider" />
-
             <div className="signup-login-prompt">
               Already have an account?{" "}
               <Link to="/login" className="signup-login-link">
