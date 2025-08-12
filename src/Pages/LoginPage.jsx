@@ -8,7 +8,7 @@ import Faq from "../components/Faq's";
 import { faqData } from "../components/FaqData";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 import { AuthContext } from "../AuthContext";
-import PROD_API_URL from "../config/apiConfig";
+import API_BASE_URL from "../config/apiConfig";
 
 
 const LoginPage = () => {
@@ -30,7 +30,7 @@ const LoginPage = () => {
     setIsLoading(true);
     setError("");
     try {
-      const res = await fetch(`${PROD_API_URL}/api/login`, {
+      const res = await fetch(`${API_BASE_URL}/api/login`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -45,7 +45,7 @@ const LoginPage = () => {
       if (data.user) {
         setUser(data.user);
       } else {
-        const userRes = await fetch(`${PROD_API_URL}/api/me`, {
+        const userRes = await fetch(`${API_BASE_URL}/api/me`, {
           credentials: "include",
         });
         const userData = await userRes.json();

@@ -5,7 +5,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import IndiaFlag from "../assets/India-flag.png";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 import { AuthContext } from "../AuthContext";
-import PROD_API_URL from "../config/apiConfig";
+import API_BASE_URL from "../config/apiConfig";
 
 const SignupPage = () => {
   useScrollAnimation();
@@ -59,7 +59,7 @@ const SignupPage = () => {
     setError("");
     setIsLoading(true);
     try {
-      const res = await fetch(`${PROD_API_URL}/api/signup`, {
+      const res = await fetch(`${API_BASE_URL}/api/signup`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -75,7 +75,7 @@ const SignupPage = () => {
       if (!res.ok) {
         return setError(data.error || "Signup failed");
       }
-      const userRes = await fetch(`${PROD_API_URL}/api/me`, {
+      const userRes = await fetch(`${API_BASE_URL}/api/me`, {
         credentials: "include",
       });
       const userData = await userRes.json();
