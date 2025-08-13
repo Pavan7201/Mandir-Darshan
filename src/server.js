@@ -94,7 +94,8 @@ app.post("/api/signup", async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      // secure: process.env.NODE_ENV === "production",
+      secure:true,
       sameSite: "none",
       path: "/",
       maxAge: 3600000,
@@ -204,7 +205,7 @@ app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
 
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
-    const deletedUser = await User.findByIdAndDelete(req.user.id);
+    const deletedUser = await User.findByIdAndDelete(req.user._id);
 
     if (!deletedUser) {
       return res.status(404).json({ error: "User not found" });
