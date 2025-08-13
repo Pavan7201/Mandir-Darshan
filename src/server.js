@@ -49,18 +49,20 @@ const UserSchema = new mongoose.Schema({
 const User = mongoose.model("User", UserSchema);
 
 const authenticateUserMiddleware = async (req, res, next) => {
+  try {
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ error: "Unauthorized" });
 
   const blacklisted = await BlacklistedToken.findOne({ token });
-  if (blacklisted) return res.status(401).json({ error: "Token has been invalidated" });
+  if (blacklisted) return res.status(401).json({ error: "Session expired. Please login again."  });
 
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    req.user = user;
     next();
   } catch {
-    return res.status(401).json({ error: "Invalid token" });
+    console.error("Authentication error:", err);
+    return res.status(401).json({ error: "Session expired. Please login again." });
   }
 };
 
@@ -154,14 +156,19 @@ app.get("/api/me", async (req, res) => {
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
     const token = req.cookies.token;
+    await User.findByIdAndDelete(req.user.id);
+
     if (token) {
       const decoded = jwt.decode(token);
       const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
-      if (!(await BlacklistedToken.findOne({ token }))) await BlacklistedToken.create({ token, expiresAt: expiry });
+      await BlacklistedToken.create({ token, expiresAt: expiry });
     }
-
-    await User.findByIdAndDelete(req.user.id);
-    res.clearCookie("token", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "none", path: "/" });
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      path: "/"
+    });
 
     return res.json({ message: "Account deleted successfully" });
   } catch (err) {

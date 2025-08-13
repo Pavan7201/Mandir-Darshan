@@ -46,19 +46,33 @@ const Header = () => {
 
   const confirmDeleteAccount = async () => {
   try {
-    await deleteAccount();
+    const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
+      method: "DELETE",
+      credentials: "include"
+    });
+
+    if (res.status === 401) {
+      alert("Session expired. Please login again.");
+      setUser(null);
+      localStorage.removeItem("auth");
+      setDropdownOpen(false);
+      navigate("/Login", { replace: true });
+      return;
+    }
+
+    if (!res.ok) {
+      const data = await res.json();
+      alert(data.error || "Failed to delete account");
+      return;
+    }
+    setUser(null);
+    localStorage.removeItem("auth");
     setDropdownOpen(false);
     setShowDeleteDialog(false);
     navigate("/SignUp", { replace: true });
-  } catch (err) {
-    console.error("Error deleting account:", err);
-    if (err.message === "Unauthorized" || err.message === "Not authenticated") {
-      setUser(null);
-      alert("Session expired. Please login again.");
-      navigate("/Login", { replace: true });
-    } else {
-      alert(err.message || "Failed to delete account. Please try again.");
-    }
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    alert("An error occurred. Please try again.");
   }
 };
 
