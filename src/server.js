@@ -162,9 +162,12 @@ app.get("/api/me", async (req, res) => {
   }
 });
 
+// DELETE /api/delete-account
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
     const token = req.cookies.token;
+
+    // Blacklist the token so it cannot be reused
     if (token) {
       const decoded = jwt.decode(token);
       const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
@@ -173,17 +176,22 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
         await BlacklistedToken.create({ token, expiresAt: expiry });
       }
     }
+
+    // Delete user from MongoDB
     await User.findByIdAndDelete(req.user.id);
+
+    // Clear cookie
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "none",
       path: "/"
     });
-    return res.json({ message: "Account deleted successfully" });
+
+    res.json({ message: "Account deleted successfully" });
   } catch (err) {
-    console.log("Deleting account error: ", err);
-    return res.status(500).json({ error: "Failed to delete account" });
+    console.error("Error deleting account:", err);
+    res.status(500).json({ error: "Failed to delete account" });
   }
 });
 
