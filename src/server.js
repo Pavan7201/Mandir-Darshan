@@ -8,65 +8,48 @@ import dotenv from "dotenv";
 import BlacklistedToken from "./models/BlacklistedToken.js";
 
 dotenv.config();
+
 const app = express();
 app.set("trust proxy", 1);
 
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
+const NODE_ENV = process.env.NODE_ENV || "development";
+const DEV_FRONTEND_URL = "http://localhost:5173";
+const PROD_FRONTEND_URL = "https://pavan7201.github.io";
+const allowedOrigins = NODE_ENV === "production" ? [PROD_FRONTEND_URL] : [DEV_FRONTEND_URL];
 const TOKEN_EXPIRY_SECONDS = 3600;
 
 const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  secure: NODE_ENV === "production",
+  sameSite: NODE_ENV === "production" ? "none" : "lax",
   path: "/",
   maxAge: TOKEN_EXPIRY_SECONDS * 1000
 };
 
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
-  .split(",")
-  .map(o => o.trim())
-  .filter(Boolean)
-  .map(origin => {
-    try {
-      new URL(origin);
-      return origin;
-    } catch {
-      console.warn("⚠️ Ignoring invalid origin:", origin);
-      return null;
-    }
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) callback(null, true);
+      else callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 200
   })
-  .filter(Boolean);
+);
 
-console.log("✅ Allowed Origins:", allowedOrigins);
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      console.warn("Blocked CORS request from:", origin);
-      return callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
-
+app.options("*", cors());
 app.use(express.json());
 app.use(cookieParser());
 
 mongoose
   .connect(MONGODB_URI)
   .then(() => console.log("✅ Connected to MongoDB Atlas"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+  .catch(err => console.error("❌ MongoDB connection error:", err));
 
 const UserSchema = new mongoose.Schema({
   firstName: String,
@@ -80,8 +63,10 @@ const User = mongoose.model("User", UserSchema);
 const authenticateUserMiddleware = async (req, res, next) => {
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ error: "Unauthorized" });
+
   const blacklisted = await BlacklistedToken.findOne({ token });
   if (blacklisted) return res.status(401).json({ error: "Token has been invalidated" });
+
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
@@ -101,6 +86,7 @@ app.post("/api/signup", async (req, res) => {
     if (!firstName || !lastName || !mobile || !password) {
       return res.status(400).json({ error: "All required fields must be filled." });
     }
+
     const existing = await User.findOne({ mobile });
     if (existing) return res.status(400).json({ error: "User already exists" });
 
@@ -112,10 +98,10 @@ app.post("/api/signup", async (req, res) => {
       expiresIn: TOKEN_EXPIRY_SECONDS
     });
 
-    res.cookie("token", token, { ...cookieOptions });
+    res.cookie("token", token, cookieOptions);
     res.status(201).json({ message: "User created", user });
   } catch (err) {
-    console.error(err);
+    console.error("Signup error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -135,13 +121,19 @@ app.post("/api/login", async (req, res) => {
       expiresIn: TOKEN_EXPIRY_SECONDS
     });
 
-    res.cookie("token", token, { ...cookieOptions });
+    res.cookie("token", token, cookieOptions);
     res.json({
       message: "Login successful",
-      user: { _id: user._id, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName, mobile: user.mobile }
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        middleName: user.middleName,
+        lastName: user.lastName,
+        mobile: user.mobile
+      }
     });
   } catch (err) {
-    console.error(err);
+    console.error("Login error:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -151,10 +143,11 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
   if (token) {
     const decoded = jwt.decode(token);
     if (decoded?.exp) {
-      await BlacklistedToken.create({ token, expiresAt: new Date(decoded.exp * 1000) });
+      const expiry = new Date(decoded.exp * 1000);
+      await BlacklistedToken.create({ token, expiresAt: expiry });
     }
   }
-  res.clearCookie("token", { ...cookieOptions });
+  res.clearCookie("token", cookieOptions);
   res.json({ message: "Logged out successfully" });
 });
 
@@ -164,14 +157,15 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
     if (token) {
       const decoded = jwt.decode(token);
       if (decoded?.exp) {
-        await BlacklistedToken.create({ token, expiresAt: new Date(decoded.exp * 1000) });
+        const expiry = new Date(decoded.exp * 1000);
+        await BlacklistedToken.create({ token, expiresAt: expiry });
       }
     }
     await User.findByIdAndDelete(req.user.id);
-    res.clearCookie("token", { ...cookieOptions });
+    res.clearCookie("token", cookieOptions);
     res.json({ message: "Account deleted successfully" });
   } catch (err) {
-    console.error("Deleting account error:", err);
+    console.error("Delete account error:", err);
     res.status(500).json({ error: "Failed to delete account" });
   }
 });
