@@ -14,12 +14,8 @@ app.set("trust proxy", 1);
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
-  .split(",")
-  .map(o => o.trim())
-  .filter(Boolean);
-
 const TOKEN_EXPIRY_SECONDS = 3600;
+
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
@@ -28,26 +24,42 @@ const cookieOptions = {
   maxAge: TOKEN_EXPIRY_SECONDS * 1000
 };
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        console.warn("Blocked CORS request from:", origin);
-        return callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    optionsSuccessStatus: 200
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map(o => o.trim())
+  .filter(Boolean)
+  .map(origin => {
+    try {
+      new URL(origin);
+      return origin;
+    } catch {
+      console.warn("⚠️ Ignoring invalid origin:", origin);
+      return null;
+    }
   })
-);
+  .filter(Boolean);
 
-app.options("*", cors());
+console.log("✅ Allowed Origins:", allowedOrigins);
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      console.warn("Blocked CORS request from:", origin);
+      return callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -96,14 +108,11 @@ app.post("/api/signup", async (req, res) => {
     const user = new User({ firstName, middleName, lastName, mobile, passwordHash });
     await user.save();
 
-    const token = jwt.sign(
-      { id: user._id, firstName: user.firstName },
-      JWT_SECRET,
-      { expiresIn: TOKEN_EXPIRY_SECONDS }
-    );
+    const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, {
+      expiresIn: TOKEN_EXPIRY_SECONDS
+    });
 
     res.cookie("token", token, { ...cookieOptions });
-
     res.status(201).json({ message: "User created", user });
   } catch (err) {
     console.error(err);
@@ -114,32 +123,22 @@ app.post("/api/signup", async (req, res) => {
 app.post("/api/login", async (req, res) => {
   try {
     const { mobile, password } = req.body;
-    if (!mobile || !password) {
-      return res.status(400).json({ error: "Mobile and password are required" });
-    }
+    if (!mobile || !password) return res.status(400).json({ error: "Mobile and password are required" });
+
     const user = await User.findOne({ mobile });
     if (!user) return res.status(401).json({ error: "Invalid credentials" });
 
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
 
-    const token = jwt.sign(
-      { id: user._id, firstName: user.firstName },
-      JWT_SECRET,
-      { expiresIn: TOKEN_EXPIRY_SECONDS }
-    );
+    const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, {
+      expiresIn: TOKEN_EXPIRY_SECONDS
+    });
 
     res.cookie("token", token, { ...cookieOptions });
-
     res.json({
       message: "Login successful",
-      user: {
-        _id: user._id,
-        firstName: user.firstName,
-        middleName: user.middleName,
-        lastName: user.lastName,
-        mobile: user.mobile
-      }
+      user: { _id: user._id, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName, mobile: user.mobile }
     });
   } catch (err) {
     console.error(err);
@@ -152,8 +151,7 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
   if (token) {
     const decoded = jwt.decode(token);
     if (decoded?.exp) {
-      const expiry = new Date(decoded.exp * 1000);
-      await BlacklistedToken.create({ token, expiresAt: expiry });
+      await BlacklistedToken.create({ token, expiresAt: new Date(decoded.exp * 1000) });
     }
   }
   res.clearCookie("token", { ...cookieOptions });
@@ -166,8 +164,7 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
     if (token) {
       const decoded = jwt.decode(token);
       if (decoded?.exp) {
-        const expiry = new Date(decoded.exp * 1000);
-        await BlacklistedToken.create({ token, expiresAt: expiry });
+        await BlacklistedToken.create({ token, expiresAt: new Date(decoded.exp * 1000) });
       }
     }
     await User.findByIdAndDelete(req.user.id);
@@ -178,7 +175,6 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
     res.status(500).json({ error: "Failed to delete account" });
   }
 });
-
 
 app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
   const user = await User.findById(req.user.id).select("-passwordHash");
