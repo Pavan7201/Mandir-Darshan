@@ -19,7 +19,7 @@ const Header = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
 
-  const { auth, setUser, loading } = useContext(AuthContext);
+  const { auth, setUser, loading, deleteAccount } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const headerRef = useRef();
@@ -45,26 +45,22 @@ const Header = () => {
   };
 
   const confirmDeleteAccount = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
-        method: "DELETE",
-        credentials: "include"
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        alert(data.error || "Failed to delete account");
-        return;
-      }
+  try {
+    await deleteAccount();
+    setDropdownOpen(false);
+    setShowDeleteDialog(false);
+    navigate("/SignUp", { replace: true });
+  } catch (err) {
+    console.error("Error deleting account:", err);
+    if (err.message === "Unauthorized" || err.message === "Not authenticated") {
       setUser(null);
-      localStorage.removeItem("auth");
-      setDropdownOpen(false);
-      setShowDeleteDialog(false);
-      navigate("/SignUp", { replace: true });
-    } catch (error) {
-      console.error("Error deleting account:", error);
-      alert("An error occurred while deleting your account. Please try again.");
+      alert("Session expired. Please login again.");
+      navigate("/Login", { replace: true });
+    } else {
+      alert(err.message || "Failed to delete account. Please try again.");
     }
-  };
+  }
+};
 
   const toggleMenu = () => setMenuOpen((prev) => !prev);
   const showHeader = hovered || !hide;

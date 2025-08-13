@@ -8,27 +8,33 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem("auth");
-    if (stored) {
-      setAuth(JSON.parse(stored));
-    }
+    const fetchUser = async () => {
+      try {
+        const stored = localStorage.getItem("auth");
+        if (stored) {
+          setAuth(JSON.parse(stored));
+        }
 
-    fetch(`${API_BASE_URL}/api/me`, { credentials: "include" })
-      .then((res) => {
-        if (!res.ok) throw new Error("Not authenticated");
-        return res.json();
-      })
-      .then((data) => {
+        const res = await fetch(`${API_BASE_URL}/api/me`, { credentials: "include" });
+        if (!res.ok) {
+          setAuth(null);
+          localStorage.removeItem("auth");
+          throw new Error("Not authenticated");
+        }
+
+        const data = await res.json();
         setAuth(data);
         localStorage.setItem("auth", JSON.stringify(data));
-      })
-      .catch(() => {
+      } catch (err) {
+        console.warn("User not authenticated:", err.message);
         setAuth(null);
         localStorage.removeItem("auth");
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchUser();
   }, []);
 
   const logout = async () => {
