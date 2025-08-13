@@ -87,7 +87,7 @@ app.post("/api/signup", async (req, res) => {
     await user.save();
 
     const token = jwt.sign(
-      { id: user._id, firstName: user.firstName },
+      { _id: user._id, firstName: user.firstName },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -131,7 +131,7 @@ app.post("/api/login", async (req, res) => {
     if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
 
     const token = jwt.sign(
-      { id: user._id, firstName: user.firstName },
+      { _id: user._id, firstName: user.firstName },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -183,7 +183,7 @@ app.post("/api/logout", async (req, res) => {
 
 app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user._id).select("-password");
     if (!user) {
       return res.status(401).json({ error: "Not authenticated" });
     }
@@ -205,7 +205,7 @@ app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
 
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
-    const deletedUser = await User.findByIdAndDelete(req.user.id);
+    const deletedUser = await User.findByIdAndDelete(req.user._id);
 
     if (!deletedUser) {
       return res.status(404).json({ error: "User not found" });
