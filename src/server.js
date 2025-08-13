@@ -205,7 +205,7 @@ app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
 
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
-    const deletedUser = await User.findByIdAndDelete(req.user._id);
+    const deletedUser = await User.findOneAndDelete({ _id: req.user._id });
 
     if (!deletedUser) {
       return res.status(404).json({ error: "User not found" });
