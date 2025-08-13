@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import BlacklistedToken from "./models/BlacklistedToken";
+import BlacklistedToken from "./models/BlacklistedToken.js";
 
 dotenv.config();
 
@@ -16,7 +16,6 @@ const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
-const tokenBlacklist = new Set();
 
 app.use(
   cors({
@@ -33,7 +32,6 @@ app.use(
 );
 
 app.options("*", cors());
-
 app.use(express.json());
 app.use(cookieParser());
 
@@ -54,10 +52,12 @@ const User = mongoose.model("User", UserSchema);
 const authenticateUserMiddleware = async (req, res, next) => {
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ error: "Unauthorized" });
-   const blacklisted = await BlacklistedToken.findOne({ token });
+
+  const blacklisted = await BlacklistedToken.findOne({ token });
   if (blacklisted) {
     return res.status(401).json({ error: "Token has been invalidated" });
   }
+
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
@@ -66,6 +66,7 @@ const authenticateUserMiddleware = async (req, res, next) => {
     return res.status(401).json({ error: "Invalid token" });
   }
 };
+
 
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
@@ -89,7 +90,7 @@ app.post("/api/signup", async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "none",
-      path: "/", 
+      path: "/",
       maxAge: 3600000
     });
 
@@ -117,7 +118,7 @@ app.post("/api/login", async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "none",
-      path: "/",    
+      path: "/",
       maxAge: 3600000
     });
 
@@ -142,10 +143,7 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
   if (token) {
     const decoded = jwt.decode(token);
     const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
-    await BlacklistedToken.create({
-      token,
-      expiresAt: expiry
-    });
+    await BlacklistedToken.create({ token, expiresAt: expiry });
   }
   res.clearCookie("token", {
     httpOnly: true,
@@ -153,21 +151,19 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
     sameSite: "none",
     path: "/"
   });
-  res.json({ message: "Logged out Sucessfully" });
+  res.json({ message: "Logged out successfully" });
 });
 
-app.get("/api/me", async (req, res) => {
-  const token = req.cookies.token;
-  if (!token) return res.status(401).json({ error: "Unauthorized" });
+app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const user = await User.findById(decoded.id).select("-passwordHash");
+    const user = await User.findById(req.user.id).select("-passwordHash");
     if (!user) return res.status(404).json({ error: "User not found" });
     res.json(user);
   } catch {
-    res.status(401).json({ error: "Invalid token" });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
@@ -175,10 +171,7 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
     if (token) {
       const decoded = jwt.decode(token);
       const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
-      await BlacklistedToken.create({
-        token,
-        expiresAt: expiry
-      });
+      await BlacklistedToken.create({ token, expiresAt: expiry });
     }
     await User.findByIdAndDelete(req.user.id);
     res.clearCookie("token", {
@@ -189,7 +182,7 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
     });
     return res.json({ message: "Account deleted successfully" });
   } catch (err) {
-    console.log("Deleting account error: ", err)
+    console.error("Deleting account error: ", err);
     return res.status(500).json({ error: "Failed to delete account" });
   }
 });
