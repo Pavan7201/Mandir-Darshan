@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import BlacklistedToken from "./models/BlacklistedToken.js";
+import BlacklistedToken from "./models/BlacklistedToken";
 
 dotenv.config();
 
@@ -16,14 +16,13 @@ const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
+const tokenBlacklist = new Set();
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      console.warn(`Blocked CORS request from: ${origin}`);
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
@@ -34,6 +33,7 @@ app.use(
 );
 
 app.options("*", cors());
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -92,7 +92,7 @@ app.post("/api/signup", async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "none",
-      path: "/",
+      path: "/", 
       maxAge: 3600000
     });
 
@@ -120,7 +120,7 @@ app.post("/api/login", async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "none",
-      path: "/",
+      path: "/",    
       maxAge: 3600000
     });
 
@@ -145,7 +145,10 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
   if (token) {
     const decoded = jwt.decode(token);
     const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
-    await BlacklistedToken.create({ token, expiresAt: expiry });
+    await BlacklistedToken.create({
+      token,
+      expiresAt: expiry
+    });
   }
   res.clearCookie("token", {
     httpOnly: true,
@@ -153,19 +156,17 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
     sameSite: "none",
     path: "/"
   });
-  res.json({ message: "Logged out successfully" });
+  res.json({ message: "Logged out Sucessfully" });
 });
 
-app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
-  try {
+app.get("/api/me", authenticateUserMiddleware, async(req,res) => {
+  try{
     const user = await User.findById(req.user.id).select("-passwordHash");
-    if (!user) return res.status(404).json({ error: "User not found" });
+    if(!user) returnres.status(404).json({error:"User not found"});
     res.json(user);
-  } catch {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
+  }catch{res.status(500).json({error:"Internal server error"});
+}
+})
 
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
@@ -173,7 +174,10 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
     if (token) {
       const decoded = jwt.decode(token);
       const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
-      await BlacklistedToken.create({ token, expiresAt: expiry });
+      await BlacklistedToken.create({
+        token,
+        expiresAt: expiry
+      });
     }
     await User.findByIdAndDelete(req.user.id);
     res.clearCookie("token", {
@@ -184,7 +188,7 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
     });
     return res.json({ message: "Account deleted successfully" });
   } catch (err) {
-    console.error("Deleting account error: ", err);
+    console.log("Deleting account error: ", err)
     return res.status(500).json({ error: "Failed to delete account" });
   }
 });
