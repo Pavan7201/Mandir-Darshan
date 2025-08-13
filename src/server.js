@@ -8,7 +8,6 @@ import dotenv from "dotenv";
 import BlacklistedToken from "./models/BlacklistedToken.js";
 
 dotenv.config();
-
 const app = express();
 app.set("trust proxy", 1);
 
@@ -17,7 +16,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
-  .map(origin => origin.trim())
+  .map(o => o.trim())
   .filter(Boolean);
 
 const TOKEN_EXPIRY_SECONDS = 3600;
@@ -31,15 +30,14 @@ const cookieOptions = {
 
 app.use(
   cors({
-    origin: (incomingOrigin, callback) => {
-      if (!incomingOrigin) return callback(null, true);
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(incomingOrigin)) {
+      if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       } else {
-        return callback(
-          new Error(`CORS policy: Origin ${incomingOrigin} not allowed`)
-        );
+        console.warn("Blocked CORS request from:", origin);
+        return callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
