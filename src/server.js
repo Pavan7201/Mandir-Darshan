@@ -8,10 +8,15 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
+
+app.set("trust proxy", 1);
+
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
-const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(",") : [];
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : [];
 
 app.use(
   cors({
@@ -20,7 +25,7 @@ app.use(
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(null, false);
+        callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
@@ -31,7 +36,6 @@ app.use(
 );
 
 app.options("*", cors());
-
 app.use(express.json());
 app.use(cookieParser());
 
@@ -47,7 +51,6 @@ const UserSchema = new mongoose.Schema({
   mobile: { type: String, unique: true },
   passwordHash: String
 });
-
 const User = mongoose.model("User", UserSchema);
 
 const authenticateUserMiddleware = (req, res, next) => {
@@ -80,12 +83,14 @@ app.post("/api/signup", async (req, res) => {
     const user = new User({ firstName, middleName, lastName, mobile, passwordHash });
     await user.save();
     const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
+
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 3600000
     });
+
     res.status(201).json({ message: "User created", user });
   } catch {
     res.status(500).json({ error: "Internal server error" });
@@ -103,12 +108,14 @@ app.post("/api/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
     const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
+
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 3600000
     });
+
     res.json({
       message: "Login successful",
       user: {
@@ -125,7 +132,11 @@ app.post("/api/login", async (req, res) => {
 });
 
 app.post("/api/logout", (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none"
+  });
   res.json({ message: "Logged out" });
 });
 
@@ -146,7 +157,11 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
   try {
     const userId = req.user.id;
     await User.deleteOne({ _id: userId });
-    res.clearCookie("token");
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none"
+    });
     return res.json({ message: "Account deleted successfully" });
   } catch {
     return res.status(500).json({ error: "Failed to delete account" });
