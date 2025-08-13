@@ -17,7 +17,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
-  .map(o => o.trim())
+  .map(origin => origin.trim())
   .filter(Boolean);
 
 const TOKEN_EXPIRY_SECONDS = 3600;
@@ -31,10 +31,16 @@ const cookieOptions = {
 
 app.use(
   cors({
-    origin(origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error("Not allowed by CORS"));
+    origin: (incomingOrigin, callback) => {
+      if (!incomingOrigin) return callback(null, true);
+
+      if (allowedOrigins.includes(incomingOrigin)) {
+        return callback(null, true);
+      } else {
+        return callback(
+          new Error(`CORS policy: Origin ${incomingOrigin} not allowed`)
+        );
+      }
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
