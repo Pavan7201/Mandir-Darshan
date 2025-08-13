@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 const app = express();
@@ -31,7 +32,7 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
-app.options("*", cors());
+app.options("/*wildcard", cors());
 
 app.use(express.json());
 app.use(cookieParser());
@@ -62,10 +63,6 @@ const authenticateUserMiddleware = (req, res, next) => {
   }
 };
 
-app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
-});
-
 app.post("/api/signup", async (req, res) => {
   try {
     const { firstName, middleName, lastName, mobile, password } = req.body;
@@ -80,14 +77,12 @@ app.post("/api/signup", async (req, res) => {
     const user = new User({ firstName, middleName, lastName, mobile, passwordHash });
     await user.save();
     const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
-
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "none",
       maxAge: 3600000
     });
-
     res.status(201).json({ message: "User created", user });
   } catch (err) {
     console.error(err);
@@ -106,14 +101,12 @@ app.post("/api/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
     const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
-
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "none",
       maxAge: 3600000
     });
-
     res.json({
       message: "Login successful",
       user: {
@@ -165,6 +158,10 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
   } catch {
     return res.status(500).json({ error: "Failed to delete account" });
   }
+});
+
+app.get("/", (req, res) => {
+  res.send("Backend is running 🚀");
 });
 
 app.listen(PORT, () => {
