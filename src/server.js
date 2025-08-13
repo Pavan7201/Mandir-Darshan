@@ -8,7 +8,6 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-
 app.set("trust proxy", 1);
 
 const PORT = process.env.PORT || 4000;
@@ -32,8 +31,8 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
-
 app.options("*", cors());
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -90,7 +89,8 @@ app.post("/api/signup", async (req, res) => {
     });
 
     res.status(201).json({ message: "User created", user });
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -124,7 +124,8 @@ app.post("/api/login", async (req, res) => {
         mobile: user.mobile
       }
     });
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
 });

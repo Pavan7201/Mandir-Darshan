@@ -1,9 +1,10 @@
 import React, { createContext, useState, useEffect } from "react";
+import API_BASE_URL from "./config/apiConfig";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [auth, setAuth] = useState(null); 
+  const [auth, setAuth] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -12,7 +13,7 @@ export const AuthProvider = ({ children }) => {
       setAuth(JSON.parse(stored));
     }
 
-    fetch("http://localhost:4000/api/me", { credentials: "include" })
+    fetch(`${API_BASE_URL}/api/me`, { credentials: "include" })
       .then((res) => {
         if (!res.ok) throw new Error("Not authenticated");
         return res.json();
@@ -32,7 +33,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      const res = await fetch("http://localhost:4000/api/logout", {
+      const res = await fetch(`${API_BASE_URL}/api/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -50,7 +51,7 @@ export const AuthProvider = ({ children }) => {
 
   const deleteAccount = async () => {
     try {
-      const res = await fetch("http://localhost:4000/api/delete-account", {
+      const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
         method: "DELETE",
         credentials: "include",
       });

@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle } from "@fortawesome/free-regular-svg-icons";
 import ThemeToggle from "../components/ThemeToggle";
 import { AuthContext } from "../AuthContext";
+import API_BASE_URL from "../config/apiConfig";
 
 const Header = () => {
   const [hide, setHide] = useState(false);
@@ -41,7 +42,7 @@ const Header = () => {
 
   const confirmDeleteAccount = async () => {
     try {
-      const res = await fetch("http://localhost:4000/api/delete-account", {
+      const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
         method: "DELETE",
         credentials: "include",
         headers: {
