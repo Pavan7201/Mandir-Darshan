@@ -20,7 +20,10 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      console.warn(`Blocked CORS request from: ${origin}`);
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
@@ -33,7 +36,10 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-mongoose.connect(MONGODB_URI).then(() => console.log("✅ Connected to MongoDB Atlas")).catch((err) => console.error("❌ MongoDB connection error:", err));
+mongoose
+  .connect(MONGODB_URI)
+  .then(() => console.log("✅ Connected to MongoDB Atlas"))
+  .catch((err) => console.error("❌ MongoDB connection error:", err));
 
 const UserSchema = new mongoose.Schema({
   firstName: String,
@@ -65,16 +71,25 @@ app.get("/", (req, res) => {
 app.post("/api/signup", async (req, res) => {
   try {
     const { firstName, middleName, lastName, mobile, password } = req.body;
-    if (!firstName || !lastName || !mobile || !password) return res.status(400).json({ error: "All required fields must be filled." });
+    if (!firstName || !lastName || !mobile || !password) {
+      return res.status(400).json({ error: "All required fields must be filled." });
+    }
     const existing = await User.findOne({ mobile });
     if (existing) return res.status(400).json({ error: "User already exists" });
     const passwordHash = await bcrypt.hash(password, 10);
     const user = new User({ firstName, middleName, lastName, mobile, passwordHash });
     await user.save();
     const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
-    res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "none", path: "/", maxAge: 3600000 });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      path: "/", 
+      maxAge: 3600000
+    });
     res.status(201).json({ message: "User created", user });
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -82,15 +97,33 @@ app.post("/api/signup", async (req, res) => {
 app.post("/api/login", async (req, res) => {
   try {
     const { mobile, password } = req.body;
-    if (!mobile || !password) return res.status(400).json({ error: "Mobile and password are required" });
+    if (!mobile || !password) {
+      return res.status(400).json({ error: "Mobile and password are required" });
+    }
     const user = await User.findOne({ mobile });
     if (!user) return res.status(401).json({ error: "Invalid credentials" });
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
     const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
-    res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "none", path: "/", maxAge: 3600000 });
-    res.json({ message: "Login successful", user: { _id: user._id, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName, mobile: user.mobile } });
-  } catch {
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      path: "/",    
+      maxAge: 3600000
+    });
+    res.json({
+      message: "Login successful",
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        middleName: user.middleName,
+        lastName: user.lastName,
+        mobile: user.mobile
+      }
+    });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Internal server error" });
   }
 });
@@ -101,9 +134,16 @@ app.post("/api/logout", async (req, res) => {
     const decoded = jwt.decode(token);
     const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
     const blacklisted = await BlacklistedToken.findOne({ token });
-    if (!blacklisted) await BlacklistedToken.create({ token, expiresAt: expiry });
+    if (!blacklisted) {
+      await BlacklistedToken.create({ token, expiresAt: expiry });
+    }
   }
-  res.clearCookie("token", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "none", path: "/" });
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none",
+    path: "/"
+  });
   res.json({ message: "Logged out successfully" });
 });
 
@@ -129,13 +169,21 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
       const decoded = jwt.decode(token);
       const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
       const blacklisted = await BlacklistedToken.findOne({ token });
-      if (!blacklisted) await BlacklistedToken.create({ token, expiresAt: expiry });
+      if (!blacklisted) {
+        await BlacklistedToken.create({ token, expiresAt: expiry });
+      }
     }
     await User.findByIdAndDelete(req.user.id);
-    res.clearCookie("token", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "none", path: "/" });
-    res.json({ message: "Account deleted successfully" });
-  } catch {
-    res.status(500).json({ error: "Failed to delete account" });
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+      path: "/"
+    });
+    return res.json({ message: "Account deleted successfully" });
+  } catch (err) {
+    console.log("Deleting account error: ", err);
+    return res.status(500).json({ error: "Failed to delete account" });
   }
 });
 
