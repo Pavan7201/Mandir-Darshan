@@ -10,7 +10,6 @@ import { useScrollAnimation } from "../hooks/useScrollAnimation";
 import { AuthContext } from "../AuthContext";
 import API_BASE_URL from "../config/apiConfig";
 
-
 const LoginPage = () => {
   useScrollAnimation();
   const [mobile, setMobile] = useState("");
@@ -77,9 +76,7 @@ const LoginPage = () => {
                     id="mobile"
                     placeholder="Enter mobile number"
                     value={mobile}
-                    onChange={(e) =>
-                      setMobile(e.target.value.replace(/\D/g, ""))
-                    }
+                    onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
                     maxLength="10"
                     required
                   />

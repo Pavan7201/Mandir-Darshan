@@ -160,16 +160,16 @@ const Header = () => {
             ref={toggleRef}
           />
           <NavLink
-            to="/"
-            onClick={(e) => {
-              e.preventDefault();
-              sessionStorage.setItem("justLogoClick", "true");
-              navigate("/");
-            }}
-            className="logo-img fade-in delay-1"
-          >
-            <img src={MandirLogo} alt="Mandir Logo" />
-          </NavLink>
+  to="/"
+  onClick={(e) => {
+    e.preventDefault();
+    sessionStorage.setItem("justLogoClick", "true");
+    navigate("/");
+  }}
+  className="logo-img fade-in delay-1"
+>
+  <img src={MandirLogo} alt="Mandir Logo" />
+</NavLink>
           {isMobile && (
             <div className="mobile-header-actions fade-in delay-3">
               {!loading && auth?.user ? (
@@ -180,8 +180,8 @@ const Header = () => {
                   >
                     <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
                     <span style={{ fontSize: "0.85rem", marginTop: "4px" }}>
-                      {showWelcome ? `Welcome ${auth.user?.firstName || "User"}` : auth.user?.firstName || "User"}
-                    </span>
+  {showWelcome ? `Welcome ${auth.user?.firstName || "User"}` : auth.user?.firstName || "User"}
+</span>
                   </div>
                   {dropdownOpen && (
                     <div className="dropdown-menu">
@@ -225,8 +225,8 @@ const Header = () => {
                   <div className="welcome-container fade-in delay-4">
                     <div className="welcome-text" onClick={() => setDropdownOpen(!dropdownOpen)} style={{ cursor: "pointer" }}>
                       <span className="signin-text">
-                        {showWelcome ? `Welcome ${auth.user?.firstName || "User"}` : auth.user?.firstName || "User"}
-                      </span>
+  {showWelcome ? `Welcome ${auth.user?.firstName || "User"}` : auth.user?.firstName || "User"}
+</span>
                       <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
                     </div>
                     {dropdownOpen && (
