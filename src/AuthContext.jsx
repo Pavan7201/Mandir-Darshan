@@ -1,3 +1,95 @@
+// import React, { createContext, useState, useEffect } from "react";
+// import API_BASE_URL from "./config/apiConfig";
+
+// export const AuthContext = createContext();
+
+// export const AuthProvider = ({ children }) => {
+//   const [auth, setAuth] = useState(null);
+//   const [loading, setLoading] = useState(true);
+
+//   useEffect(() => {
+//     const fetchUser = async () => {
+//       try {
+//         const stored = localStorage.getItem("auth");
+//         if (stored) {
+//           setAuth(JSON.parse(stored));
+//         }
+
+//         const res = await fetch(`${API_BASE_URL}/api/me`, { credentials: "include" });
+//         if (!res.ok) {
+//           setAuth(null);
+//           localStorage.removeItem("auth");
+//           throw new Error("Not authenticated");
+//         }
+
+//         const data = await res.json();
+//         setAuth(data);
+//         localStorage.setItem("auth", JSON.stringify(data));
+//       } catch (err) {
+//         console.warn("User not authenticated:", err.message);
+//         setAuth(null);
+//         localStorage.removeItem("auth");
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchUser();
+//   }, []);
+
+//   const logout = async () => {
+//     try {
+//       const res = await fetch(`${API_BASE_URL}/api/logout`, {
+//         method: "POST",
+//         credentials: "include",
+//       });
+//       if (!res.ok) {
+//         const data = await res.json();
+//         throw new Error(data.error || "Logout failed");
+//       }
+//       setAuth(null);
+//       localStorage.removeItem("auth");
+//     } catch (error) {
+//       console.error("Logout error:", error);
+//       throw error;
+//     }
+//   };
+
+//   const deleteAccount = async () => {
+//     try {
+//       const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
+//         method: "DELETE",
+//         credentials: "include",
+//       });
+//       if (!res.ok) {
+//         const data = await res.json();
+//         throw new Error(data.error || "Failed to delete account");
+//       }
+//       setAuth(null);
+//       localStorage.removeItem("auth");
+//     } catch (error) {
+//       console.error("Delete account error:", error);
+//       throw error;
+//     }
+//   };
+
+//   const setUser = (userData) => {
+//     const payload = userData ? { user: userData } : null;
+//     setAuth(payload);
+//     if (payload) {
+//       localStorage.setItem("auth", JSON.stringify(payload));
+//     } else {
+//       localStorage.removeItem("auth");
+//     }
+//   };
+
+//   return (
+//     <AuthContext.Provider value={{ auth, setUser, logout, deleteAccount, loading }}>
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// };
+
 import React, { createContext, useState, useEffect } from "react";
 import API_BASE_URL from "./config/apiConfig";
 
@@ -10,25 +102,18 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const stored = localStorage.getItem("auth");
-        if (stored) {
-          setAuth(JSON.parse(stored));
-        }
-
         const res = await fetch(`${API_BASE_URL}/api/me`, { credentials: "include" });
+
         if (!res.ok) {
           setAuth(null);
-          localStorage.removeItem("auth");
           throw new Error("Not authenticated");
         }
 
         const data = await res.json();
         setAuth(data);
-        localStorage.setItem("auth", JSON.stringify(data));
       } catch (err) {
         console.warn("User not authenticated:", err.message);
         setAuth(null);
-        localStorage.removeItem("auth");
       } finally {
         setLoading(false);
       }
@@ -43,15 +128,10 @@ export const AuthProvider = ({ children }) => {
         method: "POST",
         credentials: "include",
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Logout failed");
-      }
+      if (!res.ok) throw new Error("Logout failed");
       setAuth(null);
-      localStorage.removeItem("auth");
     } catch (error) {
       console.error("Logout error:", error);
-      throw error;
     }
   };
 
@@ -61,26 +141,15 @@ export const AuthProvider = ({ children }) => {
         method: "DELETE",
         credentials: "include",
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to delete account");
-      }
+      if (!res.ok) throw new Error("Failed to delete account");
       setAuth(null);
-      localStorage.removeItem("auth");
     } catch (error) {
       console.error("Delete account error:", error);
-      throw error;
     }
   };
 
   const setUser = (userData) => {
-    const payload = userData ? { user: userData } : null;
-    setAuth(payload);
-    if (payload) {
-      localStorage.setItem("auth", JSON.stringify(payload));
-    } else {
-      localStorage.removeItem("auth");
-    }
+    setAuth(userData ? { user: userData } : null);
   };
 
   return (
