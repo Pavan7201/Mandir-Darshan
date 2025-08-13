@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import BlacklistedToken from "./models/BlacklistedToken";
 
 dotenv.config();
 
@@ -15,24 +16,23 @@ const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
+const tokenBlacklist = new Set();
 
 app.use(
   cors({
-    origin: function (origin, callback) {
+    origin(origin, callback) {
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
-    optionsSuccessStatus: 200,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 200
   })
 );
-app.options("/*wildcard", cors());
+
+app.options("*", cors());
 
 app.use(express.json());
 app.use(cookieParser());
@@ -51,9 +51,13 @@ const UserSchema = new mongoose.Schema({
 });
 const User = mongoose.model("User", UserSchema);
 
-const authenticateUserMiddleware = (req, res, next) => {
+const authenticateUserMiddleware = async (req, res, next) => {
   const token = req.cookies.token;
   if (!token) return res.status(401).json({ error: "Unauthorized" });
+   const blacklisted = await BlacklistedToken.findOne({ token });
+  if (blacklisted) {
+    return res.status(401).json({ error: "Token has been invalidated" });
+  }
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
@@ -63,6 +67,10 @@ const authenticateUserMiddleware = (req, res, next) => {
   }
 };
 
+app.get("/", (req, res) => {
+  res.send("Backend is running 🚀");
+});
+
 app.post("/api/signup", async (req, res) => {
   try {
     const { firstName, middleName, lastName, mobile, password } = req.body;
@@ -70,19 +78,21 @@ app.post("/api/signup", async (req, res) => {
       return res.status(400).json({ error: "All required fields must be filled." });
     }
     const existing = await User.findOne({ mobile });
-    if (existing) {
-      return res.status(400).json({ error: "User already exists" });
-    }
+    if (existing) return res.status(400).json({ error: "User already exists" });
+
     const passwordHash = await bcrypt.hash(password, 10);
     const user = new User({ firstName, middleName, lastName, mobile, passwordHash });
     await user.save();
+
     const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "none",
+      path: "/", 
       maxAge: 3600000
     });
+
     res.status(201).json({ message: "User created", user });
   } catch (err) {
     console.error(err);
@@ -98,15 +108,19 @@ app.post("/api/login", async (req, res) => {
     }
     const user = await User.findOne({ mobile });
     if (!user) return res.status(401).json({ error: "Invalid credentials" });
+
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
+
     const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "none",
+      path: "/",    
       maxAge: 3600000
     });
+
     res.json({
       message: "Login successful",
       user: {
@@ -123,13 +137,23 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-app.post("/api/logout", (req, res) => {
+app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
+  const token = req.cookies.token;
+  if (token) {
+    const decoded = jwt.decode(token);
+    const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
+    await BlacklistedToken.create({
+      token,
+      expiresAt: expiry
+    });
+  }
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "none"
+    sameSite: "none",
+    path: "/"
   });
-  res.json({ message: "Logged out" });
+  res.json({ message: "Logged out Sucessfully" });
 });
 
 app.get("/api/me", async (req, res) => {
@@ -147,21 +171,27 @@ app.get("/api/me", async (req, res) => {
 
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id;
-    await User.deleteOne({ _id: userId });
+    const token = req.cookies.token;
+    if (token) {
+      const decoded = jwt.decode(token);
+      const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
+      await BlacklistedToken.create({
+        token,
+        expiresAt: expiry
+      });
+    }
+    await User.findByIdAndDelete(req.user.id);
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "none"
+      sameSite: "none",
+      path: "/"
     });
     return res.json({ message: "Account deleted successfully" });
-  } catch {
+  } catch (err) {
+    console.log("Deleting account error: ", err)
     return res.status(500).json({ error: "Failed to delete account" });
   }
-});
-
-app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
 });
 
 app.listen(PORT, () => {

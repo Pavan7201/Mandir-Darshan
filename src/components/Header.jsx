@@ -19,8 +19,7 @@ const Header = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
 
-
-  const { auth, setUser, logout, loading } = useContext(AuthContext);
+  const { auth, setUser, loading } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const headerRef = useRef();
@@ -31,7 +30,12 @@ const Header = () => {
 
   const handleLogout = async () => {
     try {
-      await logout();
+      const res = await fetch(`${API_BASE_URL}/api/logout`, {
+        method: "POST",
+        credentials: "include"
+      });
+      if (!res.ok) throw new Error("Logout failed");
+      setUser(null);
       setDropdownOpen(false);
       sessionStorage.setItem("justLoggedOut", "true");
       navigate("/Login", { replace: true });
@@ -44,19 +48,13 @@ const Header = () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
         method: "DELETE",
-        credentials: "include",
-        headers: {
-          Authorization: `Bearer ${auth?.token}`,
-          "Content-Type": "application/json",
-        },
+        credentials: "include"
       });
-
       if (!res.ok) {
         const data = await res.json();
         alert(data.error || "Failed to delete account");
         return;
       }
-
       setUser(null);
       localStorage.removeItem("auth");
       setDropdownOpen(false);
@@ -69,7 +67,6 @@ const Header = () => {
   };
 
   const toggleMenu = () => setMenuOpen((prev) => !prev);
-
   const showHeader = hovered || !hide;
 
   useEffect(() => {
@@ -81,7 +78,6 @@ const Header = () => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 480);
     };
-
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("resize", handleResize);
     return () => {
@@ -107,7 +103,6 @@ const Header = () => {
         setMenuOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuOpen]);
@@ -142,11 +137,7 @@ const Header = () => {
 
   return (
     <>
-      <div
-        className="header-hover-trigger"
-        onMouseEnter={() => setHovered(true)}
-      ></div>
-
+      <div className="header-hover-trigger" onMouseEnter={() => setHovered(true)}></div>
       <div
         className={`header-wrapper${showHeader ? "" : " hide"}${loaded ? " loaded" : ""}`}
         onMouseEnter={() => setHovered(true)}
@@ -168,20 +159,17 @@ const Header = () => {
             }}
             ref={toggleRef}
           />
-
           <NavLink
-  to="/"
-  onClick={(e) => {
-    e.preventDefault();
-    sessionStorage.setItem("justLogoClick", "true");
-    navigate("/");
-  }}
-  className="logo-img fade-in delay-1"
->
-  <img src={MandirLogo} alt="Mandir Logo" />
-</NavLink>
-
-
+            to="/"
+            onClick={(e) => {
+              e.preventDefault();
+              sessionStorage.setItem("justLogoClick", "true");
+              navigate("/");
+            }}
+            className="logo-img fade-in delay-1"
+          >
+            <img src={MandirLogo} alt="Mandir Logo" />
+          </NavLink>
           {isMobile && (
             <div className="mobile-header-actions fade-in delay-3">
               {!loading && auth?.user ? (
@@ -192,16 +180,13 @@ const Header = () => {
                   >
                     <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
                     <span style={{ fontSize: "0.85rem", marginTop: "4px" }}>
-  {showWelcome ? `Welcome ${auth.user?.firstName || "User"}` : auth.user?.firstName || "User"}
-</span>
+                      {showWelcome ? `Welcome ${auth.user?.firstName || "User"}` : auth.user?.firstName || "User"}
+                    </span>
                   </div>
-
                   {dropdownOpen && (
                     <div className="dropdown-menu">
                       <button className="logout-btn" onClick={handleLogout}>Logout</button>
-                      <button className="delete-account-btn" onClick={handleDeleteClick}>
-                        Delete Account
-                      </button> 
+                      <button className="delete-account-btn" onClick={handleDeleteClick}>Delete Account</button>
                     </div>
                   )}
                 </div>
@@ -212,7 +197,6 @@ const Header = () => {
               )}
             </div>
           )}
-
           <nav
             ref={menuRef}
             id="main-navigation"
@@ -229,40 +213,26 @@ const Header = () => {
               </div>
             )}
           </nav>
-
           {!isMobile && (
             <div className="header-actions">
               <button className="dashboard-btn fade-in delay-5">
                 <ThemeToggle />
                 <span className="dashboard-label">PUBLIC DASHBOARD</span>
               </button>
-
               <div className="search-signin">
-                <input
-                  type="text"
-                  placeholder="Search Temples"
-                  className="search-bar fade-in delay-3"
-                />
-
+                <input type="text" placeholder="Search Temples" className="search-bar fade-in delay-3" />
                 {!loading && auth?.user ? (
                   <div className="welcome-container fade-in delay-4">
-                    <div
-                      className="welcome-text"
-                      onClick={() => setDropdownOpen(!dropdownOpen)}
-                      style={{ cursor: "pointer" }}
-                    >
+                    <div className="welcome-text" onClick={() => setDropdownOpen(!dropdownOpen)} style={{ cursor: "pointer" }}>
                       <span className="signin-text">
-  {showWelcome ? `Welcome ${auth.user?.firstName || "User"}` : auth.user?.firstName || "User"}
-</span>
+                        {showWelcome ? `Welcome ${auth.user?.firstName || "User"}` : auth.user?.firstName || "User"}
+                      </span>
                       <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
                     </div>
-
                     {dropdownOpen && (
                       <div className="dropdown-menu">
                         <button className="logout-btn" onClick={handleLogout}>Logout</button>
-                        <button className="delete-account-btn" onClick={handleDeleteClick}>
-                          Delete Account
-                        </button>
+                        <button className="delete-account-btn" onClick={handleDeleteClick}>Delete Account</button>
                       </div>
                     )}
                   </div>
@@ -277,7 +247,6 @@ const Header = () => {
           )}
         </header>
       </div>
-
       {showDeleteDialog && (
         <div className="modal-overlay">
           <div className="modal-content">
