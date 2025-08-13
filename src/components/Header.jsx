@@ -45,36 +45,50 @@ const Header = () => {
   };
 
   const confirmDeleteAccount = async () => {
+  if (!window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+    return;
+  }
+
   try {
-    const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
+    const response = await fetch(`${API_BASE_URL}/api/delete-account`, {
       method: "DELETE",
-      credentials: "include"
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      }
     });
 
-    if (res.status === 401) {
-      alert("Session expired. Please login again.");
+    if (response.status === 401) {
+      alert("Session expired. Please log in again.");
       setUser(null);
       localStorage.removeItem("auth");
       setDropdownOpen(false);
       navigate("/Login", { replace: true });
       return;
     }
-
-    if (!res.ok) {
-      const data = await res.json();
-      alert(data.error || "Failed to delete account");
+    if (!response.ok) {
+      let message = "Failed to delete account";
+      try {
+        const data = await response.json();
+        message = data.error || message;
+      } catch {
+      }
+      alert(message);
       return;
     }
+    alert("Your account has been deleted successfully.");
     setUser(null);
     localStorage.removeItem("auth");
     setDropdownOpen(false);
     setShowDeleteDialog(false);
     navigate("/SignUp", { replace: true });
+
   } catch (error) {
     console.error("Error deleting account:", error);
-    alert("An error occurred. Please try again.");
+    alert("An unexpected error occurred. Please try again later.");
   }
 };
+
 
   const toggleMenu = () => setMenuOpen((prev) => !prev);
   const showHeader = hovered || !hide;
