@@ -11,9 +11,7 @@ export const AuthProvider = ({ children }) => {
     const fetchUser = async () => {
       try {
         const stored = localStorage.getItem("auth");
-        if (stored) {
-          setAuth(JSON.parse(stored));
-        }
+        if (stored) setAuth(JSON.parse(stored));
 
         const res = await fetch(`${API_BASE_URL}/api/me`, { credentials: "include" });
         if (!res.ok) {
@@ -26,7 +24,6 @@ export const AuthProvider = ({ children }) => {
         setAuth(data);
         localStorage.setItem("auth", JSON.stringify(data));
       } catch (err) {
-        console.warn("User not authenticated:", err.message);
         setAuth(null);
         localStorage.removeItem("auth");
       } finally {
@@ -50,7 +47,6 @@ export const AuthProvider = ({ children }) => {
       setAuth(null);
       localStorage.removeItem("auth");
     } catch (error) {
-      console.error("Logout error:", error);
       throw error;
     }
   };
@@ -68,19 +64,14 @@ export const AuthProvider = ({ children }) => {
       setAuth(null);
       localStorage.removeItem("auth");
     } catch (error) {
-      console.error("Delete account error:", error);
       throw error;
     }
   };
 
   const setUser = (userData) => {
-    const payload = userData ? { user: userData } : null;
-    setAuth(payload);
-    if (payload) {
-      localStorage.setItem("auth", JSON.stringify(payload));
-    } else {
-      localStorage.removeItem("auth");
-    }
+    setAuth(userData);
+    if (userData) localStorage.setItem("auth", JSON.stringify(userData));
+    else localStorage.removeItem("auth");
   };
 
   return (

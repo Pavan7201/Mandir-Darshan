@@ -50,26 +50,28 @@ const User = mongoose.model("User", UserSchema);
 
 const authenticateUserMiddleware = async (req, res, next) => {
   try {
-  const token = req.cookies.token;
-  if (!token) return res.status(401).json({ error: "Unauthorized" });
+    const token = req.cookies.token;
+    if (!token) return res.status(401).json({ error: "Unauthorized" });
 
-  const blacklisted = await BlacklistedToken.findOne({ token });
-  if (blacklisted) return res.status(401).json({ error: "Session expired. Please login again."  });
+    const blacklisted = await BlacklistedToken.findOne({ token });
+    if (blacklisted) return res.status(401).json({ error: "Session expired. Please login again." });
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-passwordHash");
+    if (!user) return res.status(404).json({ error: "User not found" });
+
     req.user = user;
     next();
-  } catch {
+  } catch (err) {
     console.error("Authentication error:", err);
-    return res.status(401).json({ error: "Session expired. Please login again." });
+    res.status(401).json({ error: "Invalid or expired token" });
   }
 };
 
 const setTokenCookie = (res, token) => {
   res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // false in dev
+    secure: process.env.NODE_ENV === "production", 
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     path: "/",
     maxAge: 3600000,
@@ -116,9 +118,10 @@ app.post("/api/login", async (req, res) => {
     setTokenCookie(res, token);
 
     res.json({
-      message: "Login successful",
-      user: { _id: user._id, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName, mobile: user.mobile },
-    });
+  message: "Login successful",
+  user: { _id: user._id, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName, mobile: user.mobile },
+});
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal server error" });
@@ -147,7 +150,14 @@ app.get("/api/me", async (req, res) => {
     const decoded = jwt.verify(token, JWT_SECRET);
     const user = await User.findById(decoded.id).select("-passwordHash");
     if (!user) return res.status(404).json({ error: "User not found" });
-    res.json(user);
+    res.json({
+  _id: user._id,
+  firstName: user.firstName,
+  middleName: user.middleName,
+  lastName: user.lastName,
+  mobile: user.mobile,
+});
+
   } catch {
     res.status(401).json({ error: "Invalid token" });
   }
