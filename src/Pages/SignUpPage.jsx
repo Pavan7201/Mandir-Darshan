@@ -115,6 +115,7 @@ const SignupPage = () => {
                 <label htmlFor="firstName">First Name *</label>
                 <input
                   type="text"
+                  id="firstName"
                   name="firstName"
                   value={form.firstName}
                   onChange={handleChange}
@@ -126,6 +127,7 @@ const SignupPage = () => {
                 <label htmlFor="middleName">Middle Name</label>
                 <input
                   type="text"
+                  id="middleName"
                   name="middleName"
                   value={form.middleName}
                   onChange={handleChange}
@@ -136,6 +138,7 @@ const SignupPage = () => {
                 <label htmlFor="lastName">Last Name *</label>
                 <input
                   type="text"
+                  id="lastName"
                   name="lastName"
                   value={form.lastName}
                   onChange={handleChange}
@@ -152,6 +155,7 @@ const SignupPage = () => {
               <span className="signup-code">+91</span>
               <input
                 type="tel"
+                id="mobile"
                 name="mobile"
                 maxLength="10"
                 required
@@ -167,6 +171,7 @@ const SignupPage = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
+                id="password"
                 value={form.password}
                 onChange={handleChange}
                 required
@@ -188,6 +193,7 @@ const SignupPage = () => {
             <div className="signup-password-input">
               <input
                 type={showConfirmPassword ? "text" : "password"}
+                id="confirmPAssword"
                 name="confirmPassword"
                 value={form.confirmPassword}
                 onChange={handleChange}

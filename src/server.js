@@ -22,10 +22,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      console.warn(`Blocked CORS request from: ${origin}`);
+      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
@@ -120,9 +117,7 @@ app.post("/api/signup", async (req, res) => {
 app.post("/api/login", async (req, res) => {
   try {
     const { mobile, password } = req.body;
-    if (!mobile || !password) {
-      return res.status(400).json({ error: "Mobile and password are required" });
-    }
+    if (!mobile || !password) return res.status(400).json({ error: "Mobile and password are required" });
 
     const user = await User.findOne({ mobile });
     if (!user) return res.status(401).json({ error: "User Not Found" });
@@ -130,12 +125,7 @@ app.post("/api/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
 
-    const token = jwt.sign(
-      { _id: user._id, firstName: user.firstName },
-      JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
+    const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
     res.cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -166,9 +156,7 @@ app.post("/api/logout", async (req, res) => {
     const decoded = jwt.decode(token);
     const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
     const blacklisted = await BlacklistedToken.findOne({ token });
-    if (!blacklisted) {
-      await BlacklistedToken.create({ token, expiresAt: expiry });
-    }
+    if (!blacklisted) await BlacklistedToken.create({ token, expiresAt: expiry });
   }
 
   res.clearCookie("token", {
@@ -227,34 +215,6 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
     res.status(500).json({ error: "Failed to delete account" });
   }
 });
-
-
-// app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
-//   try {
-//     const token = req.cookies.token;
-//     if (token) {
-//       const decoded = jwt.decode(token);
-//       const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
-//       const blacklisted = await BlacklistedToken.findOne({ token });
-//       if (!blacklisted) {
-//         await BlacklistedToken.create({ token, expiresAt: expiry });
-//       }
-//     }
-//     await User.findByIdAndDelete(req.user.id);
-
-//     res.clearCookie("token", {
-//       httpOnly: true,
-//       secure: process.env.NODE_ENV === "production",
-//       sameSite: "none",
-//       path: "/",
-//     });
-
-//     res.json({ message: "Account deleted successfully" });
-//   } catch (err) {
-//     console.error("Error deleting account:", err);
-//     res.status(500).json({ error: "Failed to delete account" });
-//   }
-// });
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

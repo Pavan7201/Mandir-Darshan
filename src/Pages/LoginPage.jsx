@@ -74,6 +74,7 @@ const LoginPage = () => {
                   <input
                     type="tel"
                     id="mobile"
+  name="mobile"
                     placeholder="Enter mobile number"
                     value={mobile}
                     onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
@@ -86,6 +87,7 @@ const LoginPage = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     id="password"
+      name="password"
                     placeholder="Enter password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
