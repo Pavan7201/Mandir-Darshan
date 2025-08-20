@@ -12,7 +12,7 @@ const FeaturedTemples = ({className=""}) => {
             src={lineDecor}
             alt="decorative line"
             className={`line-decor-img ${className}`}
-          z  loading="lazy"
+            loading="lazy"
           />
           <div className="featured-cards-container">
             {templeData.slice(11).map((Temple, index) => (
