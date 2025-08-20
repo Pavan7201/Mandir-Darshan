@@ -5,9 +5,10 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import BlacklistedToken from "./models/BlacklistedToken.js";
 
 dotenv.config();
+
+import BlacklistedToken from "./models/BlacklistedToken.js";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -40,6 +41,8 @@ mongoose
   .then(() => console.log("✅ Connected to MongoDB Atlas"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
+/* ----- SCHEMAS ----- */
+
 const UserSchema = new mongoose.Schema({
   firstName: String,
   middleName: String,
@@ -47,7 +50,18 @@ const UserSchema = new mongoose.Schema({
   mobile: { type: String, unique: true },
   passwordHash: String,
 });
+
 const User = mongoose.model("User", UserSchema);
+
+const BlacklistedTokenSchema = new mongoose.Schema({
+  token: String,
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  expiresAt: Date,
+});
+
+BlacklistedTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
+/* ----- MIDDLEWARE ----- */
 
 const authenticateUserMiddleware = async (req, res, next) => {
   const token = req.cookies.token;
@@ -64,6 +78,8 @@ const authenticateUserMiddleware = async (req, res, next) => {
     return res.status(401).json({ error: "Invalid token" });
   }
 };
+
+/* ----- ROUTES ----- */
 
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
@@ -83,16 +99,11 @@ app.post("/api/signup", async (req, res) => {
     const user = new User({ firstName, middleName, lastName, mobile, passwordHash });
     await user.save();
 
-    const token = jwt.sign(
-      { _id: user._id, firstName: user.firstName },
-      JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+    const token = jwt.sign({ _id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
 
     res.cookie("token", token, {
       httpOnly: true,
-      // secure: process.env.NODE_ENV === "production",
-      secure:true,
+      secure: true,
       sameSite: "none",
       path: "/",
       maxAge: 3600000,
@@ -125,10 +136,14 @@ app.post("/api/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
 
-    const token = jwt.sign({ id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
+    // Remove any existing blacklisted tokens for this user
+    await BlacklistedToken.deleteMany({ userId: user._id });
+
+    const token = jwt.sign({ _id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
+
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "none",
       path: "/",
       maxAge: 3600000,
@@ -156,12 +171,12 @@ app.post("/api/logout", async (req, res) => {
     const decoded = jwt.decode(token);
     const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
     const blacklisted = await BlacklistedToken.findOne({ token });
-    if (!blacklisted) await BlacklistedToken.create({ token, expiresAt: expiry });
+    if (!blacklisted) await BlacklistedToken.create({ token, userId: decoded._id, expiresAt: expiry });
   }
 
   res.clearCookie("token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     sameSite: "none",
     path: "/",
   });
@@ -171,45 +186,30 @@ app.post("/api/logout", async (req, res) => {
 
 app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("-password");
-    if (!user) {
-      return res.status(401).json({ error: "Not authenticated" });
-    }
+    const user = await User.findById(req.user._id).select("-passwordHash");
+    if (!user) return res.status(401).json({ error: "Not authenticated" });
     res.json({ user });
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
-//   try {
-//     const user = await User.findById(req.user.id).select("-passwordHash");
-//     if (!user) return res.status(404).json({ error: "User not found" });
-//     res.json(user);
-//   } catch {
-//     res.status(500).json({ error: "Internal server error" });
-//   }
-// });
-
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
     const deletedUser = await User.findByIdAndDelete(req.user._id);
+    if (!deletedUser) return res.status(404).json({ error: "User not found" });
 
-    if (!deletedUser) {
-      return res.status(404).json({ error: "User not found" });
-    }
-    // if (req.session) {
-    //   req.session.destroy(() => {});
-    // }
+    // Remove all blacklisted tokens of this user
+    await BlacklistedToken.deleteMany({ userId: req.user._id });
 
     res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: true,
       sameSite: "none",
       path: "/",
     });
 
-    res.json({ message: "Account deleted successfully" });
+    res.json({ message: "Account deleted successfully", redirect: "/signup" });
   } catch (err) {
     console.error("Error deleting account:", err);
     res.status(500).json({ error: "Failed to delete account" });
