@@ -40,17 +40,18 @@ function AppRoutes() {
   const location = useLocation();
 
   const layoutRoutes = [
-    "/",
-    "/Temples",
-    "/Sevas-&-Booking",
-    "/Donation",
-    "/Media",
-    "/Support",
-  ];
+  "/", 
+  "/temples", 
+  "/sevas-&-booking", 
+  "/donation", 
+  "/media", 
+  "/support"
+];
 
-  const showLayout = layoutRoutes.some((path) =>
-    location.pathname.startsWith(path.toLowerCase())
-  );
+const showLayout = layoutRoutes.some((path) =>
+  location.pathname.startsWith(path)
+);
+
 
   const justLoggedOut = sessionStorage.getItem("justLoggedOut") === "true";
   const justLogoClick = sessionStorage.getItem("justLogoClick") === "true";
