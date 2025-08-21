@@ -47,70 +47,52 @@ const SignupPage = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const { firstName, lastName, mobile, password, confirmPassword } = form;
+  e.preventDefault();
+  const { firstName, lastName, mobile, password, confirmPassword } = form;
 
-    if (mobile.length !== 10) {
-      return setError("Please enter a valid 10-digit mobile number.");
-    }
+  if (mobile.length !== 10) {
+    return setError("Please enter a valid 10-digit mobile number.");
+  }
 
-    if (!strongPasswordRegex.test(password)) {
-      return setError(
-        "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
-      );
-    }
+  if (!strongPasswordRegex.test(password)) {
+    return setError(
+      "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
+    );
+  }
 
-    if (password !== confirmPassword) {
-      return setError("Passwords do not match.");
-    }
+  if (password !== confirmPassword) {
+    return setError("Passwords do not match.");
+  }
 
-    setError("");
-    setIsLoading(true);
+  setError("");
+  setIsLoading(true);
 
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/signUp`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firstName,
-          middleName: form.middleName,
-          lastName,
-          mobile,
-          password,
-        }),
-      });
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/signUp`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        firstName,
+        middleName: form.middleName,
+        lastName,
+        mobile,
+        password,
+      }),
+    });
 
-      const data = await res.json();
-      if (!res.ok) return setError(data.error || "Signup failed");
+    const data = await res.json();
+    if (!res.ok) return setError(data.error || "Signup failed");
 
-      const userRes = await fetch(`${API_BASE_URL}/api/me`, {
-        credentials: "include",
-      });
-
-      if (!userRes.ok) {
-        setError("Failed to fetch user information after signup.");
-        setIsLoading(false);
-        return;
-      }
-
-      const userData = await userRes.json();
-      if (!userData.user) {
-        setError("Authenticated user data not received.");
-        setIsLoading(false);
-        return;
-      }
-
-      setUser(userData.user);
-      navigate("/");
-    } catch (err) {
-      console.error("Signup error:", err);
-      setError("An unexpected error occurred.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+    setUser(data.user); // Use user data directly from signup response
+    navigate("/"); // Redirect to homepage
+  } catch (err) {
+    console.error("Signup error:", err);
+    setError("An unexpected error occurred.");
+  } finally {
+    setIsLoading(false);
+  }
+};
   return (
     <section className="signup-section">
       <div className="blurred-circle circle-large"></div>
