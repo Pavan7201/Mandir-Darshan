@@ -42,7 +42,6 @@ const Header = () => {
     setShowDeleteDialog(false);
     sessionStorage.setItem("justLoggedOut", "true");
     navigate("/Login", { replace: true });
-
   } catch (err) {
     console.error("Logout failed", err);
     setDropdownOpen(false);
@@ -55,7 +54,7 @@ const Header = () => {
       method: "DELETE",
       credentials: "include",
       headers: {
-        Authorization: `Bearer ${auth?.token}`,
+        Authorization: `Bearer ${auth?.token}`, // Note: Backend doesn't verify this header, it uses cookie token
         "Content-Type": "application/json",
       },
     });
@@ -73,16 +72,14 @@ const Header = () => {
       const data = await response.json().catch(() => ({}));
       console.error(data.error || "Failed to delete account");
       setShowDeleteDialog(false);
-
       return;
     }
 
     setUser(null);
     localStorage.removeItem("auth");
-    setShowDeleteDialog(false); 
+    setShowDeleteDialog(false);
     setDropdownOpen(false);
     navigate("/SignUp", { replace: true });
-
   } catch (error) {
     console.error("Error deleting account:", error);
     setShowDeleteDialog(false);

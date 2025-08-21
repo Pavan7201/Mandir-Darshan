@@ -22,15 +22,12 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     if (mobile.length !== 10) {
       setError("Please enter a valid 10-digit mobile number.");
       return;
     }
-
     setIsLoading(true);
     setError("");
-
     try {
       const res = await fetch(`${API_BASE_URL}/api/login`, {
         method: "POST",
@@ -38,15 +35,12 @@ const LoginPage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mobile, password }),
       });
-
       const data = await res.json();
-
       if (!res.ok) {
         setError(data.error || "Login failed");
         setIsLoading(false);
         return;
       }
-
       if (data.user) {
         setUser(data.user);
       } else {
@@ -54,15 +48,8 @@ const LoginPage = () => {
           credentials: "include",
         });
         const userData = await userRes.json();
-        if (userData.user) {
-          setUser(userData.user);
-        } else {
-          setError("Failed to fetch authenticated user data.");
-          setIsLoading(false);
-          return;
-        }
+        setUser(userData.user);
       }
-
       sessionStorage.removeItem("justLoggedOut");
       sessionStorage.setItem("showWelcome", "true");
       navigate("/");
