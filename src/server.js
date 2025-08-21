@@ -14,7 +14,9 @@ app.set("trust proxy", 1);
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
-const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(",") : [];
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",")
+  : [];
 
 app.use(express.json());
 app.use(cookieParser());
@@ -25,7 +27,10 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
       return callback(new Error("Not allowed by CORS"));
     },
-    credentials: true, 
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 200,
   })
 );
 
@@ -41,6 +46,7 @@ const UserSchema = new mongoose.Schema({
   mobile: { type: String, unique: true },
   passwordHash: String,
 });
+
 const User = mongoose.model("User", UserSchema);
 
 const BlacklistedTokenSchema = new mongoose.Schema({
@@ -48,15 +54,18 @@ const BlacklistedTokenSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   expiresAt: { type: Date, required: true, index: { expires: 0 } },
 });
-const BlacklistedToken = mongoose.models.BlacklistedToken || mongoose.model("BlacklistedToken", BlacklistedTokenSchema);
+
+const BlacklistedToken =
+  mongoose.models.BlacklistedToken ||
+  mongoose.model("BlacklistedToken", BlacklistedTokenSchema);
 
 const authenticateUserMiddleware = async (req, res, next) => {
   try {
-    const token = req.cookies?.token;
+    const token = req.cookies.token;
     if (!token) return res.status(401).json({ error: "Unauthorized" });
 
     const blacklisted = await BlacklistedToken.findOne({ token });
-    if (blacklisted) return res.status(401).json({ error: "Token has been invalidated" });
+    if (blacklisted) return res.status(401).json({ error: "Token invalidated" });
 
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
@@ -72,10 +81,10 @@ const cookieOptions = {
   secure: isProd,
   sameSite: isProd ? "none" : "lax",
   path: "/",
-  maxAge: 3600000, 
+  maxAge: 3600000,
 };
 
-app.get("/", (req, res) => res.send("Backend is running 🚀"));
+app.get("/", (req, res) => res.send("Backend running 🚀"));
 
 app.post("/api/signUp", async (req, res) => {
   try {
@@ -95,10 +104,11 @@ app.post("/api/signUp", async (req, res) => {
 
     res.status(201).json({
       message: "User created",
-      user: { _id: user._id, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName, mobile: user.mobile },
+      user: { _id: user._id, firstName, middleName, lastName, mobile },
+      redirect: "/",
     });
-  } catch (err) {
-    res.status(500).json({ error: "Internal server error" });
+  } catch {
+    res.status(500).json({ error: "Internal server error", redirect: "/signup" });
   }
 });
 
@@ -121,45 +131,56 @@ app.post("/api/login", async (req, res) => {
     res.json({
       message: "Login successful",
       user: { _id: user._id, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName, mobile: user.mobile },
+      redirect: "/",
     });
-  } catch (err) {
-    res.status(500).json({ error: "Internal server error" });
+  } catch {
+    res.status(500).json({ error: "Internal server error", redirect: "/login" });
   }
 });
 
 app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
   try {
-    const token = req.cookies?.token;
-    if (token && req.user?._id) {
-      const expiry = req.user.exp ? new Date(req.user.exp * 1000) : new Date();
-      await BlacklistedToken.create({ token, userId: req.user._id, expiresAt: expiry });
+    const token = req.cookies.token;
+    if (token) {
+      const decoded = jwt.decode(token);
+      if (decoded && decoded._id) {
+        const expiry = decoded.exp ? new Date(decoded.exp * 1000) : new Date();
+        await BlacklistedToken.create({ token, userId: decoded._id, expiresAt: expiry });
+      }
     }
-
     res.cookie("token", "", { ...cookieOptions, maxAge: 0 });
-    res.json({ message: "Logged out successfully" });
-  } catch (err) {
-    console.error("❌ Logout error:", err);
-    res.status(500).json({ error: "Internal server error" });
+    res.json({ message: "Logged out successfully", redirect: "/login" });
+  } catch {
+    res.status(500).json({ error: "Logout failed", redirect: "/login" });
+  }
+});
+
+app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("-passwordHash");
+    res.json({ user });
+  } catch {
+    res.status(500).json({ error: "Server error" });
   }
 });
 
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
     const deletedUser = await User.findByIdAndDelete(req.user._id);
-    if (!deletedUser) return res.status(404).json({ error: "User not found", redirect: "/signup" });
+    if (!deletedUser)
+      return res.status(404).json({ error: "User not found", redirect: "/signup" });
 
-    const token = req.cookies?.token;
-    if (token && req.user?._id) {
-      const expiry = req.user.exp ? new Date(req.user.exp * 1000) : new Date();
+    const token = req.cookies.token;
+    if (token) {
+      const decoded = jwt.decode(token);
+      const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
       await BlacklistedToken.create({ token, userId: req.user._id, expiresAt: expiry });
     }
 
     await BlacklistedToken.deleteMany({ userId: req.user._id });
-
     res.cookie("token", "", { ...cookieOptions, maxAge: 0 });
     res.json({ message: "Account deleted successfully", redirect: "/signup" });
-  } catch (err) {
-    console.error("❌ Delete account error:", err);
+  } catch {
     res.status(500).json({ error: "Failed to delete account", redirect: "/signup" });
   }
 });
