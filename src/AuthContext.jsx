@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import API_BASE_URL from "./config/apiConfig";
 
 export const AuthContext = createContext();
@@ -6,6 +7,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -16,8 +18,8 @@ export const AuthProvider = ({ children }) => {
           throw new Error("Not authenticated");
         }
         const data = await res.json();
-        setAuth({ user: data.user });
-      } catch (err) {
+        setAuth(data.user);
+      } catch {
         setAuth(null);
       } finally {
         setLoading(false);
@@ -34,6 +36,7 @@ export const AuthProvider = ({ children }) => {
       });
       if (!res.ok) throw new Error("Logout failed");
       setAuth(null);
+      navigate("/login", { replace: true });
     } catch (_) {}
   };
 
@@ -45,11 +48,12 @@ export const AuthProvider = ({ children }) => {
       });
       if (!res.ok) throw new Error("Failed to delete account");
       setAuth(null);
+      navigate("/signup", { replace: true });
     } catch (_) {}
   };
 
   const setUser = (userData) => {
-    setAuth(userData ? { user: userData } : null);
+    setAuth(userData || null);
   };
 
   return (

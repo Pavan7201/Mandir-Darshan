@@ -31,7 +31,6 @@ const SignupPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     if (name === "password") {
       setPasswordStrengthError(
         strongPasswordRegex.test(value)
@@ -39,7 +38,6 @@ const SignupPage = () => {
           : "Weak password. Use 8+ chars, uppercase, lowercase, number, special char."
       );
     }
-
     setForm((prev) => ({
       ...prev,
       [name]: name === "mobile" ? value.replace(/\D/g, "") : value,
@@ -47,57 +45,50 @@ const SignupPage = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  const { firstName, lastName, mobile, password, confirmPassword } = form;
+    e.preventDefault();
+    const { firstName, lastName, mobile, password, confirmPassword } = form;
+    if (mobile.length !== 10) {
+      return setError("Please enter a valid 10-digit mobile number.");
+    }
+    if (!strongPasswordRegex.test(password)) {
+      return setError(
+        "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
+      );
+    }
+    if (password !== confirmPassword) {
+      return setError("Passwords do not match.");
+    }
+    setError("");
+    setIsLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/signup`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName,
+          middleName: form.middleName,
+          lastName,
+          mobile,
+          password,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) return setError(data.error || "Signup failed");
+      if (data.user) setUser(data.user);
+      navigate("/");
+    } catch (err) {
+      console.error("Signup error:", err);
+      setError("An unexpected error occurred.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  if (mobile.length !== 10) {
-    return setError("Please enter a valid 10-digit mobile number.");
-  }
-
-  if (!strongPasswordRegex.test(password)) {
-    return setError(
-      "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
-    );
-  }
-
-  if (password !== confirmPassword) {
-    return setError("Passwords do not match.");
-  }
-
-  setError("");
-  setIsLoading(true);
-
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/signUp`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        firstName,
-        middleName: form.middleName,
-        lastName,
-        mobile,
-        password,
-      }),
-    });
-
-    const data = await res.json();
-    if (!res.ok) return setError(data.error || "Signup failed");
-
-    setUser(data.user); // Use user data directly from signup response
-    navigate("/"); // Redirect to homepage
-  } catch (err) {
-    console.error("Signup error:", err);
-    setError("An unexpected error occurred.");
-  } finally {
-    setIsLoading(false);
-  }
-};
   return (
     <section className="signup-section">
       <div className="blurred-circle circle-large"></div>
       <div className="blurred-circle circle-medium"></div>
-
       <div className="signup-page">
         <div className="signup-left">
           <form
@@ -105,7 +96,6 @@ const SignupPage = () => {
             onSubmit={handleSubmit}
           >
             <h2>Sign Up</h2>
-
             <div className="signup-name-row">
               <div className="name-input">
                 <label htmlFor="firstName">First Name *</label>
@@ -118,7 +108,6 @@ const SignupPage = () => {
                   required
                 />
               </div>
-
               <div className="name-input">
                 <label htmlFor="middleName">Middle Name</label>
                 <input
@@ -129,7 +118,6 @@ const SignupPage = () => {
                   onChange={handleChange}
                 />
               </div>
-
               <div className="name-input">
                 <label htmlFor="lastName">Last Name *</label>
                 <input
@@ -142,7 +130,6 @@ const SignupPage = () => {
                 />
               </div>
             </div>
-
             <label className="mobile-label" htmlFor="mobile">
               Mobile Number *
             </label>
@@ -159,7 +146,6 @@ const SignupPage = () => {
                 onChange={handleChange}
               />
             </div>
-
             <label className="password-label" htmlFor="password">
               Password *
             </label>
@@ -182,7 +168,6 @@ const SignupPage = () => {
             {passwordStrengthError && (
               <div className="signup-error">{passwordStrengthError}</div>
             )}
-
             <label className="confirm-password-label" htmlFor="confirmPassword">
               Confirm Password *
             </label>
@@ -197,20 +182,18 @@ const SignupPage = () => {
               />
               <span
                 className="signup-eye-icon"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                onClick={() =>
+                  setShowConfirmPassword(!showConfirmPassword)
+                }
               >
                 {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
-
             {error && <div className="signup-error">{error}</div>}
-
             <button className="signup-button" type="submit" disabled={isLoading}>
               {isLoading ? "Signing Up..." : "Sign Up"}
             </button>
-
             <hr className="signup-divider" />
-
             <div className="signup-login-prompt">
               Already have an account?{" "}
               <Link to="/login" className="signup-login-link">

@@ -74,6 +74,16 @@ const authenticateUserMiddleware = async (req, res, next) => {
 
 app.get("/", (req, res) => res.send("Backend is running 🚀"));
 
+const isProd = process.env.NODE_ENV === "production";
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProd ? true : false,
+  sameSite: isProd ? "none" : "lax",
+  path: "/",
+  maxAge: 3600000,
+}
+
+
 app.post("/api/signUp", async (req, res) => {
   try {
     const { firstName, middleName, lastName, mobile, password } = req.body;
@@ -89,13 +99,7 @@ app.post("/api/signUp", async (req, res) => {
 
     const token = jwt.sign({ _id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/",
-      maxAge: 3600000,
-    });
+    res.cookie("token", token, cookieOptions);
 
     res.status(201).json({
       message: "User created",
@@ -121,13 +125,7 @@ app.post("/api/login", async (req, res) => {
 
     const token = jwt.sign({ _id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/",
-      maxAge: 3600000,
-    });
+    res.cookie("token", token, cookieOptions);
 
     res.json({
       message: "Login successful",
@@ -150,12 +148,7 @@ app.post("/api/logout", async (req, res) => {
       }
     }
 
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/",
-    });
+    res.cookie("token", "" , {...cookieOptions, maxAge: 0});
 
     res.json({ message: "Logged out successfully" });
   } catch (err) {
@@ -178,14 +171,16 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
     const deletedUser = await User.findByIdAndDelete(req.user._id);
     if (!deletedUser) return res.status(404).json({ error: "User not found" });
 
-    await BlacklistedToken.deleteMany({ userId: req.user._id });
+    const token = req.cookies.token;
+    if (token) {
+      const decoded = jwt.decode(token);
+      const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
+      await BlacklistedToken.create({ token, userId: req.user._id, expiresAt: expiry });
+    }
 
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      path: "/",
-    });
+    await BlacklistedToken.deleteMany({ userId: req.user._id });
+    
+    res.cookie("token", "" , {...cookieOptions, maxAge: 0});
 
     res.json({ message: "Account deleted successfully", redirect: "/signup" });
   } catch (err) {

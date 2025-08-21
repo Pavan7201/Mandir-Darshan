@@ -30,9 +30,7 @@ const PrivateRoute = ({ children }) => {
 
   if (loading) return <p>Loading...</p>;
 
-  if (!auth?.user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+  if (!auth) { return <Navigate to="/login" state={{ from: location }} replace />;}
 
   return children;
 };
@@ -68,38 +66,11 @@ function AppRoutes() {
       {showLayout && <Header />}
 
       <Routes>
-        <Route
-          path="/"
-          element={
-            auth?.user || justLogoClick ? (
-              <Homepage />
-            ) : justLoggedOut ? (
-              <Navigate to="/login" replace />
-            ) : (
-              <Navigate to="/signup" replace />
-            )
-          }
-        />
-
-        <Route
-          path="/login"
-          element={auth?.user ? <Navigate to="/" replace /> : <LoginPage />}
-        />
-
-        <Route
-          path="/signup"
-          element={auth?.user ? <Navigate to="/" replace /> : <SignUpPage />}
-        />
-        <Route path="/" element={<Homepage />}></Route>
+        <Route path="/" element={ auth || justLogoClick ? ( <Homepage /> ) : justLoggedOut ? ( <Navigate to="/login" replace /> ) : ( <Navigate to="/signup" replace /> )} />
+        <Route path="/login" element={auth ? <Navigate to="/" replace /> : <LoginPage />} />
+        <Route path="/signup" element={auth ? <Navigate to="/" replace /> : <SignUpPage />} />
         <Route path="/Temples" element={<TemplesPage />} />
-        <Route
-          path="/Sevas-&-Booking"
-          element={
-            <PrivateRoute>
-              <Sevas />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/Sevas-&-Booking" element={ <PrivateRoute> <Sevas /> </PrivateRoute> } />
         <Route path="/Donation" element={<DonationPage />} />
         <Route path="/Media" element={<MediaRoomPage />} />
         <Route path="/Support" element={<SupportPage />} />
