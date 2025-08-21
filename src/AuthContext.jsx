@@ -41,20 +41,28 @@ export const AuthProvider = ({ children }) => {
   };
 
   const deleteAccount = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error("Failed to delete account");
-      setAuth(null);
-      navigate("/signup", { replace: true });
-    } catch (_) {}
-  };
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
+      method: "DELETE",
+      credentials: "include",
+    });
 
-  const setUser = (userData) => {
-    setAuth(userData || null);
-  };
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to delete account");
+    }
+
+    setAuth(null);
+    navigate(data.redirect || "/signup", { replace: true });
+  } catch (err) {
+    console.error("❌ Error deleting account:", err.message);
+  }
+};
+
+const setUser = (userData) => {
+  setAuth(userData || null);
+};
 
   return (
     <AuthContext.Provider value={{ auth, setUser, logout, deleteAccount, loading }}>

@@ -141,7 +141,7 @@ app.post("/api/logout", async (req, res) => {
     const token = req.cookies.token;
     if (token) {
       const decoded = jwt.decode(token);
-      if (decoded) {
+      if (decoded && decoded._id) {
         const expiry = decoded.exp ? new Date(decoded.exp * 1000) : new Date();
         const blacklisted = await BlacklistedToken.findOne({ token });
         if (!blacklisted) await BlacklistedToken.create({ token, userId: decoded._id, expiresAt: expiry });
@@ -169,22 +169,38 @@ app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
     const deletedUser = await User.findByIdAndDelete(req.user._id);
-    if (!deletedUser) return res.status(404).json({ error: "User not found" });
+    if (!deletedUser) {
+      return res.status(404).json({
+        error: "User not found",
+        redirect: "/signup",
+      });
+    }
 
     const token = req.cookies.token;
     if (token) {
       const decoded = jwt.decode(token);
       const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
-      await BlacklistedToken.create({ token, userId: req.user._id, expiresAt: expiry });
+      await BlacklistedToken.create({
+        token,
+        userId: req.user._id,
+        expiresAt: expiry,
+      });
     }
 
     await BlacklistedToken.deleteMany({ userId: req.user._id });
-    
-    res.cookie("token", "" , {...cookieOptions, maxAge: 0});
 
-    res.json({ message: "Account deleted successfully", redirect: "/signup" });
+    res.cookie("token", "", { ...cookieOptions, maxAge: 0 });
+
+    return res.json({
+      message: "Account deleted successfully",
+      redirect: "/signup",
+    });
   } catch (err) {
-    res.status(500).json({ error: "Failed to delete account" });
+    console.error("❌ Delete account error:", err);
+    return res.status(500).json({
+      error: "Failed to delete account",
+      redirect: "/signup",
+    });
   }
 });
 
