@@ -87,11 +87,7 @@ const showLayout = layoutRoutes.some((path) =>
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <Router basename="/Mandir-Darshan">
           <AppRoutes />
-        </Router>
-      </AuthProvider>
     </ThemeProvider>
   );
 }
