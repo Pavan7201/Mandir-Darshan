@@ -51,7 +51,6 @@ const LoginPage = () => {
         setUser(userData);
       }
       sessionStorage.removeItem("justLoggedOut");
-      sessionStorage.setItem("showWelcome", "true");
       navigate("/");
     } catch {
       setError("An error occurred. Please try again.");
@@ -75,7 +74,7 @@ const LoginPage = () => {
                   <input
                     type="tel"
                     id="mobile"
-  name="mobile"
+                    name="mobile"
                     placeholder="Enter mobile number"
                     value={mobile}
                     onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}

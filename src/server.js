@@ -143,11 +143,13 @@ app.post("/api/login", async (req, res) => {
 app.post("/api/logout", async (req, res) => {
   const token = req.cookies.token;
   if (token) {
-    const decoded = jwt.decode(token);
+  const decoded = jwt.decode(token);
+  if (decoded) {
     const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
     const blacklisted = await BlacklistedToken.findOne({ token });
     if (!blacklisted) await BlacklistedToken.create({ token, userId: decoded._id, expiresAt: expiry });
   }
+}
 
   res.clearCookie("token", {
     httpOnly: true,

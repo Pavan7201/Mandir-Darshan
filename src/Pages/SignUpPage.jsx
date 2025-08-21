@@ -89,7 +89,6 @@ const SignupPage = () => {
       });
       const userData = await userRes.json();
       setUser(userData.user);
-      sessionStorage.setItem("showWelcome", "true");
       navigate("/");
     } catch {
       setError("An unexpected error occurred.");
@@ -194,7 +193,7 @@ const SignupPage = () => {
             <div className="signup-password-input">
               <input
                 type={showConfirmPassword ? "text" : "password"}
-                id="confirmPAssword"
+                id="confirmPassword"
                 name="confirmPassword"
                 value={form.confirmPassword}
                 onChange={handleChange}

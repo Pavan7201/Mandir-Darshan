@@ -41,7 +41,6 @@ const Header = () => {
     setDropdownOpen(false);
     setShowDeleteDialog(false);
     sessionStorage.setItem("justLoggedOut", "true");
-    sessionStorage.removeItem("showWelcome");
     navigate("/Login", { replace: true });
 
   } catch (err) {
@@ -55,6 +54,10 @@ const Header = () => {
     const response = await fetch(`${API_BASE_URL}/api/delete-account`, {
       method: "DELETE",
       credentials: "include",
+      headers: {
+        Authorization: `Bearer ${auth?.token}`,
+        "Content-Type": "application/json",
+      },
     });
 
     if (response.status === 401) {
@@ -138,21 +141,15 @@ const Header = () => {
     }
   }, [menuOpen, isMobile]);
 
-  const welcomeShownRef = useRef(false);
   useEffect(() => {
-  if (
-    location.pathname === "/" &&
-    auth?.user &&
-    sessionStorage.getItem("showWelcome") === "true"
-  ) {
+    if (location.pathname === "/") {
     setShowWelcome(true);
-    sessionStorage.removeItem("showWelcome");
     const timer = setTimeout(() => {
       setShowWelcome(false);
     }, 2000);
     return () => clearTimeout(timer);
   }
-}, [location.pathname, auth?.user]);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (!menuOpen && document.activeElement && menuRef.current?.contains(document.activeElement)) {
@@ -194,11 +191,13 @@ const Header = () => {
           />
           <NavLink to="/" onClick={(e) => {
             e.preventDefault();
+            sessionStorage.setItem("justLogoClick", "true");
             navigate("/");
           }} 
           className="logo-img fade-in delay-1">
             <img src={MandirLogo} alt="Mandir Logo" />
           </NavLink>
+
           {isMobile && (
             <div className="mobile-header-actions fade-in delay-3">
               {!loading && auth?.user ? (
