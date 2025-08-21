@@ -22,12 +22,15 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
     if (mobile.length !== 10) {
       setError("Please enter a valid 10-digit mobile number.");
       return;
     }
+
     setIsLoading(true);
     setError("");
+
     try {
       const res = await fetch(`${API_BASE_URL}/api/login`, {
         method: "POST",
@@ -35,12 +38,15 @@ const LoginPage = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mobile, password }),
       });
+
       const data = await res.json();
+
       if (!res.ok) {
         setError(data.error || "Login failed");
         setIsLoading(false);
         return;
       }
+
       if (data.user) {
         setUser(data.user);
       } else {
@@ -48,12 +54,20 @@ const LoginPage = () => {
           credentials: "include",
         });
         const userData = await userRes.json();
-        setUser(userData);
+        if (userData.user) {
+          setUser(userData.user);
+        } else {
+          setError("Failed to fetch authenticated user data.");
+          setIsLoading(false);
+          return;
+        }
       }
+
       sessionStorage.removeItem("justLoggedOut");
       sessionStorage.setItem("showWelcome", "true");
       navigate("/");
-    } catch {
+    } catch (err) {
+      console.error("Login error:", err);
       setError("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
@@ -88,7 +102,7 @@ const LoginPage = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     id="password"
-      name="password"
+                    name="password"
                     placeholder="Enter password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -114,7 +128,7 @@ const LoginPage = () => {
               <hr className="divider" />
               <div className="signup-prompt">
                 <span>Don't have an account? </span>
-                <Link to="/SignUp" className="signup-link">
+                <Link to="/signup" className="signup-link">
                   Sign Up
                 </Link>
               </div>

@@ -11,22 +11,18 @@ export const AuthProvider = ({ children }) => {
     const fetchUser = async () => {
       try {
         const res = await fetch(`${API_BASE_URL}/api/me`, { credentials: "include" });
-
         if (!res.ok) {
           setAuth(null);
           throw new Error("Not authenticated");
         }
-
         const data = await res.json();
         setAuth({ user: data.user });
       } catch (err) {
-        console.warn("User not authenticated:", err.message);
         setAuth(null);
       } finally {
         setLoading(false);
       }
     };
-
     fetchUser();
   }, []);
 
@@ -38,9 +34,7 @@ export const AuthProvider = ({ children }) => {
       });
       if (!res.ok) throw new Error("Logout failed");
       setAuth(null);
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+    } catch (_) {}
   };
 
   const deleteAccount = async () => {
@@ -51,9 +45,7 @@ export const AuthProvider = ({ children }) => {
       });
       if (!res.ok) throw new Error("Failed to delete account");
       setAuth(null);
-    } catch (error) {
-      console.error("Delete account error:", error);
-    }
+    } catch (_) {}
   };
 
   const setUser = (userData) => {

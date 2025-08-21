@@ -68,7 +68,7 @@ const SignupPage = () => {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/signup`, {
+      const res = await fetch(`${API_BASE_URL}/api/signUp`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -87,10 +87,24 @@ const SignupPage = () => {
       const userRes = await fetch(`${API_BASE_URL}/api/me`, {
         credentials: "include",
       });
+
+      if (!userRes.ok) {
+        setError("Failed to fetch user information after signup.");
+        setIsLoading(false);
+        return;
+      }
+
       const userData = await userRes.json();
+      if (!userData.user) {
+        setError("Authenticated user data not received.");
+        setIsLoading(false);
+        return;
+      }
+
       setUser(userData.user);
       navigate("/");
-    } catch {
+    } catch (err) {
+      console.error("Signup error:", err);
       setError("An unexpected error occurred.");
     } finally {
       setIsLoading(false);
@@ -201,9 +215,7 @@ const SignupPage = () => {
               />
               <span
                 className="signup-eye-icon"
-                onClick={() =>
-                  setShowConfirmPassword(!showConfirmPassword)
-                }
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
@@ -211,11 +223,7 @@ const SignupPage = () => {
 
             {error && <div className="signup-error">{error}</div>}
 
-            <button
-              className="signup-button"
-              type="submit"
-              disabled={isLoading}
-            >
+            <button className="signup-button" type="submit" disabled={isLoading}>
               {isLoading ? "Signing Up..." : "Sign Up"}
             </button>
 

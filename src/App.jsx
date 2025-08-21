@@ -1,3 +1,4 @@
+import React, { useContext, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -20,28 +21,47 @@ import NotFound from "./Pages/NotFoundPage";
 
 import { ThemeProvider } from "./ThemeContext";
 import { AuthProvider, AuthContext } from "./AuthContext";
-import { useContext } from "react";
 
 import "./App.css";
+
+const PrivateRoute = ({ children }) => {
+  const { auth, loading } = useContext(AuthContext);
+  const location = useLocation();
+
+  if (loading) return <p>Loading...</p>;
+
+  if (!auth?.user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+};
 
 function AppRoutes() {
   const { auth } = useContext(AuthContext);
   const location = useLocation();
 
   const layoutRoutes = [
-  "/",
-  "/Temples",
-  "/Sevas-&-Booking",
-  "/Donation",
-  "/Media",
-  "/Support",
-];
-const showLayout =
-  layoutRoutes.some((path) => location.pathname.startsWith(path))
+    "/",
+    "/Temples",
+    "/Sevas-&-Booking",
+    "/Donation",
+    "/Media",
+    "/Support",
+  ];
 
+  const showLayout = layoutRoutes.some((path) =>
+    location.pathname.startsWith(path.toLowerCase())
+  );
 
   const justLoggedOut = sessionStorage.getItem("justLoggedOut") === "true";
   const justLogoClick = sessionStorage.getItem("justLogoClick") === "true";
+
+  useEffect(() => {
+    if (justLogoClick) {
+      sessionStorage.removeItem("justLogoClick");
+    }
+  }, [justLogoClick]);
 
   return (
     <div className="App">
@@ -49,26 +69,37 @@ const showLayout =
 
       <Routes>
         <Route
-        path="/"
-        element={
-          auth?.user || justLogoClick
-      ? (justLogoClick ? (sessionStorage.removeItem("justLogoClick"), <Homepage />) : <Homepage />)
-      : justLoggedOut
-      ? <Navigate to="/login" replace />
-      : <Navigate to="/signUp" replace />
-  }
+          path="/"
+          element={
+            auth?.user || justLogoClick ? (
+              <Homepage />
+            ) : justLoggedOut ? (
+              <Navigate to="/login" replace />
+            ) : (
+              <Navigate to="/signup" replace />
+            )
+          }
         />
-<Route
-  path="/login"
-  element={auth?.user ? <Navigate to="/" replace /> : <LoginPage />}
-/>
-<Route
-  path="/signUp"
-  element={auth?.user ? <Navigate to="/" replace /> : <SignUpPage />}
-/>
-        <Route path="/" element={<Homepage />} />
+
+        <Route
+          path="/login"
+          element={auth?.user ? <Navigate to="/" replace /> : <LoginPage />}
+        />
+
+        <Route
+          path="/signup"
+          element={auth?.user ? <Navigate to="/" replace /> : <SignUpPage />}
+        />
+        <Route path="/" element={<Homepage />}></Route>
         <Route path="/Temples" element={<TemplesPage />} />
-        <Route path="/Sevas-&-Booking" element={<Sevas />} />
+        <Route
+          path="/Sevas-&-Booking"
+          element={
+            <PrivateRoute>
+              <Sevas />
+            </PrivateRoute>
+          }
+        />
         <Route path="/Donation" element={<DonationPage />} />
         <Route path="/Media" element={<MediaRoomPage />} />
         <Route path="/Support" element={<SupportPage />} />
