@@ -1,25 +1,26 @@
-import { createContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import API_BASE_URL from "./config/apiConfig";
+import React, { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext();
+
+const API_BASE_URL = "https://mandir-darshan.onrender.com";
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
+  
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/me`, { credentials: "include" });
+        const res = await fetch(`${API_BASE_URL}/api/me`, {
+          credentials: "include",
+        });
         if (!res.ok) {
           setAuth(null);
-          throw new Error("Not authenticated");
+        } else {
+          const data = await res.json();
+          setAuth(data.user);
         }
-        const data = await res.json();
-        setAuth(data.user);
-      } catch {
+      } catch (err) {
         setAuth(null);
       } finally {
         setLoading(false);
@@ -28,45 +29,59 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, []);
 
+  const login = async (mobile, password) => {
+    const res = await fetch(`${API_BASE_URL}/api/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ mobile, password }),
+    });
+    if (!res.ok) throw new Error("Login failed");
+    const data = await res.json();
+    setAuth(data.user);
+    return data.user;
+  };
+
   const logout = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/logout`, {
+      await fetch(`${API_BASE_URL}/api/logout`, {
         method: "POST",
         credentials: "include",
       });
-      if (!res.ok) throw new Error("Logout failed");
+    } catch (err) {
+      console.error("Logout failed:", err);
+    } finally {
       setAuth(null);
-      navigate("/login", { replace: true });
-    } catch (_) {}
+      sessionStorage.setItem("justLoggedOut", "true");
+    }
   };
 
   const deleteAccount = async () => {
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
-      method: "DELETE",
-      credentials: "include",
-    });
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
+        method: "DELETE",
+        credentials: "include", 
+      });
+      if (!res.ok) throw new Error("Failed to delete account");
 
-    const data = await res.json();
+      const data = await res.json();
+      setAuth(null);
+      sessionStorage.setItem("justLoggedOut", "true");
 
-    if (!res.ok) {
-      throw new Error(data.error || "Failed to delete account");
+      if (data.redirect) window.location.href = data.redirect;
+    } catch (err) {
+      console.error("Error deleting account:", err);
     }
+  };
 
-    setAuth(null);
-    navigate(data.redirect || "/signup", { replace: true });
-  } catch (err) {
-    console.error("❌ Error deleting account:", err.message);
-  }
-};
+  const value = {
+    auth,
+    setUser: setAuth,
+    login,
+    logout,
+    deleteAccount,
+    loading,
+  };
 
-const setUser = (userData) => {
-  setAuth(userData || null);
-};
-
-  return (
-    <AuthContext.Provider value={{ auth, setUser, logout, deleteAccount, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

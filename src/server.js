@@ -9,7 +9,6 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-
 app.set("trust proxy", 1);
 
 const PORT = process.env.PORT || 4000;
@@ -26,10 +25,7 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
       return callback(new Error("Not allowed by CORS"));
     },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    optionsSuccessStatus: 200,
+    credentials: true, 
   })
 );
 
@@ -45,7 +41,6 @@ const UserSchema = new mongoose.Schema({
   mobile: { type: String, unique: true },
   passwordHash: String,
 });
-
 const User = mongoose.model("User", UserSchema);
 
 const BlacklistedTokenSchema = new mongoose.Schema({
@@ -53,12 +48,11 @@ const BlacklistedTokenSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   expiresAt: { type: Date, required: true, index: { expires: 0 } },
 });
-
 const BlacklistedToken = mongoose.models.BlacklistedToken || mongoose.model("BlacklistedToken", BlacklistedTokenSchema);
 
 const authenticateUserMiddleware = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    const token = req.cookies?.token;
     if (!token) return res.status(401).json({ error: "Unauthorized" });
 
     const blacklisted = await BlacklistedToken.findOne({ token });
@@ -72,17 +66,16 @@ const authenticateUserMiddleware = async (req, res, next) => {
   }
 };
 
-app.get("/", (req, res) => res.send("Backend is running 🚀"));
-
 const isProd = process.env.NODE_ENV === "production";
 const cookieOptions = {
   httpOnly: true,
-  secure: isProd ? true : false,
+  secure: isProd,
   sameSite: isProd ? "none" : "lax",
   path: "/",
-  maxAge: 3600000,
-}
+  maxAge: 3600000, 
+};
 
+app.get("/", (req, res) => res.send("Backend is running 🚀"));
 
 app.post("/api/signUp", async (req, res) => {
   try {
@@ -98,7 +91,6 @@ app.post("/api/signUp", async (req, res) => {
     await user.save();
 
     const token = jwt.sign({ _id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
-
     res.cookie("token", token, cookieOptions);
 
     res.status(201).json({
@@ -124,7 +116,6 @@ app.post("/api/login", async (req, res) => {
     await BlacklistedToken.deleteMany({ userId: user._id });
 
     const token = jwt.sign({ _id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
-
     res.cookie("token", token, cookieOptions);
 
     res.json({
@@ -136,74 +127,41 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-app.post("/api/logout", async (req, res) => {
+app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
   try {
-    const token = req.cookies.token;
-    if (token) {
-      const decoded = jwt.decode(token);
-      if (decoded && decoded._id) {
-        const expiry = decoded.exp ? new Date(decoded.exp * 1000) : new Date();
-        const blacklisted = await BlacklistedToken.findOne({ token });
-        if (!blacklisted) await BlacklistedToken.create({ token, userId: decoded._id, expiresAt: expiry });
-      }
+    const token = req.cookies?.token;
+    if (token && req.user?._id) {
+      const expiry = req.user.exp ? new Date(req.user.exp * 1000) : new Date();
+      await BlacklistedToken.create({ token, userId: req.user._id, expiresAt: expiry });
     }
 
-    res.cookie("token", "" , {...cookieOptions, maxAge: 0});
-
+    res.cookie("token", "", { ...cookieOptions, maxAge: 0 });
     res.json({ message: "Logged out successfully" });
   } catch (err) {
+    console.error("❌ Logout error:", err);
     res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id).select("-passwordHash");
-    if (!user) return res.status(401).json({ error: "Not authenticated" });
-    res.json({ user });
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
   }
 });
 
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
     const deletedUser = await User.findByIdAndDelete(req.user._id);
-    if (!deletedUser) {
-      return res.status(404).json({
-        error: "User not found",
-        redirect: "/signup",
-      });
-    }
+    if (!deletedUser) return res.status(404).json({ error: "User not found", redirect: "/signup" });
 
-    const token = req.cookies.token;
-    if (token) {
-      const decoded = jwt.decode(token);
-      const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date();
-      await BlacklistedToken.create({
-        token,
-        userId: req.user._id,
-        expiresAt: expiry,
-      });
+    const token = req.cookies?.token;
+    if (token && req.user?._id) {
+      const expiry = req.user.exp ? new Date(req.user.exp * 1000) : new Date();
+      await BlacklistedToken.create({ token, userId: req.user._id, expiresAt: expiry });
     }
 
     await BlacklistedToken.deleteMany({ userId: req.user._id });
 
     res.cookie("token", "", { ...cookieOptions, maxAge: 0 });
-
-    return res.json({
-      message: "Account deleted successfully",
-      redirect: "/signup",
-    });
+    res.json({ message: "Account deleted successfully", redirect: "/signup" });
   } catch (err) {
     console.error("❌ Delete account error:", err);
-    return res.status(500).json({
-      error: "Failed to delete account",
-      redirect: "/signup",
-    });
+    res.status(500).json({ error: "Failed to delete account", redirect: "/signup" });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
