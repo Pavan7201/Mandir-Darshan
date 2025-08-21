@@ -54,16 +54,16 @@ const showLayout =
           auth?.user || justLogoClick
       ? (justLogoClick ? (sessionStorage.removeItem("justLogoClick"), <Homepage />) : <Homepage />)
       : justLoggedOut
-      ? <Navigate to="/Login" replace />
-      : <Navigate to="/SignUp" replace />
+      ? <Navigate to="/login" replace />
+      : <Navigate to="/signUp" replace />
   }
         />
 <Route
-  path="/Login"
+  path="/login"
   element={auth?.user ? <Navigate to="/" replace /> : <LoginPage />}
 />
 <Route
-  path="/SignUp"
+  path="/signUp"
   element={auth?.user ? <Navigate to="/" replace /> : <SignUpPage />}
 />
         <Route path="/" element={<Homepage />} />

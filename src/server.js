@@ -19,7 +19,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",")
-  : ["http://localhost:3000"];
+  : [];
 
 app.use(express.json());
 app.use(cookieParser());
@@ -51,6 +51,13 @@ const UserSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model("User", UserSchema);
+const BlacklistedTokenSchema = new mongoose.Schema({
+  token: {type: String, required: true, unique:true},
+  userId:{type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
+  expiresAt: {type: Date, required: true},
+});
+
+BlacklistedToken.diffIndexes({ expiresAt: 1 }, { expireAfterSeconds:0});
 
 const authenticateUserMiddleware = async (req, res, next) => {
   const token = req.cookies.token;
@@ -70,7 +77,7 @@ const authenticateUserMiddleware = async (req, res, next) => {
 
 app.get("/", (req, res) => res.send("Backend is running 🚀"));
 
-app.post("/api/signup", async (req, res) => {
+app.post("/api/signUp", async (req, res) => {
   try {
     const { firstName, middleName, lastName, mobile, password } = req.body;
     if (!firstName || !lastName || !mobile || !password)
@@ -97,7 +104,7 @@ app.post("/api/signup", async (req, res) => {
 
     res.status(201).json({
       message: "User created",
-      user: { _id: user._id, firstName, middleName, lastName, mobile },
+      user: { _id: user._id, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName, mobile: user.mobile },
     });
   } catch (err) {
     console.error(err);
@@ -132,7 +139,7 @@ app.post("/api/login", async (req, res) => {
 
     res.json({
       message: "Login successful",
-      user: { _id: user._id, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName, mobile },
+      user: { _id: user._id, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName, mobile: user.mobile },
     });
   } catch (err) {
     console.error(err);
