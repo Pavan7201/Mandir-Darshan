@@ -192,7 +192,11 @@ const Header = () => {
             }}
             ref={toggleRef}
           />
-          <NavLink to="/" onClick={() => navigate("/")} className="logo-img fade-in delay-1">
+          <NavLink to="/" onClick={(e) => {
+            e.preventDefault();
+            navigate("/");
+          }} 
+          className="logo-img fade-in delay-1">
             <img src={MandirLogo} alt="Mandir Logo" />
           </NavLink>
           {isMobile && (
