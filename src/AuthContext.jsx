@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         const data = await res.json();
-        setAuth(data);
+        setAuth({ user: data.user });
       } catch (err) {
         console.warn("User not authenticated:", err.message);
         setAuth(null);
@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       }
     };
+
     fetchUser();
   }, []);
 
