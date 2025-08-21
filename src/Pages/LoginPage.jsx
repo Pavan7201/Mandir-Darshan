@@ -51,6 +51,7 @@ const LoginPage = () => {
         setUser(userData);
       }
       sessionStorage.removeItem("justLoggedOut");
+      sessionStorage.setItem("showWelcome", "true");
       navigate("/");
     } catch {
       setError("An error occurred. Please try again.");
