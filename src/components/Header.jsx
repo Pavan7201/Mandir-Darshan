@@ -55,10 +55,6 @@ const Header = () => {
     const response = await fetch(`${API_BASE_URL}/api/delete-account`, {
       method: "DELETE",
       credentials: "include",
-      headers: {
-        Authorization: `Bearer ${auth?.token}`,
-        "Content-Type": "application/json",
-      },
     });
 
     if (response.status === 401) {
