@@ -50,7 +50,9 @@ const Header = () => {
       const triggerY = window.innerHeight * 0.2;
       setHide(!isTablet && window.scrollY > triggerY && !hovered);
     };
-    const handleResize = () => setIsMobile(window.innerWidth <= 480);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 480);
+    };
 
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("resize", handleResize);
@@ -93,7 +95,9 @@ const Header = () => {
   useEffect(() => {
     if (location.pathname === "/") {
       setShowWelcome(true);
-      const timer = setTimeout(() => setShowWelcome(false), 2000);
+      const timer = setTimeout(() => {
+        setShowWelcome(false);
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [location.pathname]);
@@ -110,7 +114,10 @@ const Header = () => {
 
   return (
     <>
-      <div className="header-hover-trigger" onMouseEnter={() => setHovered(true)}></div>
+      <div
+        className="header-hover-trigger"
+        onMouseEnter={() => setHovered(true)}
+      ></div>
 
       <div
         className={`header-wrapper${showHeader ? "" : " hide"}${loaded ? " loaded" : ""}`}
@@ -128,7 +135,9 @@ const Header = () => {
             aria-expanded={menuOpen}
             aria-controls="main-navigation"
             onClick={toggleMenu}
-            onKeyDown={(e) => { if (["Enter", " "].includes(e.key)) toggleMenu(); }}
+            onKeyDown={(e) => {
+              if (["Enter", " "].includes(e.key)) toggleMenu();
+            }}
             ref={toggleRef}
           />
           <NavLink
@@ -147,14 +156,25 @@ const Header = () => {
             <div className="mobile-header-actions fade-in delay-3">
               {!loading && auth ? (
                 <div className="welcome-container-mobile">
-                  <div className="Welcome-text-mobile" onClick={() => setDropdownOpen(!dropdownOpen)}>
+                  <div
+                    className="Welcome-text-mobile"
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                  >
                     <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
-                    <span>{showWelcome ? `Welcome ${auth?.firstName || "User"}` : auth?.firstName || "User"}</span>
+                    <span>
+                      {showWelcome
+                        ? `Welcome ${auth?.firstName || "User"}`
+                        : auth?.firstName || "User"}
+                    </span>
                   </div>
                   {dropdownOpen && (
                     <div className="dropdown-menu">
-                      <button className="logout-btn" onClick={handleLogout}>Logout</button>
-                      <button className="delete-account-btn" onClick={handleDeleteClick}>Delete Account</button>
+                      <button className="logout-btn" onClick={handleLogout}>
+                        Logout
+                      </button>
+                      <button className="delete-account-btn" onClick={handleDeleteClick}>
+                        Delete Account
+                      </button>
                     </div>
                   )}
                 </div>
@@ -171,12 +191,26 @@ const Header = () => {
             id="main-navigation"
             className={`sub-header fade-in delay-2 ${menuOpen ? "menu-open" : ""}`}
           >
-            <NavLink to="/Temples" className="nav-link" onClick={() => setMenuOpen(false)}>Temples</NavLink>
-            <NavLink to="/Sevas-&-Booking" className="nav-link" onClick={() => setMenuOpen(false)}>Sevas & Bookings</NavLink>
-            <NavLink to="/Donation" className="nav-link" onClick={() => setMenuOpen(false)}>Donation</NavLink>
-            <NavLink to="/Media" className="nav-link" onClick={() => setMenuOpen(false)}>Media Room</NavLink>
-            <NavLink to="/Support" className="nav-link" onClick={() => setMenuOpen(false)}>Support</NavLink>
-            {isMobile && <div className="theme-toggle-mobile"><ThemeToggle /></div>}
+            <NavLink to="/Temples" className="nav-link" onClick={() => setMenuOpen(false)}>
+              Temples
+            </NavLink>
+            <NavLink to="/Sevas-&-Booking" className="nav-link" onClick={() => setMenuOpen(false)}>
+              Sevas & Bookings
+            </NavLink>
+            <NavLink to="/Donation" className="nav-link" onClick={() => setMenuOpen(false)}>
+              Donation
+            </NavLink>
+            <NavLink to="/Media" className="nav-link" onClick={() => setMenuOpen(false)}>
+              Media Room
+            </NavLink>
+            <NavLink to="/Support" className="nav-link" onClick={() => setMenuOpen(false)}>
+              Support
+            </NavLink>
+            {isMobile && (
+              <div className="theme-toggle-mobile">
+                <ThemeToggle />
+              </div>
+            )}
           </nav>
 
           {!isMobile && (
@@ -187,19 +221,34 @@ const Header = () => {
               </button>
 
               <div className="search-signin">
-                <input type="text" placeholder="Search Temples" className="search-bar fade-in delay-3" />
+                <input
+                  type="text"
+                  placeholder="Search Temples"
+                  className="search-bar fade-in delay-3"
+                />
 
                 {!loading && auth ? (
                   <div className="welcome-container fade-in delay-4">
-                    <div className="welcome-text" onClick={() => setDropdownOpen(!dropdownOpen)}>
-                      <span className="signin-text">{showWelcome ? `Welcome ${auth?.firstName || "User"}` : auth?.firstName || "User"}</span>
+                    <div
+                      className="welcome-text"
+                      onClick={() => setDropdownOpen(!dropdownOpen)}
+                    >
+                      <span className="signin-text">
+                        {showWelcome
+                          ? `Welcome ${auth?.firstName || "User"}`
+                          : auth?.firstName || "User"}
+                      </span>
                       <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
                     </div>
 
                     {dropdownOpen && (
                       <div className="dropdown-menu">
-                        <button className="logout-btn" onClick={handleLogout}>Logout</button>
-                        <button className="delete-account-btn" onClick={handleDeleteClick}>Delete Account</button>
+                        <button className="logout-btn" onClick={handleLogout}>
+                          Logout
+                        </button>
+                        <button className="delete-account-btn" onClick={handleDeleteClick}>
+                          Delete Account
+                        </button>
                       </div>
                     )}
                   </div>
@@ -220,8 +269,12 @@ const Header = () => {
           <div className="modal-content">
             <h3>Are you sure you want to delete your account?</h3>
             <div className="modal-actions">
-              <button className="yes-btn" onClick={confirmDeleteAccount}>Yes</button>
-              <button className="cancel-btn" onClick={() => setShowDeleteDialog(false)}>Cancel</button>
+              <button className="yes-btn" onClick={confirmDeleteAccount}>
+                Yes
+              </button>
+              <button className="cancel-btn" onClick={() => setShowDeleteDialog(false)}>
+                Cancel
+              </button>
             </div>
           </div>
         </div>
