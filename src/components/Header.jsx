@@ -202,8 +202,8 @@ const Header = () => {
           {isMobile && (
             <div className="mobile-header-actions fade-in delay-3">
               {!loading && auth?.user ? (
-                <div className="welcome-container-mobile" style={{ textAlign: "center" }}>
-                  <div
+                <div className="welcome-container-mobile">
+                  <div className="Welcome-text-mobile"
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                   >
                     <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
