@@ -41,7 +41,6 @@ const showLayout =
 
 
   const justLoggedOut = sessionStorage.getItem("justLoggedOut") === "true";
-  const justLogoClick = sessionStorage.getItem("justLogoClick") === "true";
 
   return (
     <div className="App">
@@ -49,15 +48,16 @@ const showLayout =
 
       <Routes>
         <Route
-  path="/"
-  element={
-    auth?.user || justLogoClick
-      ? (justLogoClick ? (sessionStorage.removeItem("justLogoClick"), <Homepage />) : <Homepage />)
-      : justLoggedOut
-      ? <Navigate to="/Login" replace />
-      : <Navigate to="/SignUp" replace />
-  }
-/>
+        path="/"
+        element={
+          auth?.user
+          ? <Homepage />
+          : justLoggedOut
+          ? <Navigate to="/Login" replace />
+          : <Navigate to="/SignUp" replace />
+        }
+        />
+
 <Route
   path="/Login"
   element={auth?.user ? <Navigate to="/" replace /> : <LoginPage />}
@@ -66,7 +66,6 @@ const showLayout =
   path="/SignUp"
   element={auth?.user ? <Navigate to="/" replace /> : <SignUpPage />}
 />
-        <Route path="/" element={<Homepage />} />
         <Route path="/Temples" element={<TemplesPage />} />
         <Route path="/Sevas-&-Booking" element={<Sevas />} />
         <Route path="/Donation" element={<DonationPage />} />

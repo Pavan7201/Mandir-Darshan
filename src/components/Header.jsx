@@ -41,6 +41,7 @@ const Header = () => {
     setDropdownOpen(false);
     setShowDeleteDialog(false);
     sessionStorage.setItem("justLoggedOut", "true");
+    sessionStorage.removeItem("showWelcome");
     navigate("/Login", { replace: true });
 
   } catch (err) {
@@ -141,15 +142,21 @@ const Header = () => {
     }
   }, [menuOpen, isMobile]);
 
+  const welcomeShownRef = useRef(false);
   useEffect(() => {
-    if (location.pathname === "/") {
-      setShowWelcome(true);
-      const timer = setTimeout(() => {
-        setShowWelcome(false);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [location.pathname]);
+  if (
+    location.pathname === "/" &&
+    auth?.user &&
+    sessionStorage.getItem("showWelcome") === "true"
+  ) {
+    setShowWelcome(true);
+    sessionStorage.removeItem("showWelcome");
+    const timer = setTimeout(() => {
+      setShowWelcome(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }
+}, [location.pathname, auth?.user]);
 
   useEffect(() => {
     if (!menuOpen && document.activeElement && menuRef.current?.contains(document.activeElement)) {
@@ -189,25 +196,18 @@ const Header = () => {
             }}
             ref={toggleRef}
           />
-          <NavLink to="/" onClick={(e) => {
-            e.preventDefault();
-            sessionStorage.setItem("justLogoClick", "true");
-            navigate("/");
-          }}
-          className="logo-img fade-in delay-1">
+          <NavLink to="/" onClick={() => navigate("/")} className="logo-img fade-in delay-1">
             <img src={MandirLogo} alt="Mandir Logo" />
           </NavLink>
-
           {isMobile && (
             <div className="mobile-header-actions fade-in delay-3">
               {!loading && auth?.user ? (
                 <div className="welcome-container-mobile" style={{ textAlign: "center" }}>
                   <div
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    style={{ cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center" }}
                   >
                     <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
-                    <span style={{ fontSize: "0.85rem", marginTop: "4px" }}>
+                    <span>
                       {showWelcome ? `Welcome ${auth.user?.firstName || "User"}` : auth.user?.firstName || "User"}
                       </span>
                     </div>
@@ -264,7 +264,6 @@ const Header = () => {
                     <div
                       className="welcome-text"
                       onClick={() => setDropdownOpen(!dropdownOpen)}
-                      style={{ cursor: "pointer" }}
                     >
                       <span className="signin-text">
                         {showWelcome ? `Welcome ${auth.user?.firstName || "User"}` : auth.user?.firstName || "User"}

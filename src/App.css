@@ -5,7 +5,7 @@ body.dark {
   --heading-color:#f7edd6;
   --card-color: #2a2a2a;
   --primary-color: #800000;
-  --secondary-color: orange;
+  --secondary-color: #f7edd6;
   --faq-color: #f0e6bd;
   --link-hover: #ffffff;
   --box-shadow:0 4px 12px #f1efea2b;
@@ -32,6 +32,7 @@ body.dark {
   --signup-input:#f0e6bd;
   --signup-button:yellow;
   --signup-bg-button:rgb(243, 243, 136);
+  --logout-signup-hover-bg-btn:rgb(63, 59, 59);
 
 
   background-color: var(--bg-color);
@@ -45,7 +46,7 @@ body {
   --heading-color:#a84300;
   --card-color: rgb(255, 242, 213);
   --primary-color: maroon;
-  --secondary-color: orange;
+  --secondary-color: #f7edd6;
   --faq-color: maroon;
   --link-hover: black;
   --box-shadow:0 4px 12px rgba(0, 0, 0, 0.1);
@@ -72,6 +73,7 @@ body {
   --signup-input:black;
   --signup-button:purple;
   --signup-bg-button:rgb(210, 187, 210);
+  --logout-signup-hover-bg-btn:maroon;
 }
 
 body.dark header,

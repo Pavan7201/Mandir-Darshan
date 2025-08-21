@@ -89,6 +89,7 @@ const SignupPage = () => {
       });
       const userData = await userRes.json();
       setUser(userData.user);
+      sessionStorage.setItem("showWelcome", "true");
       navigate("/");
     } catch {
       setError("An unexpected error occurred.");
