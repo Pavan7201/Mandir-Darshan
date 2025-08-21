@@ -87,11 +87,10 @@ app.post("/api/signup", async (req, res) => {
       expiresIn: "1h",
     });
 
-    const prod = process.env.NODE_ENV === "production"
     res.cookie("token", token, {
       httpOnly: true,
-      secure: prod ? true : false,
-      sameSite: prod ? "none" : "lax", 
+      secure: true,
+      sameSite: "none", 
       path: "/",
       maxAge: 3600000,
     });
@@ -123,11 +122,10 @@ app.post("/api/login", async (req, res) => {
       expiresIn: "1h",
     });
 
-    const prod = process.env.NODE_ENV === "production";
     res.cookie("token", token, {
       httpOnly: true,
-      secure: prod ? true : false, 
-      sameSite: prod ? "none" : "lax",
+      secure: true,
+      sameSite: "none",
       path: "/",
       maxAge: 3600000,
     });
@@ -152,11 +150,11 @@ app.post("/api/logout", async (req, res) => {
     if (!blacklisted) await BlacklistedToken.create({ token, userId: decoded._id, expiresAt: expiry });
   }
 }
-  const prod = process.env.NODE_ENV === "production";
+
   res.clearCookie("token", {
     httpOnly: true,
-    secure: prod ? true : false,
-    sameSite: prod ? "none" : "lax",
+    secure: true,
+    sameSite: "none",
     path: "/",
   });
 
@@ -180,11 +178,10 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
 
     await BlacklistedToken.deleteMany({ userId: req.user._id });
 
-    const prod = process.env.NODE_ENV === "production";
     res.clearCookie("token", {
       httpOnly: true,
-      secure: prod ? true : false,
-      sameSite: prod ? "none" : "lax",
+      secure: true,
+      sameSite: "none",
       path: "/",
     });
 
