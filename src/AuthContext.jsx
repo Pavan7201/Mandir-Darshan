@@ -43,18 +43,23 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    try {
-      await fetch(`${API_BASE_URL}/api/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-    } catch (err) {
-      console.error("Logout failed:", err);
-    } finally {
-      setAuth(null);
-      sessionStorage.setItem("justLoggedOut", "true");
-    }
-  };
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (!res.ok) throw new Error("Logout failed");
+
+    const data = await res.json();
+    setAuth(null);
+    sessionStorage.setItem("justLoggedOut", "true");
+
+    if (data.redirect) window.location.href = data.redirect;
+  } catch (err) {
+    console.error("Logout failed:", err);
+  }
+};
 
   const deleteAccount = async () => {
     try {
@@ -62,13 +67,17 @@ export const AuthProvider = ({ children }) => {
         method: "DELETE",
         credentials: "include", 
       });
-      if (!res.ok) throw new Error("Failed to delete account");
+      if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData?.error || "Failed to delete account");
+    }
 
       const data = await res.json();
       setAuth(null);
       sessionStorage.setItem("justLoggedOut", "true");
 
       if (data.redirect) window.location.href = data.redirect;
+    else window.location.href = "/signup";
     } catch (err) {
       console.error("Error deleting account:", err);
     }

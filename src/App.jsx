@@ -18,9 +18,8 @@ import SupportPage from "./Pages/SupportPage";
 import LoginPage from "./Pages/LoginPage";
 import SignUpPage from "./Pages/SignUpPage";
 import NotFound from "./Pages/NotFoundPage";
-
 import { ThemeProvider } from "./ThemeContext";
-import { AuthProvider, AuthContext } from "./AuthContext";
+import { AuthContext } from "./AuthContext";
 
 import "./App.css";
 
@@ -48,10 +47,7 @@ function AppRoutes() {
   "/support"
 ];
 
-const showLayout = layoutRoutes.some((path) =>
-  location.pathname.startsWith(path)
-);
-
+const showLayout = layoutRoutes.some((path) => location.pathname.startsWith(path));
 
   const justLoggedOut = sessionStorage.getItem("justLoggedOut") === "true";
   const justLogoClick = sessionStorage.getItem("justLogoClick") === "true";
@@ -70,12 +66,12 @@ const showLayout = layoutRoutes.some((path) =>
         <Route path="/" element={ auth || justLogoClick ? ( <Homepage /> ) : justLoggedOut ? ( <Navigate to="/login" replace /> ) : ( <Navigate to="/signup" replace /> )} />
         <Route path="/login" element={auth ? <Navigate to="/" replace /> : <LoginPage />} />
         <Route path="/signup" element={auth ? <Navigate to="/" replace /> : <SignUpPage />} />
-        <Route path="/Temples" element={<TemplesPage />} />
-        <Route path="/Sevas-&-Booking" element={ <PrivateRoute> <Sevas /> </PrivateRoute> } />
-        <Route path="/Donation" element={<DonationPage />} />
-        <Route path="/Media" element={<MediaRoomPage />} />
-        <Route path="/Support" element={<SupportPage />} />
-        <Route path="/Notfound" element={<NotFound />} />
+        <Route path="/temples" element={<TemplesPage />} />
+        <Route path="/sevas-&-booking" element={ <PrivateRoute> <Sevas /> </PrivateRoute> } />
+        <Route path="/donation" element={<DonationPage />} />
+        <Route path="/media" element={<MediaRoomPage />} />
+        <Route path="/support" element={<SupportPage />} />
+        <Route path="/notfound" element={<NotFound />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
 

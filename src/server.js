@@ -157,23 +157,27 @@ app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
 
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
-    const deletedUser = await User.findByIdAndDelete(req.user._id);
+    const userId = req.user._id;
+    await BlacklistedToken.deleteMany({ userId });
+
+    const deletedUser = await User.findByIdAndDelete(userId);
     if (!deletedUser) return res.status(404).json({ error: "User not found", redirect: "/signup" });
 
     const token = req.cookies?.token;
-    if (token && req.user?._id) {
-      const expiry = req.user.exp ? new Date(req.user.exp * 1000) : new Date();
-      await BlacklistedToken.create({ token, userId: req.user._id, expiresAt: expiry });
+    if (token) {
+      const decoded = jwt.decode(token);
+      const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date(Date.now() + 3600000);
+      await BlacklistedToken.create({ token, userId, expiresAt: expiry });
     }
 
-    await BlacklistedToken.deleteMany({ userId: req.user._id });
-
     res.cookie("token", "", { ...cookieOptions, maxAge: 0 });
+
     res.json({ message: "Account deleted successfully", redirect: "/signup" });
   } catch (err) {
     console.error("❌ Delete account error:", err);
     res.status(500).json({ error: "Failed to delete account", redirect: "/signup" });
   }
 });
+
 
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
