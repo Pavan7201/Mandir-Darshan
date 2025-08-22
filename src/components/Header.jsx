@@ -18,7 +18,7 @@ const Header = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showWelcome, setShowWelcome] = useState(true);
 
-  const { auth, logout, loading, deleteAccount } = useContext(AuthContext);
+  const { user, logout, loading, deleteAccount } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const headerRef = useRef();
@@ -154,7 +154,7 @@ const Header = () => {
 
           {isMobile && (
             <div className="mobile-header-actions fade-in delay-3">
-              {!loading && auth ? (
+              {!loading && user ? (
                 <div className="welcome-container-mobile">
                   <div
                     className="Welcome-text-mobile"
@@ -163,8 +163,8 @@ const Header = () => {
                     <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
                     <span>
                       {showWelcome
-                        ? `Welcome ${auth?.firstName || "User"}`
-                        : auth?.firstName || "User"}
+                        ? `Welcome ${user?.firstName || "User"}`
+                        : user?.firstName || "User"}
                     </span>
                   </div>
                   {dropdownOpen && (
@@ -227,7 +227,7 @@ const Header = () => {
                   className="search-bar fade-in delay-3"
                 />
 
-                {!loading && auth ? (
+                {!loading && user ? (
                   <div className="welcome-container fade-in delay-4">
                     <div
                       className="welcome-text"
@@ -235,8 +235,8 @@ const Header = () => {
                     >
                       <span className="signin-text">
                         {showWelcome
-                          ? `Welcome ${auth?.firstName || "User"}`
-                          : auth?.firstName || "User"}
+                          ? `Welcome ${user?.firstName || "User"}`
+                          : user?.firstName || "User"}
                       </span>
                       <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
                     </div>

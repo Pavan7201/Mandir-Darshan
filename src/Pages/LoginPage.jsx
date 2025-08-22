@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import "../css/LoginPage.css";
 import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -8,7 +8,6 @@ import Faq from "../components/Faq's";
 import { faqData } from "../components/FaqData";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 import { AuthContext } from "../AuthContext";
-import API_BASE_URL from "../config/apiConfig";
 
 const LoginPage = () => {
   useScrollAnimation();
@@ -17,7 +16,7 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { setUser } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -26,36 +25,18 @@ const LoginPage = () => {
       setError("Please enter a valid 10-digit mobile number.");
       return;
     }
+
     setIsLoading(true);
     setError("");
+
     try {
-      const res = await fetch(`${API_BASE_URL}/api/login`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Login failed");
-        setIsLoading(false);
-        return;
-      }
-      if (data.user) {
-        setUser(data.user);
-      } else {
-        const userRes = await fetch(`${API_BASE_URL}/api/me`, {
-          credentials: "include",
-        });
-        const userData = await userRes.json();
-        setUser(userData.user);
-      }
+      await login(mobile, password);
       sessionStorage.removeItem("justLoggedOut");
       sessionStorage.setItem("showWelcome", "true");
       navigate("/");
     } catch (err) {
       console.error("Login error:", err);
-      setError("An error occurred. Please try again.");
+      setError(err.message || "Login failed");
     } finally {
       setIsLoading(false);
     }

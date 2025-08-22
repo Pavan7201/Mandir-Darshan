@@ -5,11 +5,10 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import IndiaFlag from "../assets/India-flag.png";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 import { AuthContext } from "../AuthContext";
-import API_BASE_URL from "../config/apiConfig";
 
 const SignupPage = () => {
   useScrollAnimation();
-  const { setUser } = useContext(AuthContext);
+  const { signup } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -27,13 +26,13 @@ const SignupPage = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+  const StrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "password") {
       setPasswordStrengthError(
-        strongPasswordRegex.test(value)
+        StrongPassword.test(value)
           ? ""
           : "Weak password. Use 8+ chars, uppercase, lowercase, number, special char."
       );
@@ -50,7 +49,7 @@ const SignupPage = () => {
     if (mobile.length !== 10) {
       return setError("Please enter a valid 10-digit mobile number.");
     }
-    if (!strongPasswordRegex.test(password)) {
+    if (!StrongPassword.test(password)) {
       return setError(
         "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
       );
@@ -60,26 +59,13 @@ const SignupPage = () => {
     }
     setError("");
     setIsLoading(true);
+
     try {
-      const res = await fetch(`${API_BASE_URL}/api/signup`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firstName,
-          middleName: form.middleName,
-          lastName,
-          mobile,
-          password,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) return setError(data.error || "Signup failed");
-      if (data.user) setUser(data.user);
+      await signup(form);
       navigate("/");
     } catch (err) {
       console.error("Signup error:", err);
-      setError("An unexpected error occurred.");
+      setError(err.message || "Signup failed");
     } finally {
       setIsLoading(false);
     }

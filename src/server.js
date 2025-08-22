@@ -26,6 +26,9 @@ app.use(
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true, 
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 200,
   })
 );
 
@@ -41,14 +44,18 @@ const UserSchema = new mongoose.Schema({
   mobile: { type: String, unique: true },
   passwordHash: String,
 });
-const User = mongoose.model("User", UserSchema);
+
+const User = mongoose.models.User || mongoose.model("User", UserSchema);
 
 const BlacklistedTokenSchema = new mongoose.Schema({
   token: { type: String, required: true, unique: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  expiresAt: { type: Date, required: true, index: { expires: 0 } },
+  expiresAt: { type: Date, required: true, index: { expires: "0s" } },
 });
-const BlacklistedToken = mongoose.models.BlacklistedToken || mongoose.model("BlacklistedToken", BlacklistedTokenSchema);
+
+const BlacklistedToken =
+  mongoose.models.BlacklistedToken ||
+  mongoose.model("BlacklistedToken", BlacklistedTokenSchema);
 
 const authenticateUserMiddleware = async (req, res, next) => {
   try {
@@ -72,7 +79,7 @@ const cookieOptions = {
   secure: isProd,
   sameSite: isProd ? "none" : "lax",
   path: "/",
-  maxAge: 3600000, 
+  maxAge: 60 * 60 * 1000, 
 };
 
 app.get("/", (req, res) => res.send("Backend is running 🚀"));
@@ -83,14 +90,14 @@ app.post("/api/signUp", async (req, res) => {
     if (!firstName || !lastName || !mobile || !password)
       return res.status(400).json({ error: "All required fields must be filled." });
 
-    const existing = await User.findOne({ mobile });
-    if (existing) return res.status(400).json({ error: "User already exists" });
+    const existingMobile = await User.findOne({ mobile });
+    if (existingMobile) return res.status(400).json({ error: "User already exists" });
 
     const passwordHash = await bcrypt.hash(password, 10);
     const user = new User({ firstName, middleName, lastName, mobile, passwordHash });
     await user.save();
 
-    const token = jwt.sign({ _id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ _id: user._id, firstName: user.firstName, mobile: user.mobile  }, JWT_SECRET, { expiresIn: "1h" });
     res.cookie("token", token, cookieOptions);
 
     res.status(201).json({
@@ -99,7 +106,8 @@ app.post("/api/signUp", async (req, res) => {
       redirect: "/",
     });
   } catch (err) {
-    res.status(500).json({ error: "Internal server error" });
+    console.error(err);
+    res.status(500).json({ error: "Internal server error", redirect: "/signup" });
   }
 });
 
@@ -116,7 +124,7 @@ app.post("/api/login", async (req, res) => {
 
     await BlacklistedToken.deleteMany({ userId: user._id });
 
-    const token = jwt.sign({ _id: user._id, firstName: user.firstName }, JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ _id: user._id, firstName: user.firstName, mobile: user.mobile  }, JWT_SECRET, { expiresIn: "1h" });
     res.cookie("token", token, cookieOptions);
 
     res.json({
@@ -125,7 +133,8 @@ app.post("/api/login", async (req, res) => {
       redirect: "/",
     });
   } catch (err) {
-    res.status(500).json({ error: "Internal server error" });
+    console.error(err);
+    res.status(500).json({ error: "Internal server error", redirect: "/login" });
   }
 });
 
@@ -139,9 +148,10 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
         await BlacklistedToken.create({ token, userId: decoded._id, expiresAt: expiry });
       }
     }
-    res.cookie("token", token, { ...cookieOptions, maxAge: 0 });
+    res.cookie("token", "" , { ...cookieOptions, maxAge: 0 });
     res.json({ message: "Logged out successfully", redirect: "/login" });
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Logout failed", redirect: "/login" });
   }
 });
@@ -149,35 +159,28 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
 app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-passwordHash");
+    if (!user) return res.status(404).json({ error: "User not found" });
     res.json({ user });
-  } catch {
+  } catch (err) {
+    console.log(err)
     res.status(500).json({ error: "Server error" });
   }
 });
 
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
-    const userId = req.user._id;
-    await BlacklistedToken.deleteMany({ userId });
-
-    const deletedUser = await User.findByIdAndDelete(userId);
-    if (!deletedUser) return res.status(404).json({ error: "User not found", redirect: "/signup" });
-
-    const token = req.cookies?.token;
-    if (token) {
-      const decoded = jwt.decode(token);
-      const expiry = decoded?.exp ? new Date(decoded.exp * 1000) : new Date(Date.now() + 3600000);
-      await BlacklistedToken.create({ token, userId, expiresAt: expiry });
+    const deletedUser = await User.findByIdAndDelete(req.user._id);
+    if (!deletedUser) {
+      return res.status(404).json({ error: "User not found", redirect: "/signup" });
     }
-
-    res.cookie("token", token, { ...cookieOptions, maxAge: 0 });
-
+    
+    await BlacklistedToken.deleteMany({ userId: req.user._id });
+    res.cookie("token", "", { ...cookieOptions, maxAge: 0 });
     res.json({ message: "Account deleted successfully", redirect: "/signup" });
   } catch (err) {
-    console.error("❌ Delete account error:", err);
+    console.log(err)
     res.status(500).json({ error: "Failed to delete account", redirect: "/signup" });
   }
 });
-
 
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

@@ -1,44 +1,58 @@
-import React, { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect } from "react";
+const API_BASE_URL = "https://mandir-darshan.onrender.com";
 
 export const AuthContext = createContext();
 
-const API_BASE_URL = "https://mandir-darshan.onrender.com";
-
 export const AuthProvider = ({ children }) => {
-  const [auth, setAuth] = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/me`, {
-          credentials: "include",
-        });
-        if (!res.ok) {
-          setAuth(null);
-        } else {
-          const data = await res.json();
-          setAuth(data.user);
-        }
+  const fetchUser = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/me`, {
+        credentials: "include",
+      });
+      if (!res.ok) {
+        setUser(null);
+        return;
+      }
+      const data = await res.json();
+      setUser(data.user || null);
       } catch (err) {
-        setAuth(null);
+        console.error("Fetch me error:", err);
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
-    fetchUser();
+
+    useEffect(() => {
+    fetchUser().finally(() => setLoading(false));
   }, []);
+
+  const signup = async (userData) => {
+    const res = await fetch(`${API_BASE_URL}/api/signup`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || "Signup failed");
+    setUser(data.user);
+    return data.user;
+  };
 
   const login = async (mobile, password) => {
     const res = await fetch(`${API_BASE_URL}/api/login`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       credentials: "include",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mobile, password }),
     });
-    if (!res.ok) throw new Error("Login failed");
     const data = await res.json();
-    setAuth(data.user);
+    if (!res.ok) throw new Error(data.error || "Login failed");
+    setUser(data.user);
     return data.user;
   };
 
@@ -48,16 +62,11 @@ export const AuthProvider = ({ children }) => {
       method: "POST",
       credentials: "include",
     });
-
-    if (!res.ok) throw new Error("Logout failed");
-
-    const data = await res.json();
-    setAuth(null);
-    sessionStorage.setItem("justLoggedOut", "true");
-
-    if (data.redirect) window.location.href = data.redirect;
   } catch (err) {
     console.error("Logout failed:", err);
+  } finally {
+    setUser(null);
+    sessionStorage.setItem("justLoggedOut", "true");
   }
 };
 
@@ -67,29 +76,24 @@ export const AuthProvider = ({ children }) => {
         method: "DELETE",
         credentials: "include", 
       });
-      if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData?.error || "Failed to delete account");
-    }
-
       const data = await res.json();
-      setAuth(null);
+      if (!res.ok) throw new Error(data?.error || "Failed to delete account")
+      setUser(null);
       sessionStorage.setItem("justLoggedOut", "true");
-
-      if (data.redirect) window.location.href = data.redirect;
-    else window.location.href = "/signup";
     } catch (err) {
       console.error("Error deleting account:", err);
     }
   };
 
   const value = {
-    auth,
-    setUser: setAuth,
+    user,
+    setUser,
+    signup,
     login,
     logout,
     deleteAccount,
     loading,
+    fetchUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
