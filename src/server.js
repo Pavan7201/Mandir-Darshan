@@ -73,13 +73,20 @@ const authenticateUserMiddleware = async (req, res, next) => {
   }
 };
 
-const isProd = process.env.NODE_ENV === "production";
-const cookieOptions = {
-  httpOnly: true,
-  secure: isProd,
-  sameSite: isProd ? "none" : "lax",
-  path: "/",
-  maxAge: 60 * 60 * 1000, 
+const isLocalhost = (origin) =>
+  origin?.includes("localhost") || origin?.includes("127.0.0.1");
+
+const getCookieOptions = (req) => {
+  const origin = req.headers.origin;
+  const local = isLocalhost(origin);
+
+  return {
+    httpOnly: true,
+    secure: !local,
+    sameSite: local ? "lax" : "none",
+    path: "/",
+    maxAge: 60 * 60 * 1000, // 1h
+  };
 };
 
 app.get("/", (req, res) => res.send("Backend is running 🚀"));
@@ -98,7 +105,7 @@ app.post("/api/signUp", async (req, res) => {
     await user.save();
 
     const token = jwt.sign({ _id: user._id, firstName: user.firstName, mobile: user.mobile  }, JWT_SECRET, { expiresIn: "1h" });
-    res.cookie("token", token, cookieOptions);
+    res.cookie("token", token, getCookieOptions(req));
 
     res.status(201).json({
       message: "User created",
@@ -125,7 +132,7 @@ app.post("/api/login", async (req, res) => {
     await BlacklistedToken.deleteMany({ userId: user._id });
 
     const token = jwt.sign({ _id: user._id, firstName: user.firstName, mobile: user.mobile  }, JWT_SECRET, { expiresIn: "1h" });
-    res.cookie("token", token, cookieOptions);
+    res.cookie("token", token, getCookieOptions(req));
 
     res.json({
       message: "Login successful",
@@ -148,7 +155,7 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
         await BlacklistedToken.create({ token, userId: decoded._id, expiresAt: expiry });
       }
     }
-    res.cookie("token", "" , { ...cookieOptions, maxAge: 0 });
+    res.cookie("token", "" , { ...getCookieOptions(req), maxAge: 0 });
     res.json({ message: "Logged out successfully", redirect: "/login" });
   } catch (err) {
     console.error(err);
@@ -168,16 +175,26 @@ app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
 });
 
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
-  try {
+  try
+  {
     const deletedUser = await User.findByIdAndDelete(req.user._id);
     if (!deletedUser) {
       return res.status(404).json({ error: "User not found", redirect: "/signup" });
     }
     
     await BlacklistedToken.deleteMany({ userId: req.user._id });
-    res.cookie("token", "", { ...cookieOptions, maxAge: 0 });
+    const token = req.cookies.token;
+    if (token) { const decoded = jwt.decode(token);
+      if (decoded) { const expiry = decoded.exp ? new Date(decoded.exp * 1000) : new Date();
+        await BlacklistedToken.create({ token, userId: decoded._id, expiresAt: expiry });
+      }
+    }
+
+    res.cookie("token", "", { ...getCookieOptions(req), maxAge: 0 });
     res.json({ message: "Account deleted successfully", redirect: "/signup" });
-  } catch (err) {
+
+  } 
+  catch (err) {
     console.log(err)
     res.status(500).json({ error: "Failed to delete account", redirect: "/signup" });
   }
