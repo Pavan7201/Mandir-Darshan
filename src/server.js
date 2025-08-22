@@ -11,7 +11,7 @@ dotenv.config();
 const app = express();
 app.set("trust proxy", 1);
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
 const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(",") : [];
@@ -85,13 +85,13 @@ const getCookieOptions = (req) => {
     secure: !local,
     sameSite: local ? "lax" : "none",
     path: "/",
-    maxAge: 60 * 60 * 1000, // 1h
+    maxAge: 60 * 60 * 1000,
   };
 };
 
 app.get("/", (req, res) => res.send("Backend is running 🚀"));
 
-app.post("/api/signUp", async (req, res) => {
+app.post("/api/signup", async (req, res) => {
   try {
     const { firstName, middleName, lastName, mobile, password } = req.body;
     if (!firstName || !lastName || !mobile || !password)
@@ -110,11 +110,11 @@ app.post("/api/signUp", async (req, res) => {
     res.status(201).json({
       message: "User created",
       user: { _id: user._id, firstName, middleName, lastName, mobile },
-      redirect: "/",
+
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Internal server error", redirect: "/signup" });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -137,11 +137,10 @@ app.post("/api/login", async (req, res) => {
     res.json({
       message: "Login successful",
       user: { _id: user._id, firstName: user.firstName, middleName: user.middleName, lastName: user.lastName, mobile: user.mobile },
-      redirect: "/",
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Internal server error", redirect: "/login" });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -156,10 +155,10 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
       }
     }
     res.cookie("token", "" , { ...getCookieOptions(req), maxAge: 0 });
-    res.json({ message: "Logged out successfully", redirect: "/login" });
+    res.json({ message: "Logged out successfully"});
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Logout failed", redirect: "/login" });
+    res.status(500).json({ error: "Logout failed" });
   }
 });
 
@@ -179,7 +178,7 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
   {
     const deletedUser = await User.findByIdAndDelete(req.user._id);
     if (!deletedUser) {
-      return res.status(404).json({ error: "User not found", redirect: "/signup" });
+      return res.status(404).json({ error: "User not found" });
     }
     
     await BlacklistedToken.deleteMany({ userId: req.user._id });
@@ -191,12 +190,12 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
     }
 
     res.cookie("token", "", { ...getCookieOptions(req), maxAge: 0 });
-    res.json({ message: "Account deleted successfully", redirect: "/signup" });
+    res.json({ message: "Account deleted successfully"});
 
   } 
   catch (err) {
     console.log(err)
-    res.status(500).json({ error: "Failed to delete account", redirect: "/signup" });
+    res.status(500).json({ error: "Failed to delete account" });
   }
 });
 

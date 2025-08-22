@@ -45,26 +45,31 @@ const SignupPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { firstName, lastName, mobile, password, confirmPassword } = form;
+
+    const { firstName, middleName, lastName, mobile, password, confirmPassword } = form;
+
     if (mobile.length !== 10) {
       return setError("Please enter a valid 10-digit mobile number.");
     }
+
     if (!StrongPassword.test(password)) {
       return setError(
         "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
       );
     }
+
     if (password !== confirmPassword) {
       return setError("Passwords do not match.");
     }
+
     setError("");
     setIsLoading(true);
 
     try {
-      await signup(form);
+      await signup({ firstName, middleName, lastName, mobile, password });
       navigate("/");
     } catch (err) {
-      console.error("Signup error:", err);
+      console.log("Signup error:", err);
       setError(err.message || "Signup failed");
     } finally {
       setIsLoading(false);

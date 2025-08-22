@@ -31,16 +31,19 @@ const Header = () => {
     await logout();
     setDropdownOpen(false);
     setShowDeleteDialog(false);
-    sessionStorage.setItem("justLoggedOut", "true");
+    sessionStorage.setItem("redirectAfterLogout", "login");
+    navigate("/login");
   };
 
   const confirmDeleteAccount = async () => {
     await deleteAccount();
     setDropdownOpen(false);
     setShowDeleteDialog(false);
+    sessionStorage.setItem("redirectAfterLogout", "signup");
+    navigate("/signup");
   };
 
-  const toggleMenu = () => setMenuOpen((prev) => !prev);
+  const toggleMenu = () => setMenuOpen(prev => !prev);
 
   const showHeader = hovered || !hide;
 
@@ -48,12 +51,14 @@ const Header = () => {
     const handleScroll = () => {
       const isTablet = window.innerWidth <= 768;
       const triggerY = window.innerHeight * 0.2;
+      if (window.scrollY > window.innerHeight * 0.2) {
+        setDropdownOpen(false);
+      }
       setHide(!isTablet && window.scrollY > triggerY && !hovered);
     };
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 480);
     };
-
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("resize", handleResize);
     return () => {
@@ -68,7 +73,7 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = event => {
       if (
         menuOpen &&
         menuRef.current &&
@@ -78,11 +83,18 @@ const Header = () => {
       ) {
         setMenuOpen(false);
       }
+      if (
+        dropdownOpen &&
+        !event.target.closest(".welcome-container") &&
+        !event.target.closest(".welcome-container-mobile")
+      ) {
+        setDropdownOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [menuOpen]);
+  }, [menuOpen, dropdownOpen]);
 
   useEffect(() => {
     if (menuRef.current && isMobile) {
@@ -93,14 +105,20 @@ const Header = () => {
   }, [menuOpen, isMobile]);
 
   useEffect(() => {
-    if (location.pathname === "/") {
+  if (location.pathname === "/") {
+    if (sessionStorage.getItem("showWelcome") === "true") {
       setShowWelcome(true);
-      const timer = setTimeout(() => {
-        setShowWelcome(false);
-      }, 2000);
+      sessionStorage.removeItem("showWelcome");
+      const timer = setTimeout(() => setShowWelcome(false), 3000);
       return () => clearTimeout(timer);
+    } else {
+      setShowWelcome(false);
     }
-  }, [location.pathname]);
+  } else {
+    setShowWelcome(false);
+  }
+}, [location.pathname]);
+
 
   useEffect(() => {
     if (!menuOpen && document.activeElement && menuRef.current?.contains(document.activeElement)) {
@@ -114,10 +132,7 @@ const Header = () => {
 
   return (
     <>
-      <div
-        className="header-hover-trigger"
-        onMouseEnter={() => setHovered(true)}
-      ></div>
+      <div className="header-hover-trigger" onMouseEnter={() => setHovered(true)}></div>
 
       <div
         className={`header-wrapper${showHeader ? "" : " hide"}${loaded ? " loaded" : ""}`}
@@ -135,20 +150,10 @@ const Header = () => {
             aria-expanded={menuOpen}
             aria-controls="main-navigation"
             onClick={toggleMenu}
-            onKeyDown={(e) => {
-              if (["Enter", " "].includes(e.key)) toggleMenu();
-            }}
+            onKeyDown={e => { if (["Enter", " "].includes(e.key)) toggleMenu(); }}
             ref={toggleRef}
           />
-          <NavLink
-            to="/"
-            onClick={(e) => {
-              e.preventDefault();
-              sessionStorage.setItem("justLogoClick", "true");
-              navigate("/");
-            }}
-            className="logo-img fade-in delay-1"
-          >
+          <NavLink to="/" onClick={e => { e.preventDefault(); navigate("/"); }} className="logo-img fade-in delay-1">
             <img src={MandirLogo} alt="Mandir Logo" />
           </NavLink>
 
@@ -158,25 +163,15 @@ const Header = () => {
                 <div className="welcome-container-mobile">
                   <div
                     className="Welcome-text-mobile"
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    onClick={() => setDropdownOpen(prev => !prev)}
                   >
                     <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
-                    <span>
-                      {showWelcome
-                        ? `Welcome ${user?.firstName || "User"}`
-                        : user?.firstName || "User"}
-                    </span>
+                    <span>{showWelcome ? `Welcome ${user?.firstName || "User"}` : user?.firstName || "User"}</span>
                   </div>
-                  {dropdownOpen && (
-                    <div className="dropdown-menu">
-                      <button className="logout-btn" onClick={handleLogout}>
-                        Logout
-                      </button>
-                      <button className="delete-account-btn" onClick={handleDeleteClick}>
-                        Delete Account
-                      </button>
-                    </div>
-                  )}
+                  <div className={`dropdown-menu ${dropdownOpen ? "open" : ""}`}>
+                    <button className="logout-btn" onClick={handleLogout}>Logout</button>
+                    <button className="delete-account-btn" onClick={handleDeleteClick}>Delete Account</button>
+                  </div>
                 </div>
               ) : (
                 <NavLink to="/login" className="nav-link">
@@ -186,31 +181,13 @@ const Header = () => {
             </div>
           )}
 
-          <nav
-            ref={menuRef}
-            id="main-navigation"
-            className={`sub-header fade-in delay-2 ${menuOpen ? "menu-open" : ""}`}
-          >
-            <NavLink to="/Temples" className="nav-link" onClick={() => setMenuOpen(false)}>
-              Temples
-            </NavLink>
-            <NavLink to="/Sevas-&-Booking" className="nav-link" onClick={() => setMenuOpen(false)}>
-              Sevas & Bookings
-            </NavLink>
-            <NavLink to="/Donation" className="nav-link" onClick={() => setMenuOpen(false)}>
-              Donation
-            </NavLink>
-            <NavLink to="/Media" className="nav-link" onClick={() => setMenuOpen(false)}>
-              Media Room
-            </NavLink>
-            <NavLink to="/Support" className="nav-link" onClick={() => setMenuOpen(false)}>
-              Support
-            </NavLink>
-            {isMobile && (
-              <div className="theme-toggle-mobile">
-                <ThemeToggle />
-              </div>
-            )}
+          <nav ref={menuRef} id="main-navigation" className={`sub-header fade-in delay-2 ${menuOpen ? "menu-open" : ""}`}>
+            <NavLink to="/Temples" className="nav-link" onClick={() => setMenuOpen(false)}>Temples</NavLink>
+            <NavLink to="/Sevas-&-Booking" className="nav-link" onClick={() => setMenuOpen(false)}>Sevas & Bookings</NavLink>
+            <NavLink to="/Donation" className="nav-link" onClick={() => setMenuOpen(false)}>Donation</NavLink>
+            <NavLink to="/Media" className="nav-link" onClick={() => setMenuOpen(false)}>Media Room</NavLink>
+            <NavLink to="/Support" className="nav-link" onClick={() => setMenuOpen(false)}>Support</NavLink>
+            {isMobile && <div className="theme-toggle-mobile"><ThemeToggle /></div>}
           </nav>
 
           {!isMobile && (
@@ -221,36 +198,19 @@ const Header = () => {
               </button>
 
               <div className="search-signin">
-                <input
-                  type="text"
-                  placeholder="Search Temples"
-                  className="search-bar fade-in delay-3"
-                />
+                <input type="text" placeholder="Search Temples" className="search-bar fade-in delay-3" />
 
                 {!loading && user ? (
                   <div className="welcome-container fade-in delay-4">
-                    <div
-                      className="welcome-text"
-                      onClick={() => setDropdownOpen(!dropdownOpen)}
-                    >
-                      <span className="signin-text">
-                        {showWelcome
-                          ? `Welcome ${user?.firstName || "User"}`
-                          : user?.firstName || "User"}
-                      </span>
+                    <div className="welcome-text" onClick={() => setDropdownOpen(prev => !prev)}>
+                      <span className="signin-text">{showWelcome ? `Welcome ${user?.firstName || "User"}` : user?.firstName || "User"}</span>
                       <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
                     </div>
 
-                    {dropdownOpen && (
-                      <div className="dropdown-menu">
-                        <button className="logout-btn" onClick={handleLogout}>
-                          Logout
-                        </button>
-                        <button className="delete-account-btn" onClick={handleDeleteClick}>
-                          Delete Account
-                        </button>
-                      </div>
-                    )}
+                    <div className={`dropdown-menu ${dropdownOpen ? "open" : ""}`}>
+                      <button className="logout-btn" onClick={handleLogout}>Logout</button>
+                      <button className="delete-account-btn" onClick={handleDeleteClick}>Delete Account</button>
+                    </div>
                   </div>
                 ) : (
                   <NavLink to="/login" className="signin-btn fade-in delay-4 nav-link">
@@ -269,12 +229,8 @@ const Header = () => {
           <div className="modal-content">
             <h3>Are you sure you want to delete your account?</h3>
             <div className="modal-actions">
-              <button className="yes-btn" onClick={confirmDeleteAccount}>
-                Yes
-              </button>
-              <button className="cancel-btn" onClick={() => setShowDeleteDialog(false)}>
-                Cancel
-              </button>
+              <button className="yes-btn" onClick={confirmDeleteAccount}>Yes</button>
+              <button className="cancel-btn" onClick={() => setShowDeleteDialog(false)}>Cancel</button>
             </div>
           </div>
         </div>

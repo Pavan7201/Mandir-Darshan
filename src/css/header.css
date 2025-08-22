@@ -97,15 +97,24 @@
 .dropdown-menu {
   position: absolute;
   top: 100%;
-  right: 0;
-  margin-top: 6px;
-  background-color:var(--bg-color);
+  right: -0.5px;
+  margin-top: 0.72rem;
+  background-color: var(--bg-color);
   border: 1px solid #ccc;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   z-index: 999;
   border-radius: 6px;
   padding: 8px 0;
   min-width: 120px;
+  opacity: 0;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.dropdown-menu.open {
+  opacity: 1;
+  transform: scaleY(1);
 }
 
 .logout-btn {
@@ -536,9 +545,9 @@ body.modal-open {
   }
 
   .dropdown-menu {
-    top: 117%;
-    right: 0%;
-    transform: translateX(14%);
+    top: 104%;
+    right: -0.9rem;
+    transform: translateY(-5%);
   }
 
   .modal-content {

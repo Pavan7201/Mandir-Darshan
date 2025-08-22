@@ -1,6 +1,5 @@
-import React, { useContext, useEffect } from "react";
+import { useContext} from "react";
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
@@ -24,22 +23,23 @@ import { AuthContext } from "./AuthContext";
 import "./App.css";
 
 const PrivateRoute = ({ children }) => {
-  const { auth, loading } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
   const location = useLocation();
 
   if (loading) return <p>Loading...</p>;
 
-  if (!auth) { return <Navigate to="/login" state={{ from: location }} replace />;}
+  if (!user) { return <Navigate to="/login" state={{ from: location }} replace />;}
 
   return children;
 };
 
 function AppRoutes() {
-  const { auth } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const location = useLocation();
 
   const layoutRoutes = [
   "/", 
+  "/home",
   "/temples", 
   "/sevas-&-booking", 
   "/donation", 
@@ -48,24 +48,16 @@ function AppRoutes() {
 ];
 
 const showLayout = layoutRoutes.some((path) => location.pathname.startsWith(path));
-
-  const justLoggedOut = sessionStorage.getItem("justLoggedOut") === "true";
-  const justLogoClick = sessionStorage.getItem("justLogoClick") === "true";
-
-  useEffect(() => {
-    if (justLogoClick) {
-      sessionStorage.removeItem("justLogoClick");
-    }
-  }, [justLogoClick]);
+const redirectAfterLogout = sessionStorage.getItem("redirectAfterLogout");
 
   return (
     <div className="App">
       {showLayout && <Header />}
 
       <Routes>
-        <Route path="/" element={ auth || justLogoClick ? ( <Homepage /> ) : justLoggedOut ? ( <Navigate to="/login" replace /> ) : ( <Navigate to="/signup" replace /> )} />
-        <Route path="/login" element={auth ? <Navigate to="/" replace /> : <LoginPage />} />
-        <Route path="/signup" element={auth ? <Navigate to="/" replace /> : <SignUpPage />} />
+        <Route path="/" element={ user ? ( <Homepage /> ) : redirectAfterLogout === "signup" ? ( <Navigate to="/signup" replace /> ) : ( <Navigate to="/login" replace />)} />
+        <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
+        <Route path="/signup" element={user ? <Navigate to="/" replace /> : <SignUpPage />} />
         <Route path="/temples" element={<TemplesPage />} />
         <Route path="/sevas-&-booking" element={ <PrivateRoute> <Sevas /> </PrivateRoute> } />
         <Route path="/donation" element={<DonationPage />} />

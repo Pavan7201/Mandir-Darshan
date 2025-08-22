@@ -1,11 +1,13 @@
 import { createContext, useState, useEffect } from "react";
-const API_BASE_URL = "https://mandir-darshan.onrender.com";
-
 export const AuthContext = createContext();
+const API_BASE_URL = "https://mandir-darshan.onrender.com";//For production
+// const API_BASE_URL = "http://localhost:4000";// For Development
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
   const fetchUser = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/me`, {
@@ -18,15 +20,13 @@ export const AuthProvider = ({ children }) => {
       const data = await res.json();
       setUser(data.user || null);
       } catch (err) {
-        console.error("Fetch me error:", err);
+        console.log("Fetch me error:", err);
         setUser(null);
       } finally {
         setLoading(false);
       }
     };
-
-    useEffect(() => {
-    fetchUser().finally(() => setLoading(false));
+    fetchUser();
   }, []);
 
   const signup = async (userData) => {
@@ -63,10 +63,9 @@ export const AuthProvider = ({ children }) => {
       credentials: "include",
     });
   } catch (err) {
-    console.error("Logout failed:", err);
+    console.log("Logout failed:", err);
   } finally {
     setUser(null);
-    sessionStorage.setItem("justLoggedOut", "true");
   }
 };
 
@@ -79,9 +78,8 @@ export const AuthProvider = ({ children }) => {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed to delete account")
       setUser(null);
-      sessionStorage.setItem("justLoggedOut", "true");
     } catch (err) {
-      console.error("Error deleting account:", err);
+      console.log("Error deleting account:", err);
     }
   };
 
@@ -93,7 +91,6 @@ export const AuthProvider = ({ children }) => {
     logout,
     deleteAccount,
     loading,
-    fetchUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
