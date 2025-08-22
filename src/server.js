@@ -139,7 +139,7 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
         await BlacklistedToken.create({ token, userId: decoded._id, expiresAt: expiry });
       }
     }
-    res.cookie("token", "", { ...cookieOptions, maxAge: 0 });
+    res.cookie("token", token, { ...cookieOptions, maxAge: 0 });
     res.json({ message: "Logged out successfully", redirect: "/login" });
   } catch {
     res.status(500).json({ error: "Logout failed", redirect: "/login" });
@@ -170,7 +170,7 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
       await BlacklistedToken.create({ token, userId, expiresAt: expiry });
     }
 
-    res.cookie("token", "", { ...cookieOptions, maxAge: 0 });
+    res.cookie("token", token, { ...cookieOptions, maxAge: 0 });
 
     res.json({ message: "Account deleted successfully", redirect: "/signup" });
   } catch (err) {
