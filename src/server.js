@@ -78,7 +78,7 @@ const authenticateUserMiddleware = async (req, res, next) => {
 
 const getCookieOptions = (req) => {
   const origin = req.headers.origin;
-  const local = isLocalhost(origin);
+  const local = origin?.includes("localhost");
 
   return {
     httpOnly: true,
