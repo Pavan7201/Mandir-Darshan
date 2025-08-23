@@ -25,7 +25,7 @@ const Body = () => {
       <section className="section animate-on-scroll">
         {templeData.slice(0, 11).map((temple, index) => (
           <button className="bttn" key={index} onClick={() => handleClick(temple.link)}>
-            <img loading="lazy" src={temple.image} alt={temple.name} />
+            <img src={temple.image} alt={temple.name} />
             <div className="temple-name">{(() => {
     const words = temple.name.trim().split(" ");
     if (words[0].length > 3) {

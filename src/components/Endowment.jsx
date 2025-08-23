@@ -1,8 +1,9 @@
-import lineDecor from "../HeadingDesign/Design 2.png";import "../css/Endowment.css";
-import Chandrababu_Naidu from "../assets/Chandrababu Naidu.jpg";
-import Sri_Anam_Ramanarayana_Reddy from "../assets/Sri Anam Ramanarayana Reddy.png";
-import Sri_K_Ramachandra_Mohan from "../assets/Sri K. Ramachandra Mohan.jpeg";
-import Sri_Vadarevu_Vinay_Chand from "../assets/Sri Vadarevu Vinay Chand.jpeg";
+import lineDecor from "../HeadingDesign/HeadingDesign.png";
+import "../css/Endowment.css";
+import Chandrababu_Naidu from "../assets/Chandrababu Naidu.webp";
+import Sri_Anam_Ramanarayana_Reddy from "../assets/Sri Anam Ramanarayana Reddy.webp";
+import Sri_K_Ramachandra_Mohan from "../assets/Sri K. Ramachandra Mohan.webp";
+import Sri_Vadarevu_Vinay_Chand from "../assets/Sri Vadarevu Vinay Chand.webp";
 import "../Animation/Animate.css"
 
 const images = [
@@ -40,7 +41,6 @@ const Endowment = ({className=""}) => {
           Government of Andhra Pradesh - Endowment Department
         </h2>
         <img
-          loading="lazy"
           src={lineDecor}
           alt="decorative line"
           className={`line-decor-img ${className}`}

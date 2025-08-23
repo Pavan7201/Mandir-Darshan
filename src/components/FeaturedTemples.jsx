@@ -1,4 +1,4 @@
-import lineDecor from "../HeadingDesign/Design 2.png";
+import lineDecor from "../HeadingDesign/HeadingDesign.png";
 import { templeData } from "./TempleData";
 import "../css/FeaturedTemples.css";
 
@@ -12,12 +12,11 @@ const FeaturedTemples = ({className=""}) => {
             src={lineDecor}
             alt="decorative line"
             className={`line-decor-img ${className}`}
-            loading="lazy"
           />
           <div className="featured-cards-container">
             {templeData.slice(11).map((Temple, index) => (
               <div key={index} className={`featured-card ${className}`}>
-                <img loading="lazy" src={Temple.image}></img>
+                <img src={Temple.image}></img>
                 <h3 className="featured-card-title">{Temple.name}</h3>
                 <p className="featured-card-description">{Temple.location}</p>
               </div>

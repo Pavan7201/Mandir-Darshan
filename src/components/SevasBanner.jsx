@@ -1,6 +1,6 @@
 import "../css/SevasBanner.css";
 import SevasCard from "./SevasCard";
-import bannerImg from "../assets/D3.jpg";
+import bannerImg from "../assets/D3.webp";
 
 const SevasBanner = ({
   title = "Sevas & Bookings",

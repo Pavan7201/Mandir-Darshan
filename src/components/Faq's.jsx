@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import "../css/Faq's.css";
-import lineDecor from "../HeadingDesign/Design 2.png";
+import lineDecor from "../HeadingDesign/HeadingDesign.png";
 
 const Faq = ({ faqs = [], AnimateOnScroll = "" }) => {
   const [activeIndex, setActiveIndex] = useState(null);
@@ -27,7 +27,6 @@ const Faq = ({ faqs = [], AnimateOnScroll = "" }) => {
         src={lineDecor}
         alt="decorative line"
         className={`line-decor-img ${AnimateOnScroll}`}
-        loading="lazy"
       />
       <div className="faq-container">
         {faqs.map((item, index) => {

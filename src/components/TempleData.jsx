@@ -1,17 +1,17 @@
-import Kanipakam from "../assets/Kanipakam.jpeg";
-import Kalahasti from "../assets/Kalahasti.jpeg";
-import Srisailam from "../assets/Srisailam.jpeg";
-import Mahanandi from "../assets/Mahanandi.jpeg";
-import Kasapuram from "../assets/Kasapuram.jpeg";
-import Simhachalam from "../assets/Simhadri.jpeg";
-import Annavaram from "../assets/Annavaram.jpeg";
-import Tirumala from "../assets/Dwaraka Tirumala.jpeg";
-import Durga from "../assets/Durga.jpeg";
-import Kanaka from "../assets/Kanaka Mahalakshmi.jpeg";
-import Penuganchiprolu from "../assets/Penuganchiprolu.jpeg";
-import Tirupathi from "../assets/tirupati.jpg";
-import Kashi from "../assets/kashi.jpeg";
-import Meenakshi from "../assets/Meenakshi.jpeg";
+import Kanipakam from "../assets/Kanipakam.webp";
+import Kalahasti from "../assets/Kalahasti.webp";
+import Srisailam from "../assets/Srisailam.webp";
+import Mahanandi from "../assets/Mahanandi.webp";
+import Kasapuram from "../assets/Kasapuram.webp";
+import Simhachalam from "../assets/Simhadri.webp";
+import Annavaram from "../assets/Annavaram.webp";
+import Tirumala from "../assets/Dwaraka Tirumala.webp";
+import Durga from "../assets/Durga.webp";
+import Kanaka from "../assets/Kanaka Mahalakshmi.webp";
+import Penuganchiprolu from "../assets/Penuganchiprolu.webp";
+import Tirupathi from "../assets/tirupati.webp";
+import Kashi from "../assets/kashi.webp";
+import Meenakshi from "../assets/Meenakshi.webp";
 import RamMandir from "../assets/Ram Mandir.webp";
 
 export const templeData = [

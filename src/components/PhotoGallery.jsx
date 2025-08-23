@@ -1,23 +1,23 @@
-import lineDecor from "../HeadingDesign/Design 2.png";
+import lineDecor from "../HeadingDesign/HeadingDesign.png";
 import "../css/PhotoGallery.css";
-import p1 from "../assets/p1.webp";
-import p2 from "../assets/p2.webp";
-import p4 from "../assets/p4.webp";
-import p5 from "../assets/p5.webp";
-import p6 from "../assets/p6.webp";
-import p7 from "../assets/p7.webp";
-import p8 from "../assets/p8.webp";
-import p9 from "../assets/p9.webp";
+import galleryImg1 from "../assets/galleryImg1.webp";
+import galleryImg2 from "../assets/galleryImg2.webp";
+import galleryImg3 from "../assets/galleryImg3.webp";
+import galleryImg4 from "../assets/galleryImg4.webp";
+import galleryImg5 from "../assets/galleryImg5.webp";
+import galleryImg6 from "../assets/galleryImg6.webp";
+import galleryImg7 from "../assets/galleryImg7.webp";
+import galleryImg8 from "../assets/galleryImg8.webp";
 
 const images = [
-  { src: p1, alt: "picture 1" },
-  { src: p2, alt: "picture 2" },
-  { src: p4, alt: "picture 4" },
-  { src: p5, alt: "picture 5" },
-  { src: p6, alt: "picture 6" },
-  { src: p7, alt: "picture 7" },
-  { src: p8, alt: "picture 8" },
-  { src: p9, alt: "picture 9" },
+  { src: galleryImg1, alt: "picture 1" },
+  { src: galleryImg2, alt: "picture 2" },
+  { src: galleryImg3, alt: "picture 3" },
+  { src: galleryImg4, alt: "picture 4" },
+  { src: galleryImg5, alt: "picture 5" },
+  { src: galleryImg6, alt: "picture 6" },
+  { src: galleryImg7, alt: "picture 7" },
+  { src: galleryImg8, alt: "picture 8" },
 ];
 
 const PhotoGallery = ({className=""}) => {
@@ -26,7 +26,6 @@ const PhotoGallery = ({className=""}) => {
       <div className="Photo-section-container">
         <h2 className={`Photo-heading ${className}`}>Photo Gallery</h2>
         <img
-          loading="lazy"
           src={lineDecor}
           alt="decorative line"
           className={`line-decor-img ${className}`}

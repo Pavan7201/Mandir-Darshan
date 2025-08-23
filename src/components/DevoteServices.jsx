@@ -6,7 +6,7 @@ import Seva from "../assets/Seva.mp4";
 import Donate from "../assets/Donate.mp4";
 import Accommodation from "../assets/Accommodation.mp4";
 import Temple from "../assets/Temple.mp4";
-import lineDecor from "../HeadingDesign/Design 2.png";
+import lineDecor from "../HeadingDesign/HeadingDesign.png";
 
 const services = [
   {
@@ -56,7 +56,6 @@ const DevoteServices = ({ className = "" }) => {
       <div className="devote-section-container">
         <h2 className={`devote-heading ${className}`}>Devote Services</h2>
         <img
-          loading="lazy"
           src={lineDecor}
           alt="decorative line"
           className={`line-decor-img ${className}`}

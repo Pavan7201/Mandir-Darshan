@@ -73,8 +73,8 @@ const authenticateUserMiddleware = async (req, res, next) => {
   }
 };
 
-const isLocalhost = (origin) =>
-  origin?.includes("localhost") || origin?.includes("127.0.0.1");
+// const isLocalhost = (origin) =>
+//   origin?.includes("localhost") || origin?.includes("127.0.0.1");// for development and testing uncomment this
 
 const getCookieOptions = (req) => {
   const origin = req.headers.origin;

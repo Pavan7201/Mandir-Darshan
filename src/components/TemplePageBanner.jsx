@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {useLocation} from "react-router-dom"
 import "../css/TemplePageBanner.css";
-import Banner from "../assets/TemplesPageBanner.jpg";
+import Banner from "../assets/TemplesPageBanner.webp";
 import TempleSearch from "./TempleSearch";
 import TemplesCards from "../components/TemplesCards";
 
@@ -22,7 +22,6 @@ const TemplePageBanner = () => {
           src={Banner}
           alt="Banner image"
           className="TemplePageBanner-image"
-          loading="lazy"
         />
         <div className="TemplePageBanner-caption">
           <h2>Explore Temples Across Andhra Pradesh</h2>

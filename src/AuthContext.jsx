@@ -1,7 +1,7 @@
 import { createContext, useState, useEffect } from "react";
 export const AuthContext = createContext();
-const API_BASE_URL = "https://mandir-darshan.onrender.com";//For production
-// const API_BASE_URL = "http://localhost:4000";// For Development
+const API_BASE_URL = "https://mandir-darshan.onrender.com";//For production uncomment this
+// const API_BASE_URL = "http://localhost:4000";// For Development uncomment this
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);

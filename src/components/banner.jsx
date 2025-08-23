@@ -1,5 +1,5 @@
 import "../css/banner.css";
-import Bannar from "../assets/Banner.jpg";
+import Bannar from "../assets/Banner.webp";
 
 const Banner = ({ className = "" }) => {
   return (
@@ -9,7 +9,6 @@ const Banner = ({ className = "" }) => {
           src={Bannar}
           alt="Banner image"
           className="banner-image"
-          loading="lazy"
         />
         <div className="banner-caption">
           <h2>Experience the Divine Tranquility</h2>

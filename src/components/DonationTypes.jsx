@@ -1,4 +1,4 @@
-import lineDecor from "../HeadingDesign/Design 2.png";
+import lineDecor from "../HeadingDesign/HeadingDesign.png";
 import "../css/DonationTypes.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
@@ -16,7 +16,6 @@ const DonationTypes = ({AnimateOnScroll=""}) => {
         src={lineDecor}
         alt="decorative line"
         className={`line-decor-img ${AnimateOnScroll}`}
-        loading="lazy"
       />
       <div className={`searchbar-container ${AnimateOnScroll}`}>
         <span className="searchbar-label">Search Temples</span>

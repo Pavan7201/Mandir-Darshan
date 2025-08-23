@@ -1,8 +1,8 @@
 import "../css/SevasCards.css";
-import lineDecor from "../HeadingDesign/Design 2.png";
-import p1 from "../assets/p1.webp";
-import p3 from "../assets/p3.png";
-import p4 from "../assets/p4.webp";
+import lineDecor from "../HeadingDesign/HeadingDesign.png";
+import galleryImg1 from "../assets/galleryImg1.webp";
+import picture from "../assets/picture.webp";
+import galleryImg3 from "../assets/galleryImg3.webp";
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../AuthContext';
@@ -10,21 +10,21 @@ import { AuthContext } from '../AuthContext';
 const sevas = [
   {
     title: "Darshanam",
-    image: p1,
+    image: galleryImg1,
     caption:
       "An auspicious first glance at the divinity in the temple is called Darshanam. A darshanam allows devotees to transcend into a peaceful moment.",
     link: "/NotFound",
     },
   {
     title: "Pratyaksha Seva",
-    image: p3,
+    image: picture,
     caption:
       "Pratyaksha Seva is performing/attending Temple Sevas in Person. One may book a Pratyaksha Seva online and offline.",
     link: "/NotFound",
   },
   {
     title: "Paroksha Seva",
-    image: p4,
+    image: galleryImg3,
     caption:
       "Paroksha Seva is for those who can not visit the temple in person and wish to perform/attend Temple Sevas digitally. One may book a Paroksha Seva online.",
     link: "/NotFound",
@@ -51,7 +51,6 @@ const SevasCard = ({AnimateOnScroll=""}) => {
         src={lineDecor}
         alt="decorative line"
         className={`line-decor-img ${AnimateOnScroll}`}
-        loading="lazy"
       />
       <div className={`sevas-cards-container ${AnimateOnScroll}`}>
         {sevas.map((seva, idx) => (

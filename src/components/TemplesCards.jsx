@@ -1,4 +1,4 @@
-import lineDecor from "../HeadingDesign/Design 2.png";
+import lineDecor from "../HeadingDesign/HeadingDesign.png";
 import { templeData } from "./TempleData";
 import "../css/TemplesCards.css";
 
@@ -12,13 +12,12 @@ const TemplesCards = () => {
             src={lineDecor}
             alt="decorative line"
             className="line-decor-img animate-on-scroll"
-            loading="lazy"
           />
           <div className="temple-cards-container">
             {templeData.map((Temple, index) => (
               <div key={index} className="temple-card animate-on-scroll">
                 {Temple.image && (
-                  <img loading="lazy" src={Temple.image} alt={Temple.name} />
+                  <img src={Temple.image} alt={Temple.name} />
                 )}
                 <h3 className="temple-card-title">{Temple.name}</h3>
                 {Temple.deity && (

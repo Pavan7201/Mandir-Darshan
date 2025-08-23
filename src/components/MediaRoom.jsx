@@ -1,6 +1,6 @@
 import { MediaData } from "../Data/MediaData";
 import "../css/MediaRoom.css";
-import lineDecor from "../HeadingDesign/Design 2.png";
+import lineDecor from "../HeadingDesign/HeadingDesign.png";
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../AuthContext';
@@ -21,7 +21,6 @@ const MediaRoom = ({ cardsToShow, title="Media Room", AnimateOnScroll="" }) => {
       <div className="Media-section-container">
         <h2 className={`Media-heading ${AnimateOnScroll}`}>{title}</h2>
         <img
-          loading="lazy"
           src={lineDecor}
           alt="decorative line "
           className={`line-decor-img ${AnimateOnScroll}`}
