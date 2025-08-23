@@ -85,7 +85,7 @@ const getCookieOptions = (req) => {
     secure: !local,
     sameSite: local ? "lax" : "none",
     path: "/",
-    maxAge: 60 * 60 * 1000,
+    expires: new Date(Date.now() + 60 * 60 * 1000),
   };
 };
 
