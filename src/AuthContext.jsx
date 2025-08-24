@@ -98,7 +98,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     return true;
   } catch (err) {
-    console.error("Error deleting account:", err);
+    console.log("Error deleting account:", err);
     return false;
   }
 };
