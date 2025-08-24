@@ -24,16 +24,15 @@ export const AuthProvider = ({ children }) => {
           setUser(null);
           return;
         }
-
         const data = await res.json();
         setUser(data.user || null);
       } catch (err) {
+        console.log("Fetch me error:", err);
         setUser(null);
       } finally {
         setLoading(false);
       }
     };
-
     fetchUser();
   }, []);
 
@@ -47,7 +46,6 @@ export const AuthProvider = ({ children }) => {
 
     const data = await res.json();
     if (!res.ok) throw new Error(data?.error || "Signup failed");
-
     setUser(data.user);
     setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
     return data.user;
@@ -60,10 +58,8 @@ export const AuthProvider = ({ children }) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mobile, password }),
     });
-
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Login failed");
-
     setUser(data.user);
     setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
     return data.user;
@@ -77,8 +73,8 @@ export const AuthProvider = ({ children }) => {
     });
     const data = await res.json();
 if (!res.ok) throw new Error(data?.error || "Logout failed");
-  } catch {
-    return false;
+  } catch (err) {
+    console.log("Logout failed:", err);
   } finally {
     setUser(null);
   }
@@ -91,12 +87,10 @@ if (!res.ok) throw new Error(data?.error || "Logout failed");
       credentials: "include",
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || "Failed to delete account");
+      if (!res.ok) throw new Error(data?.error || "Failed to delete account")
     setUser(null);
-    return true;
   } catch (err) {
     console.log("Error deleting account:", err);
-    return false;
   }
 };
 

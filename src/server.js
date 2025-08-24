@@ -57,8 +57,24 @@ const BlacklistedToken =
   mongoose.models.BlacklistedToken ||
   mongoose.model("BlacklistedToken", BlacklistedTokenSchema);
 
-  // const isLocalhost = (origin) =>
-  // origin?.includes("localhost") || origin?.includes("127.0.0.1");// for development and testing uncomment this
+  const authenticateUserMiddleware = async (req, res, next) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+    const blacklisted = await BlacklistedToken.findOne({ token });
+    if (blacklisted) return res.status(401).json({ error: "Token has been invalidated" });
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Invalid or expired token" });
+  }
+};
+
+// const isLocalhost = (origin) =>
+//   origin?.includes("localhost") || origin?.includes("127.0.0.1");// for development and testing uncomment this
 
 const getCookieOptions = (req) => {
   const origin = req.headers.origin;
@@ -70,24 +86,8 @@ const getCookieOptions = (req) => {
     secure: !local,
     sameSite: local ? "lax" : "none",
     path: "/",
-    expires: new Date(Date.now() + 60 * 60 * 1000)
+    expires: new Date(Date.now() + 60 * 60 * 1000),
   };
-};
-
-const authenticateUserMiddleware = async (req, res, next) => {
-  try {
-    const token = req.cookies.token;
-    if (!token) return res.status(401).json({ error: "Unauthorized" });
-
-    const blacklisted = await BlacklistedToken.findOne({ token });
-    if (blacklisted) return res.status(401).json({ error: "Token has been invalidated" });
-
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch {
-    return res.status(401).json({ error: "Invalid or expired token" });
-  }
 };
 
 app.get("/", (req, res) => res.send("Backend is running 🚀"));
