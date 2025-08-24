@@ -59,7 +59,7 @@ const BlacklistedToken =
 
   const authenticateUserMiddleware = async (req, res, next) => {
   try {
-    const token = req.cookies?.token;
+    const token = req.cookies.token;
     if (!token) return res.status(401).json({ error: "Unauthorized" });
 
     const blacklisted = await BlacklistedToken.findOne({ token });
