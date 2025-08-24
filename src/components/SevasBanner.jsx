@@ -12,11 +12,7 @@ const SevasBanner = ({
   return (
     <>
       <section className="Sevas-banner-section">
-          <img
-          src={bannerImg}
-          alt="Banner"
-          className={`banner-bg-img ${fadeup}`}
-        />
+          <img src={bannerImg} alt="Banner" className={`banner-bg-img ${fadeup}`}/>
         <div className="banner-overlay"></div>
           <div className={`SevasBanner-caption ${AnimateOnScroll}`}>
             <h1>{title}</h1>

@@ -55,12 +55,12 @@ const redirectAfterLogout = sessionStorage.getItem("redirectAfterLogout");
       {showLayout && <Header />}
 
       <Routes>
-        <Route path="/" element={ user ? ( <Homepage /> ) : redirectAfterLogout === "signup" ? ( <Navigate to="/signup" replace /> ) : ( <Navigate to="/login" replace />)} />
+        <Route path="/" element={ user ? ( <Homepage /> ) : redirectAfterLogout === "login" ? ( <Navigate to="/login" replace /> ) : ( <Navigate to="/signup" replace />)} />
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
         <Route path="/signup" element={user ? <Navigate to="/" replace /> : <SignUpPage />} />
-        <Route path="/temples" element={<TemplesPage />} />
+        <Route path="/temples" element={<PrivateRoute> <TemplesPage /> </PrivateRoute>} />
         <Route path="/sevas-&-booking" element={ <PrivateRoute> <Sevas /> </PrivateRoute> } />
-        <Route path="/donation" element={<DonationPage />} />
+        <Route path="/donation" element={<PrivateRoute><DonationPage /></PrivateRoute>} />
         <Route path="/media" element={<MediaRoomPage />} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/notfound" element={<NotFound />} />

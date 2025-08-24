@@ -4,28 +4,41 @@ const API_BASE_URL = "https://mandir-darshan.onrender.com";//For production unco
 // const API_BASE_URL = "http://localhost:4000";// For Development uncomment this
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); 
   const [loading, setLoading] = useState(true);
+  const [welcomeMessage, setWelcomeMessage] = useState(false)
 
   useEffect(() => {
-  const fetchUser = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/me`, {
-        credentials: "include",
-      });
-      if (!res.ok) {
-        setUser(null);
-        return;
-      }
-      const data = await res.json();
-      setUser(data.user || null);
+    const fetchUser = async () => {
+      try {
+        if (!document.cookie.split("; ").find((row) => row.startsWith("token="))) {
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch(`${API_BASE_URL}/api/me`, {
+          credentials: "include",
+        });
+
+        if (res.status === 401) {
+          setUser(null);
+          return;
+        }
+
+        if (!res.ok) {
+          setUser(null);
+          return;
+        }
+
+        const data = await res.json();
+        setUser(data.user || null);
       } catch (err) {
-        console.log("Fetch me error:", err);
         setUser(null);
       } finally {
         setLoading(false);
       }
     };
+
     fetchUser();
   }, []);
 
@@ -39,7 +52,9 @@ export const AuthProvider = ({ children }) => {
 
     const data = await res.json();
     if (!res.ok) throw new Error(data?.error || "Signup failed");
+
     setUser(data.user);
+    setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
     return data.user;
   };
 
@@ -50,9 +65,12 @@ export const AuthProvider = ({ children }) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mobile, password }),
     });
+
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Login failed");
+
     setUser(data.user);
+    setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
     return data.user;
   };
 
@@ -62,26 +80,28 @@ export const AuthProvider = ({ children }) => {
       method: "POST",
       credentials: "include",
     });
-  } catch (err) {
-    console.log("Logout failed:", err);
+  } catch {
+    return false;
   } finally {
     setUser(null);
   }
 };
 
   const deleteAccount = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
-        method: "DELETE",
-        credentials: "include", 
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Failed to delete account")
-      setUser(null);
-    } catch (err) {
-      console.log("Error deleting account:", err);
-    }
-  };
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || "Failed to delete account");
+    setUser(null);
+    return true;
+  } catch (err) {
+    console.error("Error deleting account:", err);
+    return false;
+  }
+};
 
   const value = {
     user,
@@ -91,6 +111,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     deleteAccount,
     loading,
+    welcomeMessage,
+    setWelcomeMessage
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

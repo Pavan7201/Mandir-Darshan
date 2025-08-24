@@ -19,7 +19,7 @@ const SupportPage = () => {
     <section>
       <MediaRoom AnimateOnScroll="animate-on-scroll" cardsToShow={MediaData.slice(7)} title="Support" />
       <hr/>
-      <Faq AnimateOnScroll="animate-on-scroll" faqs={faqData.slice(9)} />
+      <Faq AnimateOnScroll="animate-on-scroll" faqs={faqData.slice(9,12)} />
     </section>
     </>
   )

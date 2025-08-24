@@ -57,9 +57,26 @@ const BlacklistedToken =
   mongoose.models.BlacklistedToken ||
   mongoose.model("BlacklistedToken", BlacklistedTokenSchema);
 
+  // const isLocalhost = (origin) =>
+  // origin?.includes("localhost") || origin?.includes("127.0.0.1");// for development and testing uncomment this
+
+const getCookieOptions = (req) => {
+  const origin = req.headers.origin;
+  const local = origin?.includes("localhost");
+  // const local = isLocalhost(origin);//for development and testing uncomment this
+
+  return {
+    httpOnly: true,
+    secure: !local,
+    sameSite: local ? "lax" : "none",
+    path: "/",
+    expires: new Date(Date.now() + 60 * 60 * 1000)
+  };
+};
+
 const authenticateUserMiddleware = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    const token = req.cookies?.token;
     if (!token) return res.status(401).json({ error: "Unauthorized" });
 
     const blacklisted = await BlacklistedToken.findOne({ token });
@@ -68,25 +85,9 @@ const authenticateUserMiddleware = async (req, res, next) => {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ error: "Invalid or expired token" });
   }
-};
-
-// const isLocalhost = (origin) =>
-//   origin?.includes("localhost") || origin?.includes("127.0.0.1");// for development and testing uncomment this
-
-const getCookieOptions = (req) => {
-  const origin = req.headers.origin;
-  const local = origin?.includes("localhost");
-
-  return {
-    httpOnly: true,
-    secure: !local,
-    sameSite: local ? "lax" : "none",
-    path: "/",
-    expires: new Date(Date.now() + 60 * 60 * 1000),
-  };
 };
 
 app.get("/", (req, res) => res.send("Backend is running 🚀"));
@@ -154,7 +155,7 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
         await BlacklistedToken.create({ token, userId: decoded._id, expiresAt: expiry });
       }
     }
-    res.cookie("token", "" , { ...getCookieOptions(req), maxAge: 0 });
+    res.cookie("token", "" , { ...getCookieOptions(req), expires: new Date(0) });
     res.json({ message: "Logged out successfully"});
   } catch (err) {
     console.error(err);

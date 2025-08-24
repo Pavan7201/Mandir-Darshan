@@ -11,11 +11,11 @@ import { AuthContext } from "../AuthContext";
 
 
 const Body = () => {
-  const { auth } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const handleClick = (TempleLink) => {
-    if (!auth?.user) {
-      navigate("/SignUp"); 
+    if (!user) {
+      navigate("/signup"); 
     } else {
       navigate(TempleLink);
     }
@@ -27,15 +27,15 @@ const Body = () => {
           <button className="bttn" key={index} onClick={() => handleClick(temple.link)}>
             <img src={temple.image} alt={temple.name} />
             <div className="temple-name">{(() => {
-    const words = temple.name.trim().split(" ");
-    if (words[0].length > 3) {
-      return words[0];
-    } else if (words[0].length === 3) {
-      return `${words[0]} ${words[1]}`;
-    } else {
-      return words[1];
-    }
-  })()}</div>
+              const words = temple.name.trim().split(" ");
+              if (words[0].length > 3) {
+                return words[0];
+              } else if (words[0].length === 3) {
+                return `${words[0]} ${words[1]}`;
+              } else {
+                return words[1];
+              }
+              })()}</div>
           </button>
         ))}
       </section>
