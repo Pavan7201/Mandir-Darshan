@@ -190,7 +190,7 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
       }
     }
 
-    res.cookie("token", "", { ...getCookieOptions(req), maxAge: 0 });
+    res.cookie("token", "", { ...getCookieOptions(req), expires: new Date(0) });
     res.json({ message: "Account deleted successfully"});
 
   } 

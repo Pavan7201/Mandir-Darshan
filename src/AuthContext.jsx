@@ -11,11 +11,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        if (!document.cookie.split("; ").find((row) => row.startsWith("token="))) {
-          setLoading(false);
-          return;
-        }
-
         const res = await fetch(`${API_BASE_URL}/api/me`, {
           credentials: "include",
         });
@@ -80,6 +75,8 @@ export const AuthProvider = ({ children }) => {
       method: "POST",
       credentials: "include",
     });
+    const data = await res.json();
+if (!res.ok) throw new Error(data?.error || "Logout failed");
   } catch {
     return false;
   } finally {
