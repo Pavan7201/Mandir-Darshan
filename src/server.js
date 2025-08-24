@@ -155,7 +155,7 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
         await BlacklistedToken.create({ token, userId: decoded._id, expiresAt: expiry });
       }
     }
-    res.cookie("token", "" , { ...getCookieOptions(req), expires: new Date(0) });
+    res.cookie("token", "" , { ...getCookieOptions(req), maxAge: 0 });
     res.json({ message: "Logged out successfully"});
   } catch (err) {
     console.error(err);
