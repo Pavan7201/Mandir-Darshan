@@ -14,7 +14,9 @@ app.set("trust proxy", true);
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
-const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(",") : [];
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map(origin => origin.trim())
+  : [];
 
 app.use(express.json());
 app.use(cookieParser());
