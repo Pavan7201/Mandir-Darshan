@@ -11,7 +11,7 @@ dotenv.config();
 const app = express();
 app.set("trust proxy", true);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
 const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(",") : [];
@@ -25,7 +25,7 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
       return callback(new Error("Not allowed by CORS"));
     },
-    credentials: true, 
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     optionsSuccessStatus: 200,
@@ -53,11 +53,9 @@ const BlacklistedTokenSchema = new mongoose.Schema({
   expiresAt: { type: Date, required: true, index: { expires: "0s" } },
 });
 
-const BlacklistedToken =
-  mongoose.models.BlacklistedToken ||
-  mongoose.model("BlacklistedToken", BlacklistedTokenSchema);
+const BlacklistedToken = mongoose.models.BlacklistedToken || mongoose.model("BlacklistedToken", BlacklistedTokenSchema);
 
-  const authenticateUserMiddleware = async (req, res, next) => {
+const authenticateUserMiddleware = async (req, res, next) => {
   try {
     const token = req.cookies.token;
     if (!token) return res.status(401).json({ error: "Unauthorized" });
@@ -83,7 +81,7 @@ const getCookieOptions = (req) => {
 
   return {
     httpOnly: true,
-    secure: req.secure || !isLocalhost,
+    secure: process.env.NODE_ENV === "production", // force secure in prod
     sameSite: isLocalhost ? "lax" : "none",
     path: "/",
     expires: new Date(Date.now() + 60 * 60 * 1000),
@@ -155,8 +153,8 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
         await BlacklistedToken.create({ token, userId: decoded._id, expiresAt: expiry });
       }
     }
-    res.cookie("token", "" , { ...getCookieOptions(req), maxAge: 0 });
-    res.json({ message: "Logged out successfully"});
+    res.cookie("token", "", { ...getCookieOptions(req), expires: new Date(0) });
+    res.json({ message: "Logged out successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Logout failed" });
@@ -175,13 +173,12 @@ app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
 });
 
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
-  try
-  {
+  try {
     const deletedUser = await User.findByIdAndDelete(req.user._id);
     if (!deletedUser) {
       return res.status(404).json({ error: "User not found" });
     }
-    
+
     await BlacklistedToken.deleteMany({ userId: req.user._id });
     const token = req.cookies.token;
     if (token) { const decoded = jwt.decode(token);
@@ -190,11 +187,9 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
       }
     }
 
-    res.cookie("token", "", { ...getCookieOptions(req), maxAge: 0 });
-    res.json({ message: "Account deleted successfully"});
-
-  } 
-  catch (err) {
+    res.cookie("token", "", { ...getCookieOptions(req), expires: new Date(0) });
+    res.json({ message: "Account deleted successfully" });
+  } catch (err) {
     console.log(err)
     res.status(500).json({ error: "Failed to delete account" });
   }
