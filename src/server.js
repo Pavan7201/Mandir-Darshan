@@ -78,13 +78,13 @@ const BlacklistedToken =
 
 const getCookieOptions = (req) => {
   const origin = req.headers.origin;
-  const isLocalhost = origin?.includes("localhost");
+  const local = origin?.includes("localhost");
   // const local = isLocalhost(origin);//for development and testing uncomment this
 
   return {
     httpOnly: true,
-    secure: req.secure || !isLocalhost,
-    sameSite: isLocalhost ? "lax" : "none",
+    secure: !local,
+    sameSite: !local ? "lax" : "none",
     path: "/",
     expires: new Date(Date.now() + 60 * 60 * 1000),
   };
