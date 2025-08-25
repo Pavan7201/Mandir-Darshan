@@ -50,7 +50,7 @@ const User = mongoose.models.User || mongoose.model("User", UserSchema);
 const BlacklistedTokenSchema = new mongoose.Schema({
   token: { type: String, required: true, unique: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  expiresAt: { type: Date, required: true, index: { expires: "0s" } },
+  expiresAt: { type: Date, required: true, index: { expires: 3600 } },
 });
 
 const BlacklistedToken =
@@ -75,16 +75,15 @@ const BlacklistedToken =
 
 // const isLocalhost = (origin) =>
 //   origin?.includes("localhost") || origin?.includes("127.0.0.1");// for development and testing uncomment this
-
-const getCookieOptions = (req) => {
+  const getCookieOptions = (req) => {
   const origin = req.headers.origin;
-  const local = origin?.includes("localhost");
+  const isLocalhost = origin?.includes("localhost");
   // const local = isLocalhost(origin);//for development and testing uncomment this
 
   return {
     httpOnly: true,
-    secure: !local,
-    sameSite: !local ? "lax" : "none",
+    secure: !isLocalhost,
+    sameSite: isLocalhost ? "lax" : "none",
     path: "/",
     expires: new Date(Date.now() + 60 * 60 * 1000),
   };
