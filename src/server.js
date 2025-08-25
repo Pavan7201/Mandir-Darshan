@@ -22,9 +22,16 @@ app.use(cookieParser());
 // CORS configuration
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error("Not allowed by CORS"));
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like Postman)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        // Exact origin must be set, not *
+        return callback(null, origin);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -32,6 +39,7 @@ app.use(
     optionsSuccessStatus: 200,
   })
 );
+
 
 // MongoDB connection
 mongoose
