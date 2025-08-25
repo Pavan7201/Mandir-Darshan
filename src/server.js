@@ -60,6 +60,7 @@ const BlacklistedToken =
   const authenticateUserMiddleware = async (req, res, next) => {
   try {
     const token = req.cookies.token;
+    console.log("Token on request:", token);
     if (!token) return res.status(401).json({ error: "Unauthorized" });
 
     const blacklisted = await BlacklistedToken.findOne({ token });
@@ -69,6 +70,7 @@ const BlacklistedToken =
     req.user = decoded;
     next();
   } catch (err) {
+     console.log("Auth error:", err.message);
     return res.status(401).json({ error: "Invalid or expired token" });
   }
 };
