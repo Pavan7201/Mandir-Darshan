@@ -9,7 +9,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-app.set("trust proxy", 1);
+app.set("trust proxy", true);
 
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
@@ -78,13 +78,13 @@ const BlacklistedToken =
 
 const getCookieOptions = (req) => {
   const origin = req.headers.origin;
-  const local = origin?.includes("localhost");
+  const isLocalhost = origin?.includes("localhost");
   // const local = isLocalhost(origin);//for development and testing uncomment this
 
   return {
     httpOnly: true,
-    secure: !local,
-    sameSite: local ? "lax" : "none",
+    secure: req.secure || !isLocalhost,
+    sameSite: isLocalhost ? "lax" : "none",
     path: "/",
     expires: new Date(Date.now() + 60 * 60 * 1000),
   };
