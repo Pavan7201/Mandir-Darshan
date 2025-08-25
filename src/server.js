@@ -14,9 +14,7 @@ app.set("trust proxy", true);
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(",").map(origin => origin.trim())
-  : [];
+const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(",") : [];
 
 app.use(express.json());
 app.use(cookieParser());
@@ -33,18 +31,6 @@ app.use(
     optionsSuccessStatus: 200,
   })
 );
-
-app.options('*', cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error("Not allowed by CORS"));
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 200,
-}));
-
 
 mongoose
   .connect(MONGODB_URI)
@@ -98,7 +84,7 @@ const getCookieOptions = (req) => {
   return {
     httpOnly: true,
     secure: !local,
-    sameSite: !local ? "none" : "lax",
+    sameSite: !local ? "none": "lax",
     path: "/",
     expires: new Date(Date.now() + 60 * 60 * 1000),
   };
