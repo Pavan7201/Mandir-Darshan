@@ -11,23 +11,18 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/me`, {
+        const res = await fetch("/api/me", {
+          method: "GET",
           credentials: "include",
         });
-
-        if (res.status === 401) {
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+        } else {
           setUser(null);
-          return;
         }
-
-        if (!res.ok) {
-          setUser(null);
-          return;
-        }
-        const data = await res.json();
-        setUser(data.user || null);
       } catch (err) {
-        console.log("Fetch me error:", err);
+        console.error(err);
         setUser(null);
       } finally {
         setLoading(false);
