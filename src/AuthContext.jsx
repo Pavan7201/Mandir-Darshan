@@ -1,35 +1,43 @@
 import { createContext, useState, useEffect } from "react";
+
 export const AuthContext = createContext();
-const API_BASE_URL = "https://mandir-darshan.onrender.com";//For production uncomment this
-// const API_BASE_URL = "http://localhost:4000";// For Development uncomment this
+
+const API_BASE_URL =
+  import.meta.env.MODE === "production" ? "https://mandir-darshan.onrender.com" : "http://localhost:4000";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [welcomeMessage, setWelcomeMessage] = useState(false)
+  const [welcomeMessage, setWelcomeMessage] = useState("");
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("/api/me", {
-          method: "GET",
-          credentials: "include",
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data.user);
-        } else {
-          setUser(null);
-        }
-      } catch (err) {
-        console.error(err);
+  const controller = new AbortController();
+  const fetchUser = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/me`, {
+        method: "GET",
+        credentials: "include",
+        signal: controller.signal,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+      } else {
         setUser(null);
-      } finally {
-        setLoading(false);
       }
-    };
-    fetchUser();
-  }, []);
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        console.error("Error fetching user:", err);
+        setUser(null);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchUser();
+  return () => controller.abort();
+}, []);
+
 
   const signup = async (userData) => {
     const res = await fetch(`${API_BASE_URL}/api/signup`, {
@@ -53,6 +61,7 @@ export const AuthProvider = ({ children }) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mobile, password }),
     });
+
     const data = await res.json();
     if (!res.ok) throw new Error(data?.error || "Login failed");
     setUser(data.user);
@@ -62,16 +71,15 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/api/logout`, {
+      await fetch(`${API_BASE_URL}/api/logout`, {
         method: "POST",
         credentials: "include",
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Logout failed");
     } catch (err) {
       console.log("Logout failed:", err);
     } finally {
       setUser(null);
+      setWelcomeMessage("")
     }
   };
 
@@ -81,9 +89,13 @@ export const AuthProvider = ({ children }) => {
         method: "DELETE",
         credentials: "include",
       });
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Failed to delete account")
+      if (!res.ok) throw new Error(data?.error || "Failed to delete account");
+
       setUser(null);
+      setWelcomeMessage("");
+
     } catch (err) {
       console.log("Error deleting account:", err);
     }
@@ -98,8 +110,10 @@ export const AuthProvider = ({ children }) => {
     deleteAccount,
     loading,
     welcomeMessage,
-    setWelcomeMessage
+    setWelcomeMessage,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  );
 };
