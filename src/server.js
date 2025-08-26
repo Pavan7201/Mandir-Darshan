@@ -20,11 +20,6 @@ const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(",").filter(Boo
 app.use(express.json());
 app.use(cookieParser());
 
-app.use((req, _res, next) => {
-  console.log("👉", req.method, req.originalUrl);
-  next();
-});
-
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -61,12 +56,18 @@ async function connectDB() {
   }
 }
 connectDB();
+ 
+// const getCookieOptions = () => ({ //for development and testing
+//   httpOnly: true,
+//   secure: true,
+//   sameSite: "lax",
+//   path: "/",
+// });
 
-const isProd = process.env.NODE_ENV === "production";
 const getCookieOptions = () => ({
   httpOnly: true,
-  secure: isProd,
-  sameSite: isProd ? "none" : "lax",
+  secure: true,     
+  sameSite: "none",
   path: "/",
 });
 

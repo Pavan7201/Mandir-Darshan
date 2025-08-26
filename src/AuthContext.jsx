@@ -90,14 +90,15 @@ export const AuthProvider = ({ children }) => {
         credentials: "include",
       });
 
+      if (!res.ok) {
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Failed to delete account");
-
-      setUser(null);
-      setWelcomeMessage("");
-
+      throw new Error(data?.error || "Failed to delete account");
+    }
     } catch (err) {
       console.log("Error deleting account:", err);
+    } finally{
+      setUser(null);
+      setWelcomeMessage("");
     }
   };
 
