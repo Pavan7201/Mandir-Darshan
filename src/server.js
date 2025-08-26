@@ -3,7 +3,6 @@ import { MongoClient, ObjectId } from "mongodb";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -18,7 +17,6 @@ const DB_NAME = process.env.DB_NAME || "test";
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(",").filter(Boolean);
 
 app.use(express.json());
-app.use(cookieParser());
 
 app.use(
   cors({
@@ -64,18 +62,20 @@ connectDB();
 //   path: "/",
 // });
 
-const getCookieOptions = () => ({
-  httpOnly: true,
-  secure: true,     
-  sameSite: "none",
-  path: "/",
-});
+// const getCookieOptions = () => ({
+//   httpOnly: true,
+//   secure: true,     
+//   sameSite: "none",
+//   path: "/",
+// });
 
 const authenticateUserMiddleware = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
-    if (!token) return res.status(401).json({ error: "Unauthorized" });
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer "))
+      return res.status(401).json({ error: "Unauthorized" });
 
+    const token = authHeader.substring(7);
     const blacklisted = await blacklistedTokensCollection.findOne({ token });
     if (blacklisted)
       return res.status(401).json({ error: "Token has been invalidated" });
@@ -111,10 +111,12 @@ app.post("/api/signup", async (req, res) => {
       JWT_SECRET,
       { expiresIn: "1h" }
     );
-    res.cookie("token", token, getCookieOptions());
+
+    // res.cookie("token", token, getCookieOptions());
 
     res.status(201).json({
       message: "User created",
+      token,
       user: { _id: insertedId.toString(), firstName, middleName, lastName, mobile },
     });
   } catch (err) {
@@ -142,10 +144,11 @@ app.post("/api/login", async (req, res) => {
       JWT_SECRET,
       { expiresIn: "1h" }
     );
-    res.cookie("token", token, getCookieOptions());
+    // res.cookie("token", token, getCookieOptions());
 
     res.json({
       message: "Login successful",
+      token,
       user: {
         _id: user._id.toString(),
         firstName: user.firstName,
@@ -162,7 +165,12 @@ app.post("/api/login", async (req, res) => {
 
 app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
   try {
-    const token = req.cookies.token;
+    // const token = req.cookies.token;
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.startsWith("Bearer ")
+      ? authHeader.substring(7)
+      : null;
+
     if (token) {
       const decoded = jwt.decode(token);
       if (decoded?.exp && decoded?._id) {
@@ -173,7 +181,7 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
         });
       }
     }
-    res.cookie("token", "", {...getCookieOptions(), expires: new Date(0)});
+    // res.cookie("token", "", {...getCookieOptions(), expires: new Date(0)});
     res.json({ message: "Logged out successfully" });
   } catch (err) {
     console.error("Logout error:", err);
@@ -201,7 +209,7 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
 
     await usersCollection.deleteOne({ _id: userId });
 
-    res.cookie("token", "", {...getCookieOptions(), expires: new Date(0)});
+    // res.cookie("token", "", {...getCookieOptions(), expires: new Date(0)});
 
     res.json({ message: "Account deleted successfully" });
   } catch (err) {
