@@ -1,13 +1,28 @@
+import { useEffect, useState } from "react";
 import "../css/banner.css";
-import Bannar from "../assets/Banner.webp";
+// import BannarImage from "../assets/Banner.webp";
 
 const Banner = ({ className = "" }) => {
+  const [bannerUrl, setBannerUrl] = useState(null);
+
+  const API_BASE_URL =
+  import.meta.env.MODE === "production"
+    ? "https://mandir-darshan.onrender.com"
+    : "http://localhost:4000";
+
+  useEffect(()=>{
+    fetch (`${API_BASE_URL}/api/assets`).then(res => res.json()).then(data =>{
+      const banner = data.find(a => a.name === "banner");
+      if (banner) setBannerUrl(banner.url);
+    })
+    .catch(err => console.log(err));
+  }, []);
   return (
     <>
       <section className={`banner-container ${className}`}>
         <img
-          src={Bannar}
-          alt="Banner image"
+          src={bannerUrl}
+          alt="Banner"
           className="banner-image"
         />
         <div className="banner-caption">

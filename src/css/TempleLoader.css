@@ -1,0 +1,24 @@
+.loader-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; 
+  background: linear-gradient(to bottom, #fff8f0, #ffe6b3);
+  text-align: center;
+  padding: 2rem;
+}
+
+.loader-wrapper p {
+  margin-top: 1rem;
+  font-family: "Playfair Display", serif;
+  font-size: 1rem;
+  color: #8b5e3c;
+  animation: fadeInText 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes fadeInText {
+  0% { opacity: 0.4; transform: translateY(0px); }
+  50% { opacity: 1; transform: translateY(-5px); }
+  100% { opacity: 0.4; transform: translateY(0px); }
+}

@@ -1,4 +1,5 @@
 import { useContext} from "react";
+import { useState, useEffect } from "react";
 import {
   Routes,
   Route,
@@ -21,20 +22,22 @@ import { ThemeProvider } from "./ThemeContext";
 import { AuthContext } from "./AuthContext";
 
 import "./App.css";
+import TempleLoader from "./loader/TempleLoader";
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   const location = useLocation();
 
-  if (loading) return <p>Loading...</p>;
-
-  if (!user) { return <Navigate to="/login" state={{ from: location }} replace />;}
+  if(loading) return <TempleLoader />
+  if (!user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
   return children;
 };
 
 function AppRoutes() {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
   const location = useLocation();
 
   const layoutRoutes = [
@@ -49,6 +52,31 @@ function AppRoutes() {
 
 const showLayout = layoutRoutes.some((path) => location.pathname.startsWith(path));
 const redirectAfterLogout = sessionStorage.getItem("redirectAfterLogout");
+
+ const [showFooter, setShowFooter] = useState(false);
+
+ useEffect(() => {
+    if (!showLayout) return;
+
+    const handleScroll = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+
+      if (scrollTop + windowHeight >= docHeight - 50) {
+        setShowFooter(true);
+      } else {
+        setShowFooter(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [location.pathname, showLayout]);
+
+if (loading) return <TempleLoader />;
 
   return (
     <div className="App">
@@ -67,7 +95,7 @@ const redirectAfterLogout = sessionStorage.getItem("redirectAfterLogout");
         <Route path="*" element={<NotFound />} />
       </Routes>
 
-      {showLayout && <Footer />}
+      {showLayout && showFooter && <Footer />}
     </div>
   );
 }

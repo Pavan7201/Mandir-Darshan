@@ -32,7 +32,7 @@ app.use(
   })
 );
 
-let usersCollection, blacklistedTokensCollection;
+let usersCollection, blacklistedTokensCollection, assetsCollection;
 const client = new MongoClient(MONGODB_URI);
 
 async function connectDB() {
@@ -41,6 +41,7 @@ async function connectDB() {
     const db = client.db(DB_NAME);
     usersCollection = db.collection("users");
     blacklistedTokensCollection = db.collection("blacklistedtokens");
+    assetsCollection = db.collection("assets")
 
     await blacklistedTokensCollection.createIndex(
       { expiresAt: 1 },
@@ -217,5 +218,15 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
     res.status(500).json({ error: "Failed to delete account" });
   }
 });
+
+app.get("/api/assets", async (_req, res) => {
+  try{
+    const assets = await assetsCollection.find().toArray();
+    res.json(assets);
+  }catch (err) {
+    console.log("Get assets error:", err);
+    res.status(500).json({error: "Failed to fetch assets"})
+  }
+})
 
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

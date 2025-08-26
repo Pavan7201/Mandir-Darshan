@@ -20,6 +20,8 @@ export const AuthProvider = ({ children }) => {
       return;
     }
     const controller = new AbortController();
+    const minLoaderTime = 3200;
+    const startTime = Date.now();
     const fetchUser = async () => {
       try {
         const res = await fetch(`${API_BASE_URL}/api/me`, {
@@ -46,7 +48,9 @@ export const AuthProvider = ({ children }) => {
           localStorage.removeItem("token");
         }
       } finally {
-        setLoading(false);
+        const elapsed = Date.now() - startTime;
+      const remainingTime = elapsed < minLoaderTime ? minLoaderTime - elapsed : 0;
+      setTimeout(() => setLoading(false), remainingTime);
       }
     };
     fetchUser();
@@ -69,19 +73,38 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (mobile, password) => {
+  setLoading(true);
+  const minLoaderTime = 3200; 
+  const startTime = Date.now();
+
+  try {
     const res = await fetch(`${API_BASE_URL}/api/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mobile, password }),
     });
+
     const data = await res.json();
     if (!res.ok) throw new Error(data?.error || "Login failed");
+
     setUser(data.user);
     setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
     setToken(data.token);
     localStorage.setItem("token", data.token);
+
+    const elapsed = Date.now() - startTime;
+    if (elapsed < minLoaderTime) {
+      await new Promise((resolve) => setTimeout(resolve, minLoaderTime - elapsed));
+    }
+
     return data.user;
-  };
+  } catch (err) {
+    console.error("Login error:", err);
+    throw err;
+  } finally {
+    setLoading(false);
+  }
+};
 
   const logout = async () => {
     try {
