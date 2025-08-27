@@ -79,8 +79,6 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (userData) => {
     NProgress.start();
-    setLoading(true);
-    setLoadMode("authenticating");
     const minLoaderTime = 3200;
     const startTime = Date.now();
 
@@ -93,7 +91,8 @@ export const AuthProvider = ({ children }) => {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Signup failed");
-
+      setLoading(true);
+      setLoadMode("authenticating");
       setUser(data.user);
       setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
       setToken(data.token);
@@ -116,9 +115,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (mobile, password) => {
     NProgress.start()
-    setLoading(true);
-    setLoadMode("authenticating");
-    const minLoaderTime = 3200;
+    const minLoaderTime = 4000;
     const startTime = Date.now();
 
     try {
@@ -130,7 +127,8 @@ export const AuthProvider = ({ children }) => {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Login failed");
-
+      setLoading(true);
+      setLoadMode("authenticating");
       setUser(data.user);
       setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
       setToken(data.token);
@@ -150,29 +148,40 @@ export const AuthProvider = ({ children }) => {
       setLoadMode("done");
     }
   };
-
+  
   const logout = async () => {
-    NProgress.start()
-    try {
-      await fetch(`${API_BASE_URL}/api/logout`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-    } catch (err) {
-    } finally {
-      NProgress.done();
-      setUser(null);
-      setWelcomeMessage("");
-      setToken("");
-      localStorage.removeItem("token");
+  NProgress.start();
+  const minLoaderTime = 1000;
+  const startTime = Date.now();
+
+  try {
+    await fetch(`${API_BASE_URL}/api/logout`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (err) {
+    console.error("Logout error:", err);
+  } finally {
+    const elapsed = Date.now() - startTime;
+    if (elapsed < minLoaderTime) {
+      await new Promise((resolve) => setTimeout(resolve, minLoaderTime - elapsed));
     }
-  };
+
+    NProgress.done();
+    setUser(null);
+    setWelcomeMessage("");
+    setToken("");
+    localStorage.removeItem("token");
+  }
+};
 
   const deleteAccount = async () => {
     NProgress.start();
+  const minLoaderTime = 1000;
+  const startTime = Date.now();
     try {
       const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
         method: "DELETE",
@@ -187,7 +196,11 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (err) {
     } finally {
-      NProgress.done();
+      const elapsed = Date.now() - startTime;
+    if (elapsed < minLoaderTime) {
+      await new Promise((resolve) => setTimeout(resolve, minLoaderTime - elapsed));
+    }
+    NProgress.done();
       setUser(null);
       setWelcomeMessage("");
       setToken("");

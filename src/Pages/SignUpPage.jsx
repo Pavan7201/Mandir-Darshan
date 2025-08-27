@@ -68,7 +68,11 @@ const SignupPage = () => {
       navigate("/");
     } catch (err) {
       console.log("Signup error:", err);
-      setError(err.message || "Signup failed");
+      if(err){
+        setError(err.message);
+      }else{
+        setError(err.message || "Signup failed");
+      }
     }
   };
 

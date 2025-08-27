@@ -1,4 +1,4 @@
 #nprogress .bar {
-  background: #ff9800 !important;
+  background: var(--faq-color) !important;
   height: 3px;
 }
