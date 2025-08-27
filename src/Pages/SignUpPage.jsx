@@ -24,7 +24,6 @@ const SignupPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrengthError, setPasswordStrengthError] = useState("");
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   const StrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
@@ -63,7 +62,6 @@ const SignupPage = () => {
     }
 
     setError("");
-    setIsLoading(true);
 
     try {
       await signup({ firstName, middleName, lastName, mobile, password });
@@ -71,8 +69,6 @@ const SignupPage = () => {
     } catch (err) {
       console.log("Signup error:", err);
       setError(err.message || "Signup failed");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -181,8 +177,8 @@ const SignupPage = () => {
               </span>
             </div>
             {error && <div className="signup-error">{error}</div>}
-            <button className="signup-button" type="submit" disabled={isLoading}>
-              {isLoading ? "Signing Up..." : "Sign Up"}
+            <button className="signup-button" type="submit">
+              Sign Up
             </button>
             <hr className="signup-divider" />
             <div className="signup-login-prompt">

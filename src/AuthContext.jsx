@@ -1,6 +1,14 @@
 import { createContext, useState, useEffect } from "react";
-
+import NProgress from "nprogress";
+import "./css/nprogress.css";
 export const AuthContext = createContext();
+
+NProgress.configure({
+  showSpinner: false,
+  speed: 400,
+  trickleSpeed: 200,
+  minimum: 0.1,
+});
 
 const API_BASE_URL =
   import.meta.env.MODE === "production"
@@ -12,17 +20,26 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [loadMode, setLoadMode] = useState("idle");
 
   useEffect(() => {
     if (!token) {
       setLoading(false);
       setUser(null);
+      setLoadMode("idle");
       return;
     }
+
+    if (loadMode !== "authenticating") {
+      setLoadMode("reloading");
+    }
+
     const controller = new AbortController();
     const minLoaderTime = 3200;
     const startTime = Date.now();
+
     const fetchUser = async () => {
+      NProgress.start();
       try {
         const res = await fetch(`${API_BASE_URL}/api/me`, {
           method: "GET",
@@ -31,10 +48,12 @@ export const AuthProvider = ({ children }) => {
           },
           signal: controller.signal,
         });
+
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
           setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
+
         } else {
           setUser(null);
           setToken("");
@@ -42,71 +61,98 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (err) {
         if (err.name !== "AbortError") {
-          console.error("Error fetching user:", err);
           setUser(null);
           setToken("");
           localStorage.removeItem("token");
         }
       } finally {
+        NProgress.done();
         const elapsed = Date.now() - startTime;
-      const remainingTime = elapsed < minLoaderTime ? minLoaderTime - elapsed : 0;
-      setTimeout(() => setLoading(false), remainingTime);
+        const remainingTime = elapsed < minLoaderTime ? minLoaderTime - elapsed : 0;
+        setTimeout(() => setLoading(false), remainingTime);
       }
     };
+
     fetchUser();
     return () => controller.abort();
   }, [token]);
 
   const signup = async (userData) => {
-    const res = await fetch(`${API_BASE_URL}/api/signup`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userData),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || "Signup failed");
-    setUser(data.user);
-    setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
-    setToken(data.token);
-    localStorage.setItem("token", data.token);
-    return data.user;
+    NProgress.start();
+    setLoading(true);
+    setLoadMode("authenticating");
+    const minLoaderTime = 3200;
+    const startTime = Date.now();
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Signup failed");
+
+      setUser(data.user);
+      setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
+      setToken(data.token);
+      localStorage.setItem("token", data.token);
+
+      const elapsed = Date.now() - startTime;
+      if (elapsed < minLoaderTime) {
+        await new Promise((resolve) => setTimeout(resolve, minLoaderTime - elapsed));
+      }
+
+      return data.user;
+    } catch (err) {
+      throw err;
+    } finally {
+      NProgress.done();
+      setLoading(false);
+      setLoadMode("done");
+    }
   };
 
   const login = async (mobile, password) => {
-  setLoading(true);
-  const minLoaderTime = 3200; 
-  const startTime = Date.now();
+    NProgress.start()
+    setLoading(true);
+    setLoadMode("authenticating");
+    const minLoaderTime = 3200;
+    const startTime = Date.now();
 
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mobile, password }),
-    });
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mobile, password }),
+      });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || "Login failed");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Login failed");
 
-    setUser(data.user);
-    setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
-    setToken(data.token);
-    localStorage.setItem("token", data.token);
+      setUser(data.user);
+      setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
+      setToken(data.token);
+      localStorage.setItem("token", data.token);
 
-    const elapsed = Date.now() - startTime;
-    if (elapsed < minLoaderTime) {
-      await new Promise((resolve) => setTimeout(resolve, minLoaderTime - elapsed));
+      const elapsed = Date.now() - startTime;
+      if (elapsed < minLoaderTime) {
+        await new Promise((resolve) => setTimeout(resolve, minLoaderTime - elapsed));
+      }
+
+      return data.user;
+    } catch (err) {
+      throw err;
+    } finally {
+      NProgress.done();
+      setLoading(false);
+      setLoadMode("done");
     }
-
-    return data.user;
-  } catch (err) {
-    console.error("Login error:", err);
-    throw err;
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const logout = async () => {
+    NProgress.start()
     try {
       await fetch(`${API_BASE_URL}/api/logout`, {
         method: "POST",
@@ -116,8 +162,8 @@ export const AuthProvider = ({ children }) => {
         },
       });
     } catch (err) {
-      console.log("Logout failed:", err);
     } finally {
+      NProgress.done();
       setUser(null);
       setWelcomeMessage("");
       setToken("");
@@ -126,6 +172,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const deleteAccount = async () => {
+    NProgress.start();
     try {
       const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
         method: "DELETE",
@@ -139,8 +186,8 @@ export const AuthProvider = ({ children }) => {
         throw new Error(data?.error || "Failed to delete account");
       }
     } catch (err) {
-      console.log("Error deleting account:", err);
     } finally {
+      NProgress.done();
       setUser(null);
       setWelcomeMessage("");
       setToken("");
@@ -156,6 +203,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     deleteAccount,
     loading,
+    loadMode,
     welcomeMessage,
     setWelcomeMessage,
     token,
