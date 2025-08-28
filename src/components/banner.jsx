@@ -11,9 +11,18 @@ const Banner = ({ className = "" }) => {
 
    useEffect(() => {
     const fetchBanner = async () => {
+      const cachedAssets = sessionStorage.getItem("assets");
+
+    if (cachedAssets) {
+      const data = JSON.parse(cachedAssets);
+      const banner = data.find((a) => a.category === "banner");
+      if (banner) setBannerUrl(banner.url);
+      return;
+    }
       try {
         const res = await fetch(`${API_BASE_URL}/api/assets`);
         const data = await res.json();
+        sessionStorage.setItem("assets", JSON.stringify(data));
         const banner = data.find(a => a.category === "banner");
         if (banner) setBannerUrl(banner.url);
       } catch (err) {
