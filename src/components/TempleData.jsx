@@ -3,7 +3,7 @@ import Kalahasti from "../assets/Kalahasti.webp";
 import Srisailam from "../assets/Srisailam.webp";
 import Mahanandi from "../assets/Mahanandi.webp";
 import Kasapuram from "../assets/Kasapuram.webp";
-import Simhachalam from "../assets/Simhadri.webp";
+import Simhadri from "../assets/Simhadri.webp";
 import Annavaram from "../assets/Annavaram.webp";
 import Tirumala from "../assets/Dwaraka Tirumala.webp";
 import Durga from "../assets/Durga.webp";
@@ -51,7 +51,7 @@ export const templeData = [
   {
     id: "4",
     name: "Simhachalam Temple",
-    image: Simhachalam,
+    image: Simhadri,
     location: "Visakhapatnam, Andhra Pradesh",
     deity: "Lord Narasimha (Ugra Narasimha as Varaha Narasimha)",
     caption:

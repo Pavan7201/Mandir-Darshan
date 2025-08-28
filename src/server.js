@@ -32,7 +32,7 @@ app.use(
   })
 );
 
-let usersCollection, blacklistedTokensCollection, assetsCollection;
+let usersCollection, blacklistedTokensCollection, assetsCollection, templeDataCollection;
 const client = new MongoClient(MONGODB_URI);
 
 async function connectDB() {
@@ -41,7 +41,8 @@ async function connectDB() {
     const db = client.db(DB_NAME);
     usersCollection = db.collection("users");
     blacklistedTokensCollection = db.collection("blacklistedtokens");
-    assetsCollection = db.collection("assets")
+    assetsCollection = db.collection("assets");
+    templeDataCollection = db.collection("TemplesData");
 
     await blacklistedTokensCollection.createIndex(
       { expiresAt: 1 },

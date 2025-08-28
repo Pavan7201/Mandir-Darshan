@@ -1,41 +1,80 @@
 import "../css/body.css";
 import Banner from "./banner";
 import DevoteServices from "./DevoteServices";
-import { templeData } from "../components/TempleData";
 import FeaturedTemples from "./FeaturedTemples";
 import PhotoGallery from "./PhotoGallery";
 import Endowment from "./Endowment";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
-
 
 const Body = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [temples, setTemples] = useState([]);
+
+  const API_BASE_URL =
+    import.meta.env.MODE === "production"
+      ? "https://mandir-darshan.onrender.com"
+      : "http://localhost:4000";
+
+  useEffect(() => {
+    const cachedAssets = sessionStorage.getItem("assets");
+
+    if (cachedAssets) {
+      const data = JSON.parse(cachedAssets);
+      const templeData = data.filter((a) => a.category === "temple");
+      setTemples(templeData);
+      return;
+    }
+
+    const fetchTemples = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/assets`);
+        const data = await res.json();
+
+        sessionStorage.setItem("assets", JSON.stringify(data));
+
+        const templeData = data.filter((a) => a.category === "temple");
+        setTemples(templeData);
+      } catch (err) {
+        console.error("Error fetching assets:", err);
+      }
+    };
+
+    fetchTemples();
+  }, [API_BASE_URL]);
+
   const handleClick = (TempleLink) => {
     if (!user) {
-      navigate("/signup"); 
+      navigate("/signup");
     } else {
       navigate(TempleLink);
     }
   };
+
   return (
     <>
       <section className="section animate-on-scroll">
-        {templeData.slice(0, 11).map((temple, index) => (
-          <button className="bttn" key={index} onClick={() => handleClick(temple.link)}>
+        {temples.slice(0, 11).map((temple, index) => (
+          <button
+            className="bttn"
+            key={index}
+            onClick={() => handleClick(temple.link)}
+          >
             <img src={temple.image} alt={temple.name} />
-            <div className="temple-name">{(() => {
-              const words = temple.name.trim().split(" ");
-              if (words[0].length > 3) {
-                return words[0];
-              } else if (words[0].length === 3) {
-                return `${words[0]} ${words[1]}`;
-              } else {
-                return words[1];
-              }
-              })()}</div>
+            <div className="temple-name">
+              {(() => {
+                const words = temple.name.trim().split(" ");
+                if (words[0].length > 3) {
+                  return words[0];
+                } else if (words[0].length === 3) {
+                  return `${words[0]} ${words[1]}`;
+                } else {
+                  return words[1];
+                }
+              })()}
+            </div>
           </button>
         ))}
       </section>

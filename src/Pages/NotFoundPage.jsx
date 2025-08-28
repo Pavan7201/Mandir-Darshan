@@ -1,18 +1,23 @@
 import { Link } from "react-router-dom";
+import Lottie from "lottie-react";
+import lightAnimation from "../loader/Under Construction Light.json";
+import darkAnimation from "../loader/Under Construction Dark.json";
 import "../css/NotFoudPage.css";
+import { useContext } from "react";
+import { ThemeContext } from "../ThemeContext";
 
-function NotFoundPage() {
+function UnderConstruction() {
+  const { theme } = useContext(ThemeContext);
+
   return (
-    <div className="not-found-container">
-      <h1 className="not-found-title">404</h1>
-      <p className="not-found-message">
-        Oops! The page you're looking for doesn't exist.
-      </p>
-      <Link to="/" className="not-found-link">
-        Go back to Home
-      </Link>
+    <div className="under-construction-container">
+      <Lottie 
+        animationData={theme === "dark" ? darkAnimation : lightAnimation} 
+        loop={true} 
+        className="under-construction-animation"
+      />
     </div>
   );
 }
 
-export default NotFoundPage;
+export default UnderConstruction;

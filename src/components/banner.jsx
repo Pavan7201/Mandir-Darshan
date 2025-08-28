@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import "../css/banner.css";
-// import BannarImage from "../assets/Banner.webp";
 
 const Banner = ({ className = "" }) => {
   const [bannerUrl, setBannerUrl] = useState(null);
@@ -10,12 +9,18 @@ const Banner = ({ className = "" }) => {
     ? "https://mandir-darshan.onrender.com"
     : "http://localhost:4000";
 
-  useEffect(()=>{
-    fetch (`${API_BASE_URL}/api/assets`).then(res => res.json()).then(data =>{
-      const banner = data.find(a => a.name === "banner");
-      if (banner) setBannerUrl(banner.url);
-    })
-    .catch(err => console.log(err));
+   useEffect(() => {
+    const fetchBanner = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/assets`);
+        const data = await res.json();
+        const banner = data.find(a => a.category === "banner");
+        if (banner) setBannerUrl(banner.url);
+      } catch (err) {
+        console.error("Error fetching banner:", err);
+      }
+    };
+    fetchBanner();
   }, []);
   return (
     <>
