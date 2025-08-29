@@ -23,8 +23,8 @@ const Body = () => {
 
     if (cachedAssets) {
       const data = JSON.parse(cachedAssets);
-      const templeData = data.filter((a) => a.category === "temple");
-      setTemples(templeData);
+      const templeCategory = data.find((t) => t.category === "temple");
+      setTemples(templeCategory ? templeCategory.items : []);
       return;
     }
 
@@ -35,8 +35,8 @@ const Body = () => {
 
         sessionStorage.setItem("assets", JSON.stringify(data));
 
-        const templeData = data.filter((a) => a.category === "temple");
-        setTemples(templeData);
+        const templeCategory = data.find((t) => t.category === "temple");
+        setTemples(templeCategory ? templeCategory.items : []);
       } catch (err) {
         console.error("Error fetching assets:", err);
       }
@@ -56,10 +56,10 @@ const Body = () => {
   return (
     <>
       <section className="section animate-on-scroll">
-        {temples.slice(0, 11).map((temple, index) => (
+        {temples.map((temple, index) => (
           <button
             className="bttn"
-            key={index}
+            key={temple.id || index}
             onClick={() => handleClick(temple.link)}
           >
             <img src={temple.image} alt={temple.name} />
