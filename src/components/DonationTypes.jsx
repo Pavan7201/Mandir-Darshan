@@ -7,7 +7,7 @@ const DonationTypes = ({AnimateOnScroll=""}) => {
   return (
     <div className="DonationType-conatiner">
       <p className={`${AnimateOnScroll}`}>
-        Devotees can donate to AP TEMPLES Temple via online and offline
+        Devotees can donate to Temples via online and offline
         payments. Srikanakadurgamma Devasthanam website accepts easy payment
         methods like credit card, debit card and UPI transactions for donations.
       </p>

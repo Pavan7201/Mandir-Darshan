@@ -56,7 +56,7 @@ const Body = () => {
   return (
     <>
       <section className="section animate-on-scroll">
-        {temples.map((temple, index) => (
+        {temples.slice(0, 12).map((temple, index) => (
           <button
             className="bttn"
             key={temple.id || index}
@@ -82,11 +82,11 @@ const Body = () => {
       <div>
         <Banner className="animate-on-scroll" />
         <FeaturedTemples className="animate-on-scroll" />
-        <hr />
+        <hr className="animate-on-scroll" />
         <DevoteServices className="animate-on-scroll" />
-        <hr />
+        <hr className="animate-on-scroll" />
         <PhotoGallery className="animate-on-scroll" />
-        <hr />
+        <hr className="animate-on-scroll" />
         <Endowment className="animate-on-scroll" />
       </div>
     </>

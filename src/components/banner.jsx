@@ -3,6 +3,9 @@ import "../css/banner.css";
 
 const Banner = ({ className = "" }) => {
   const [bannerUrl, setBannerUrl] = useState(null);
+  const [altText, setAltText] = useState("");
+  const [heading, setHeading] = useState("");
+  const [paragraph, setParagraph] = useState("");
 
   const API_BASE_URL =
     import.meta.env.MODE === "production"
@@ -15,19 +18,24 @@ const Banner = ({ className = "" }) => {
 
       if (cachedAssets) {
         const data = JSON.parse(cachedAssets);
-        const banner = data.find((b) => b.category === "banner");
+        const banner = data.find((b) => b.category === "Banner");
         if (banner && banner.items && banner.items.length > 0) {
-          setBannerUrl(banner.items[0].url);
+          setBannerUrl(banner.items[0].bannerUrl);
+          setAltText(banner.items[0].alt);  
+          setHeading(banner.items[0].h2);
+          setParagraph(banner.items[0].p);
         }
-        return;
       }
       try {
         const res = await fetch(`${API_BASE_URL}/api/assets`);
         const data = await res.json();
         sessionStorage.setItem("assets", JSON.stringify(data));
-        const banner = data.find((b) => b.category === "banner");
+        const banner = data.find((b) => b.category === "Banner");
         if (banner && banner.items && banner.items.length > 0) {
-          setBannerUrl(banner.items[0].url);
+          setBannerUrl(banner.items[0].bannerUrl);
+          setAltText(banner.items[0].alt);
+          setHeading(banner.items[0].h2);
+          setParagraph(banner.items[0].p);
         }
       } catch (err) {
         console.error("Error fetching banner:", err);
@@ -38,16 +46,10 @@ const Banner = ({ className = "" }) => {
 
   return (
     <section className={`banner-container ${className}`}>
-      {bannerUrl ? (
-        <img src={bannerUrl} alt="Banner" className="banner-image" />
-      ) : (
-        <p>Loading banner...</p>
-      )}
+        <img src={bannerUrl} alt={altText} className="banner-image" />
       <div className="banner-caption">
-        <h2>Experience the Divine Tranquility</h2>
-        <p>
-          Explore the sacred temples and embrace the spiritual heritage of India.
-        </p>
+        <h2>{heading}</h2>
+        <p>{paragraph}</p>
       </div>
     </section>
   );
