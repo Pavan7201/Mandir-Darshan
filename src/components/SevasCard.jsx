@@ -1,50 +1,62 @@
 import "../css/SevasCards.css";
 import lineDecor from "../HeadingDesign/HeadingDesign.png";
-import galleryImg1 from "../assets/galleryImg1.webp";
-import picture from "../assets/picture.webp";
-import galleryImg3 from "../assets/galleryImg3.webp";
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import { AuthContext } from '../AuthContext';
-
-const sevas = [
-  {
-    title: "Darshanam",
-    image: galleryImg1,
-    caption:
-      "An auspicious first glance at the divinity in the temple is called Darshanam. A darshanam allows devotees to transcend into a peaceful moment.",
-    link: "/NotFound",
-    },
-  {
-    title: "Pratyaksha Seva",
-    image: picture,
-    caption:
-      "Pratyaksha Seva is performing/attending Temple Sevas in Person. One may book a Pratyaksha Seva online and offline.",
-    link: "/NotFound",
-  },
-  {
-    title: "Paroksha Seva",
-    image: galleryImg3,
-    caption:
-      "Paroksha Seva is for those who can not visit the temple in person and wish to perform/attend Temple Sevas digitally. One may book a Paroksha Seva online.",
-    link: "/NotFound",
-  },
-];
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 const SevasCard = ({AnimateOnScroll=""}) => {
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [sevas, setSevas] = useState([]);
+  const sectionRef = useRef(null);
+  useScrollAnimation([sectionRef]);
+  const API_BASE_URL =
+    import.meta.env.MODE === "production"
+      ? "https://mandir-darshan.onrender.com"
+      : "http://localhost:4000";
+  
+      useEffect(() => {
+        const cachedAssets = sessionStorage.getItem("assets");
 
-  const handleClick = (e, targetLink) => {
-  if (!auth?.user) {
-    e.preventDefault();
-    navigate('/SignUp');
-  } else {
-    navigate(targetLink);
+        if(cachedAssets) {
+          const data = JSON.parse(cachedAssets);
+    console.log("Fetched data:", data);
+          const sevasCategory = data.find((s) => s.category === "sevas");
+    console.log("Sevas category:", sevasCategory);
+
+          setSevas(sevasCategory ? sevasCategory.items : []);
+          return;
+        }
+      
+        const fetchSevas = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/assets`);
+    const data = await res.json();
+    console.log("Fetched data:", data);
+    sessionStorage.setItem("assets", JSON.stringify(data));
+    const sevasCategory = data.find((s) => s.category === "sevas");
+    console.log("Sevas category:", sevasCategory);
+    setSevas(sevasCategory ? sevasCategory.items : []);
+  } catch (err) {
+    console.error("Error fetching assets:", err);
   }
 };
+
+      fetchSevas();
+    },[API_BASE_URL]);
+
+    const handleClick = (e, targetLink) => {
+    if (!auth?.user) {
+      e.preventDefault();
+      navigate('/SignUp');
+    } else {
+      navigate(targetLink);
+    }
+  };
+
   return (
-    <section className="sevas-section">
+    <section className="sevas-section" ref={sectionRef}>
       <div className="sevas-heading-overlay"></div>
       <h2 className={`sevas-heading ${AnimateOnScroll}`}>Sevas & Booking</h2>
       <img
@@ -53,13 +65,14 @@ const SevasCard = ({AnimateOnScroll=""}) => {
         className={`line-decor-img ${AnimateOnScroll}`}
       />
       <div className={`sevas-cards-container ${AnimateOnScroll}`}>
-        {sevas.map((seva, idx) => (
-          <div className="seva-card" key={idx}>
-            <img src={seva.image} alt={seva.title} className="seva-card-img" />
-            <h3 className={`seva-card-title ${AnimateOnScroll}`}>{seva.title}</h3>
-            <p className={`seva-card-caption ${AnimateOnScroll}`}>{seva.caption}</p>
-            <div className={`seva-card-actions ${AnimateOnScroll}`}>
-              <NavLink to={seva.link} onClick={(e) => handleClick(e, seva.link)} className={`view-more-btn ${AnimateOnScroll}`}>
+        {sevas.map((seva) =>(
+          <div className="seva-card" key={seva.id}>
+            {console.log(seva)}
+            <img src={seva.ImageUrl} alt={seva.alt} className="seva-card-img" />
+            <h3 className={`seva-card-title `}>{seva.title}</h3>
+            <p className={`seva-card-caption `}>{seva.caption}</p>
+            <div className={`seva-card-actions`}>
+              <NavLink to={seva.link} onClick={(e) => handleClick(e, seva.link)} className={`view-more-btn `}>
                 View More <span className="arrow">&#x203A;</span>
               </NavLink>
               <button onClick={(e) => handleClick(e, seva.link)} className="Book-Now-btn">

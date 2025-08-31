@@ -108,7 +108,7 @@
 
 .view-more-btn {
   background: transparent;
-  color: var(--secondary-color);
+  color: var(--visit-link);
   font-size: 0.9rem;
   font-family: inherit;
   letter-spacing: 0.5px;
@@ -129,7 +129,7 @@
 }
 
 .view-more-btn .arrow {
-  color: var(--secondary-color);
+  color: var(--visit-link);
   font-size: 2rem;
   transition: transform 0.2s ease;
   margin-bottom: 0.4rem;

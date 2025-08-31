@@ -1,63 +1,66 @@
 import lineDecor from "../HeadingDesign/HeadingDesign.png";
 import "../css/Endowment.css";
-import Chandrababu_Naidu from "../assets/Chandrababu Naidu.webp";
-import Sri_Anam_Ramanarayana_Reddy from "../assets/Sri Anam Ramanarayana Reddy.webp";
-import Sri_K_Ramachandra_Mohan from "../assets/Sri K. Ramachandra Mohan.webp";
-import Sri_Vadarevu_Vinay_Chand from "../assets/Sri Vadarevu Vinay Chand.webp";
 import "../Animation/Animate.css"
-
-const images = [
-  {
-    src: Chandrababu_Naidu,
-    alt: "Chandrababu_Naidu",
-    name: "Sri Nara Chandrababu Naidu",
-    position: "Hon’ble Chief Minister of Andhra Pradesh",
-  },
-  {
-    src: Sri_Anam_Ramanarayana_Reddy,
-    alt: "Sri Anam Ramanarayana Reddy",
-    name: "Sri Anam Ramanarayana Reddy",
-    position: "Hon’ble Minister for Endowments, Andhra Pradesh",
-  },
-  {
-    src: Sri_Vadarevu_Vinay_Chand,
-    alt: "Sri Vadarevu Vinay Chand",
-    name: "Sri Vadarevu Vinay Chand, IAS",
-    position: "Secretary, Revenue Endowments Department",
-  },
-  {
-    src: Sri_K_Ramachandra_Mohan,
-    alt: "Sri K. Ramachandra Mohan",
-    name: "Sri K. Ramachandra Mohan",
-    position: "Commissioner of Endowments Andhra Pradeshh",
-  },
-];
+import { useEffect, useRef, useState } from "react";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 const Endowment = ({className=""}) => {
-  return (
-    <section className="Endowment" id="Endowment">
-      <div className="Endowment-section-container">
-        <h2 className={`Endowment-heading ${className}`}>
-          Government of Andhra Pradesh - Endowment Department
-        </h2>
-        <img
-          src={lineDecor}
-          alt="decorative line"
-          className={`line-decor-img ${className}`}
-        />
+  const [endowment, setEndowment] = useState([]);
+  const sectionRef = useRef(null);
+  useScrollAnimation([endowment]);
+  const API_BASE_URL =
+    import.meta.env.MODE === "production"
+      ? "https://mandir-darshan.onrender.com"
+      : "http://localhost:4000";
 
-        <div className="card-wrapper">
-          {images.map((img) => (
-            <div className={`profile-card ${className}`} key={img.name}>
-              <img className="profile-img" src={img.src} alt={img.alt} />
-              <h5>{img.name}</h5>
-              <p>{img.position}</p>
-            </div>
-          ))}
+      useEffect(() => {
+        const cachedAssets = sessionStorage.getItem("assets");
+
+        if(cachedAssets) {
+          const data = JSON.parse(cachedAssets);
+          const endowmentCategory = data.find((e) => e.category === "endowment");
+          setEndowment(endowmentCategory ? endowmentCategory.items : []);
+          return;
+        }
+        const fetchEndowment = async () => {
+          try{
+            const res = await fetch(`${API_BASE_URL}/api/assets`);
+            const data = await res.json();
+            sessionStorage.setItem("assets", JSON.stringify(data));
+
+            const endowmentCategory = data.find((e) => e.category === "endowment");
+            setEndowment(endowmentCategory ? endowmentCategory.items : []);
+
+          }catch (err){
+            console.error("Error fetching assets:", err);
+          }
+        };
+        fetchEndowment();
+      },[API_BASE_URL]);
+      
+      return (
+      <section className="Endowment" id="Endowment" ref={sectionRef}>
+        <div className="Endowment-section-container">
+          <h2 className={`Endowment-heading ${className}`}>
+            Government of Andhra Pradesh - Endowment Department
+          </h2>
+          <img
+            src={lineDecor}
+            alt="decorative line"
+            className={`line-decor-img ${className}`}
+          />
+          <div className="card-wrapper">
+            {endowment.map((img) => (
+              <div className={`profile-card ${className}`} key={img.id}>
+                <img className="profile-img" src={img.ImageUrl} alt={img.alt} />
+                <h5>{img.name}</h5>
+                <p>{img.position}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
-  );
-};
+      </section>
+    );
+  };
 
 export default Endowment;
