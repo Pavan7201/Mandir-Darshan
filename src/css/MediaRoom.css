@@ -124,6 +124,10 @@
   z-index: 1;
 }
 
+.view-more-btn{
+  color: var(--visit-link);
+}
+
 @media (max-width: 768px){
   .Media-section-container{
     padding: 1rem;

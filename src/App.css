@@ -33,8 +33,7 @@ body.dark {
   --signup-button:yellow;
   --signup-bg-button:rgb(243, 243, 136);
   --logout-signup-hover-bg-btn:rgb(63, 59, 59);
-
-
+  --visit-link:#f7edd6;
   background-color: var(--bg-color);
   color: var(--text-color);
 }
@@ -74,6 +73,8 @@ body {
   --signup-button:purple;
   --signup-bg-button:rgb(210, 187, 210);
   --logout-signup-hover-bg-btn:maroon;
+  --visit-link:orange;
+
 }
 
 body.dark header,

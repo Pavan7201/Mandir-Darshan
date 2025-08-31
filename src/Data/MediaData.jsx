@@ -14,49 +14,49 @@ export const MediaData = [
       video: Kit,
       title: "Media Kit",
       description: "Browse and view our trademarks, logos and other important branding and media information of Temple Devasthanam enclosed in Media Kit.",
-      link: "/NotFound"
+      link: "/notfound"
     },
     {
       id: 2,
       video: Gallery,
       title: "Gallery",
       description: "Watch old and new videos of Temple activities and events, and pass through the journey lane of Temple history depicted through vivid pictures.",
-      link: "/NotFound"
+      link: "/notfound"
     },
     {
       id: 3,
       video: New,
       title: "What's New",
       description: "Be updated with the latest news from the Temple grounds, and mark your calendars for the events and upcoming festivities listed here.",
-      link: "/NotFound"
+      link: "/notfound"
     },
     {
       id: 4,
       video: Press,
       title: "Press",
       description: "All the information, announcements, and print and digital media relevant to the media industry are kept safely in the archives of the Press.",
-      link: "/NotFound"
+      link: "/notfound"
     },
     {
       id: 5,
       video: Tenders,
       title: "Tenders",
       description: "All Tenders intended for the development of the temple are listed here with supported documents/links wherever necessary.",
-      link: "/NotFound"
+      link: "/notfound"
     },
     {
       id: 6,
       video: Act ,
       title: "RTI Act",
       description: "All shrines fall under RTI Act. AP Temples operate with utmost transparency and uphold citizens' right to information granted by the law of the land",
-      link: "/NotFound"
+      link: "/notfound"
     },
     {
       id: 7,
       video: Announcements,
       title: "Announcements",
       description: "All Announcements related to the Endowments are listed here with supported documents/links wherever necessary.",
-      link: "/NotFound"
+      link: "/notfound"
     },
     
     {
@@ -64,14 +64,14 @@ export const MediaData = [
       video: Faq ,
       title: "FAQ's",
       description:"Devotees can get the answers of frequently asked questions by accessing the FAQs page. For the comfort of devotees, we provide",
-      link: "/NotFound",
+      link: "/notfound",
     },
     {
       id: 9,
       video: Contact,
       title:"Contact Us",
       description:"To get complete information of the Temple and to clarify the doubts of devotees regarding Sevas, Darshanam",
-      link: "/NotFound",
+      link: "/notfound",
   },
   ];
   
