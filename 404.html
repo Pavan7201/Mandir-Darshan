@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
     <title>Redirecting...</title>
     <script>
-      // GitHub Pages SPA redirect
-      var redirectTo = window.location.pathname.replace("/Mandir-Darshan", "");
+      // GitHub Pages SPA redirect handling
+      var redirectTo =
+        window.location.pathname +
+        window.location.search +
+        window.location.hash;
       sessionStorage.redirect = redirectTo;
       window.location.href = "/Mandir-Darshan/";
     </script>
