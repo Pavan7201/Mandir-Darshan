@@ -25,7 +25,7 @@ const SevasBanner = ({
         const data = JSON.parse(cachedAssets);
         const banner = data.find((b) => b.category === "Banner");
         if (banner && banner.items && banner.items.length > 1) {
-          const sevasBanner = banner.items[2];
+          const sevasBanner = banner.items[3];
           setBannerUrl(sevasBanner.bannerUrl);
           setAltText(sevasBanner.alt);
           setParagraph(sevasBanner.p);
@@ -39,7 +39,7 @@ const SevasBanner = ({
         sessionStorage.setItem("assets", JSON.stringify(data));
         const banner = data.find((b) => b.category === "Banner");
         if (banner && banner.items && banner.items.length > 2) {
-          const sevasBanner = banner.items[2];
+          const sevasBanner = banner.items[3];
           setBannerUrl(sevasBanner.bannerUrl);
           setAltText(sevasBanner.alt || "Sevas & Bookings Banner");
           setParagraph(sevasBanner.p || "Dharmo Rakshathi Rakshithah");

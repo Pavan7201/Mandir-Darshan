@@ -1,11 +1,8 @@
-import { useState, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import "../css/LoginPage.css";
 import { useNavigate, Link } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import IndiaFlag from "../assets/India-flag.png";
-import loginBanner from "../assets/Loginbanner.png";
-import Faq from "../components/Faq's";
-import { faqData } from "../components/FaqData";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 import { AuthContext } from "../AuthContext";
 
@@ -16,8 +13,52 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [faqs, setFaqs] = useState([]);
+  const [banner, setBanner] = useState([])
+
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const API_BASE_URL =
+    import.meta.env.MODE === "production"
+      ? "https://mandir-darshan.onrender.com"
+      : "http://localhost:4000";
+
+  useEffect(() => {
+    const fetchFaqs = async () => {
+    const cachedAssets = sessionStorage.getItem("assets");
+
+      if (cachedAssets) {
+        const data = JSON.parse(cachedAssets);
+        const faqData = data.find((item) => item.category === "faq");
+        const bannerData = data.find((b) => b.category === "Banner");
+        if (faqData && faqData.items) {
+          setFaqs(faqData.items.slice(12));
+        }
+        if(bannerData && bannerData.items && bannerData.items.length > 0){
+          setBanner(bannerData.items[0].bannerUrl)
+        }
+      }
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/assets`);
+        const data = await res.json();
+        sessionStorage.setItem("assets", JSON.stringify(data));
+
+        const faqData = data.find((item) => item.category === "faq");
+        const bannerData = data.find((b) => b.category === "Banner");
+        if (faqData && faqData.items) {
+          setFaqs(faqData.items.slice(12));
+        }
+        if(bannerData && bannerData.items && bannerData.items.length > 0){
+          setBanner(bannerData.items[0].bannerUrl)
+        }
+      } catch (err) {
+        console.error("Error fetching FAQs:", err);
+      }
+    };
+
+    fetchFaqs();
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -103,14 +144,14 @@ const LoginPage = () => {
             </div>
           </div>
           <div className="login-right animate-on-scroll">
-            <img src={loginBanner} alt="Mandir Darshan" loading="lazy" />
+            <img src={banner} alt="Mandir Darshan" loading="lazy" />
           </div>
         </div>
       </section>
-      <section>
+      {/* <section>
         <hr />
-        <Faq className="animate-on-scroll" faqs={faqData.slice(12)} />
-      </section>
+        <Faq className="animate-on-scroll" faqs={faqs} />
+      </section> */}
     </>
   );
 };

@@ -20,10 +20,10 @@ const Banner = ({ className = "" }) => {
         const data = JSON.parse(cachedAssets);
         const banner = data.find((b) => b.category === "Banner");
         if (banner && banner.items && banner.items.length > 0) {
-          setBannerUrl(banner.items[0].bannerUrl);
-          setAltText(banner.items[0].alt);  
-          setHeading(banner.items[0].h2);
-          setParagraph(banner.items[0].p);
+          setBannerUrl(banner.items[1].bannerUrl);
+          setAltText(banner.items[1].alt);  
+          setHeading(banner.items[1].h2);
+          setParagraph(banner.items[1].p);
         }
       }
       try {
@@ -31,11 +31,11 @@ const Banner = ({ className = "" }) => {
         const data = await res.json();
         sessionStorage.setItem("assets", JSON.stringify(data));
         const banner = data.find((b) => b.category === "Banner");
-        if (banner && banner.items && banner.items.length > 0) {
-          setBannerUrl(banner.items[0].bannerUrl);
-          setAltText(banner.items[0].alt);
-          setHeading(banner.items[0].h2);
-          setParagraph(banner.items[0].p);
+        if (banner && banner.items && banner.items.length > 1) {
+          setBannerUrl(banner.items[1].bannerUrl);
+          setAltText(banner.items[1].alt);
+          setHeading(banner.items[1].h2);
+          setParagraph(banner.items[1].p);
         }
       } catch (err) {
         console.error("Error fetching banner:", err);

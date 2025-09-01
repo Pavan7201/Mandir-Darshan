@@ -1,12 +1,14 @@
 import MediaRoom from './MediaRoom';
-import { MediaData } from '../Data/MediaData';
 import "../css/MediaRoom.css";
 
 const Support = () => {
-  const SlicedSupportData = MediaData.slice(7);
+  const mediaCategory = MediaData.filter(item => item.category === "media");
+
+  const SlicedSupportData = mediaCategory.slice(7);
+
   return (
     <section>
-      <MediaRoom  cardsToShow={SlicedSupportData} />
+      <MediaRoom cardsToShow={SlicedSupportData} />
     </section>
   );
 };

@@ -21,10 +21,7 @@ const SevasCard = ({AnimateOnScroll=""}) => {
 
         if(cachedAssets) {
           const data = JSON.parse(cachedAssets);
-    console.log("Fetched data:", data);
           const sevasCategory = data.find((s) => s.category === "sevas");
-    console.log("Sevas category:", sevasCategory);
-
           setSevas(sevasCategory ? sevasCategory.items : []);
           return;
         }
@@ -33,10 +30,8 @@ const SevasCard = ({AnimateOnScroll=""}) => {
   try {
     const res = await fetch(`${API_BASE_URL}/api/assets`);
     const data = await res.json();
-    console.log("Fetched data:", data);
     sessionStorage.setItem("assets", JSON.stringify(data));
     const sevasCategory = data.find((s) => s.category === "sevas");
-    console.log("Sevas category:", sevasCategory);
     setSevas(sevasCategory ? sevasCategory.items : []);
   } catch (err) {
     console.error("Error fetching assets:", err);
@@ -46,12 +41,12 @@ const SevasCard = ({AnimateOnScroll=""}) => {
       fetchSevas();
     },[API_BASE_URL]);
 
-    const handleClick = (e, targetLink) => {
-    if (!auth?.user) {
+    const handleClick = (e, link) => {
+    if (!auth?.user && link !== "/notfound") {
       e.preventDefault();
       navigate('/SignUp');
     } else {
-      navigate(targetLink);
+      navigate(link);
     }
   };
 
@@ -67,7 +62,6 @@ const SevasCard = ({AnimateOnScroll=""}) => {
       <div className={`sevas-cards-container ${AnimateOnScroll}`}>
         {sevas.map((seva) =>(
           <div className="seva-card" key={seva.id}>
-            {console.log(seva)}
             <img src={seva.ImageUrl} alt={seva.alt} className="seva-card-img" />
             <h3 className={`seva-card-title `}>{seva.title}</h3>
             <p className={`seva-card-caption `}>{seva.caption}</p>

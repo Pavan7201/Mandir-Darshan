@@ -22,12 +22,13 @@ const TemplesCards = () => {
       ? "https://mandir-darshan.onrender.com"
       : "http://localhost:4000";
 
-  const handleClick = (e) => {
-    if (!auth?.user) {
-      e.preventDefault();
-      navigate("/SignUp");
-    }
-  };
+  const handleClick = (e, link) => {
+  if (!auth?.user && link !== "/notfound") {
+    e.preventDefault();
+    navigate("/SignUp");
+  }
+};
+
 
   useEffect(() => {
     const cachedAssets = sessionStorage.getItem("assets");
@@ -76,7 +77,6 @@ const TemplesCards = () => {
         onError={(e) => {
           e.currentTarget.src = noImage;
         }}
-        loading="lazy"
       />
     )}
     <h3 className="temple-card-title">{Temple.name}</h3>
@@ -86,20 +86,15 @@ const TemplesCards = () => {
     {Temple.hours && (
       <div className="temple-card-footer">
         <p className="temple-card-time">
-  <span className="clock">&#128339;</span>{" "}
-  <span className="time-list">
-    {Temple.hours.split(",").map((time, i) => (
-      <span key={i} className="time-item">
-        {time.trim()}
-        <br />
-      </span>
-    ))}
-  </span>
-</p>
-
+          <span className="clock">&#128339;</span>{" "}<span className="time-list">
+          {Temple.hours.split(",").map((time, i) => (
+            <span key={i} className="time-item">{time.trim()}<br /></span>
+            ))}
+          </span>
+        </p>
         <NavLink
           to={Temple.link}
-          onClick={handleClick}
+          onClick={(e) => handleClick(e, Temple.link)}
           className="Visit-link"
         >
           Visit Temple

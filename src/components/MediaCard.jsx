@@ -1,25 +1,25 @@
-import PropTypes from 'prop-types';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
-import { AuthContext } from '../AuthContext';
-import '../css/MediaCard.css';
+import PropTypes from "prop-types";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../AuthContext";
+import "../css/MediaCard.css";
 
-const MediaCard = ({ video, title, description, link }) => {
+const MediaCard = ({ url, title, description, link }) => {
   const { auth } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleClick = (e) => {
-    if (!auth?.user) {
-      e.preventDefault();
-      navigate('/SignUp');
-    }
-  };
+  const handleClick = (e, link) => {
+  if (!auth?.user && link !== "/notfound") {
+    e.preventDefault();
+    navigate("/SignUp");
+  }
+};
 
   return (
     <div className="media-card">
       <video
         className="media-video"
-        src={video}
+        src={url}
         autoPlay
         loop
         muted
@@ -29,18 +29,19 @@ const MediaCard = ({ video, title, description, link }) => {
       <p className="media-description">{description}</p>
 
       <NavLink
-        to={MediaData.link}
-        className="view-more-btn"
-        onClick={handleClick}
-      >
-        View More <span className="arrow">&#x203A;</span>
-      </NavLink>
+  className="view-more-btn"
+  to={link || "/notfound"}
+  onClick={(e) => handleClick(e, link)}
+>
+  View More <span className="arrow">&#x203A;</span>
+</NavLink>
+
     </div>
   );
 };
 
 MediaCard.propTypes = {
-  video: PropTypes.string.isRequired,
+  url: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   link: PropTypes.string,

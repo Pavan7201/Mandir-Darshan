@@ -30,47 +30,45 @@ const Faq = ({ faqs = [], AnimateOnScroll = "" }) => {
       />
       <div className="faq-container">
         {faqs.map((item, index) => {
-          const isMultiStep = item.answer.includes("\n");
+  const isMultiStep = item.answer?.includes("\n");
 
-          return (
-            <div className={`faq-item ${AnimateOnScroll}`} key={index}>
-              <div
-                className="faq-question"
-                ref={(el) => (faqRefs.current[index] = el)}
-                tabIndex={0}
-                onClick={() => toggleFaq(index)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter" || e.key === " ") toggleFaq(index);
-                }}
-              >
-                <div className="faq-number-circle">{index + 1}</div>
-                <span className="faq-question-text">{item.question}</span>
-                <span className="faq-icon">{activeIndex === index ? "−" : "+"}</span>
-              </div>
+  return (
+    <div className={`faq-item ${AnimateOnScroll}`} key={item.id || index}>
+      <div
+        className="faq-question"
+        ref={(el) => (faqRefs.current[index] = el)}
+        tabIndex={0}
+        onClick={() => toggleFaq(index)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") toggleFaq(index);
+          if (e.key === "Escape" && activeIndex === index) setActiveIndex(null);
+        }}
+      >
+        <div className="faq-number-circle">{index + 1}</div>
+        <span className="faq-question-text">{item.question}</span>
+        <span className="faq-icon">{activeIndex === index ? "−" : "+"}</span>
+      </div>
 
-              {activeIndex === index && (
-                <div className="faq-answer">
-                  <span className="faq-answer-label">Ans:</span>
-                  {isMultiStep ? (
-                    <ol>
-                      {item.answer.split("\n").map((line, idx) => {
-                        const trimmedLine = line.trim();
-                        if (!trimmedLine) return null;
-                        return (
-                          <li key={idx}>
-                            {trimmedLine.replace(/^\d+\.\s*/, "")}
-                          </li>
-                        );
-                      })}
-                    </ol>
-                  ) : (
-                    <span className="faq-answer-text">{item.answer}</span>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
+      {activeIndex === index && (
+        <div className="faq-answer">
+          <span className="faq-answer-label">Ans:</span>
+          {isMultiStep ? (
+            <ol>
+              {item.answer.split("\n").map((line, idx) => {
+                const trimmedLine = line.trim();
+                if (!trimmedLine) return null;
+                return <li key={idx}>{trimmedLine.replace(/^\d+\.\s*/, "")}</li>;
+              })}
+            </ol>
+          ) : (
+            <span className="faq-answer-text">{item.answer}</span>
+          )}
+        </div>
+      )}
+    </div>
+  );
+})}
+
       </div>
     </section>
   );

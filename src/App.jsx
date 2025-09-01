@@ -48,14 +48,14 @@
     "/donation", 
     "/media", 
     "/support",
-    "/notfound"   // include notfound for header
+    "/notfound"
   ];
 
   const showHeader = layoutRoutes.some((path) =>
     location.pathname.startsWith(path)
   );
 
-  const noFooterRoutes = ["/notfound"];
+  const noFooterRoutes = ["/notfound", "/login", "/signup"];
   const showFooterAllowed = !noFooterRoutes.includes(location.pathname);
 
   const redirectAfterLogout = sessionStorage.getItem("redirectAfterLogout");

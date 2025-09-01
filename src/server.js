@@ -55,20 +55,6 @@ async function connectDB() {
   }
 }
 connectDB();
- 
-// const getCookieOptions = () => ({ //for development and testing
-//   httpOnly: true,
-//   secure: true,
-//   sameSite: "lax",
-//   path: "/",
-// });
-
-// const getCookieOptions = () => ({
-//   httpOnly: true,
-//   secure: true,     
-//   sameSite: "none",
-//   path: "/",
-// });
 
 const authenticateUserMiddleware = async (req, res, next) => {
   try {
@@ -113,8 +99,6 @@ app.post("/api/signup", async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    // res.cookie("token", token, getCookieOptions());
-
     res.status(201).json({
       message: "User created",
       token,
@@ -145,7 +129,6 @@ app.post("/api/login", async (req, res) => {
       JWT_SECRET,
       { expiresIn: "1h" }
     );
-    // res.cookie("token", token, getCookieOptions());
 
     res.json({
       message: "Login successful",
@@ -166,7 +149,6 @@ app.post("/api/login", async (req, res) => {
 
 app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
   try {
-    // const token = req.cookies.token;
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.startsWith("Bearer ")
       ? authHeader.substring(7)
@@ -181,8 +163,7 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
           expiresAt: new Date(decoded.exp * 1000),
         });
       }
-    }
-    // res.cookie("token", "", {...getCookieOptions(), expires: new Date(0)});
+    };
     res.json({ message: "Logged out successfully" });
   } catch (err) {
     console.error("Logout error:", err);
@@ -209,8 +190,6 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
     const userId = new ObjectId(req.user._id);
 
     await usersCollection.deleteOne({ _id: userId });
-
-    // res.cookie("token", "", {...getCookieOptions(), expires: new Date(0)});
 
     res.json({ message: "Account deleted successfully" });
   } catch (err) {

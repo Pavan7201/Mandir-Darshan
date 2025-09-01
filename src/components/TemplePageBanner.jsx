@@ -31,7 +31,7 @@ const TemplePageBanner = () => {
         const data = JSON.parse(cachedAssets);
         const banner = data.find((b) => b.category === "Banner");
         if (banner && banner.items && banner.items.length > 1) {
-          const templeBanner = banner.items[1];
+          const templeBanner = banner.items[2];
           setBannerUrl(templeBanner.bannerUrl);
           setAltText(templeBanner.alt);
           setHeading(templeBanner.h2);
@@ -44,7 +44,7 @@ const TemplePageBanner = () => {
         sessionStorage.setItem("assets", JSON.stringify(data));
         const banner = data.find((b) => b.category === "Banner");
         if (banner && banner.items && banner.items.length > 1) {
-          const templeBanner = banner.items[1];
+          const templeBanner = banner.items[2];
           setBannerUrl(templeBanner.bannerUrl);
           setAltText(templeBanner.alt);
           setHeading(templeBanner.h2);
