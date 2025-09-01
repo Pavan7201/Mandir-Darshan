@@ -16,6 +16,7 @@ const SignupPage = () => {
     middleName: "",
     lastName: "",
     mobile: "",
+    sex: "",
     password: "",
     confirmPassword: "",
   });
@@ -45,7 +46,7 @@ const SignupPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { firstName, middleName, lastName, mobile, password, confirmPassword } = form;
+    const { firstName, middleName, lastName, mobile, sex, password, confirmPassword } = form;
 
     if (mobile.length !== 10) {
       return setError("Please enter a valid 10-digit mobile number.");
@@ -64,15 +65,10 @@ const SignupPage = () => {
     setError("");
 
     try {
-      await signup({ firstName, middleName, lastName, mobile, password });
+      await signup({ firstName, middleName, lastName, mobile, sex, password });
       navigate("/");
     } catch (err) {
-      console.log("Signup error:", err);
-      if(err){
-        setError(err.message);
-      }else{
-        setError(err.message || "Signup failed");
-      }
+      setError(err?.message || "Signup failed");
     }
   };
 
@@ -88,42 +84,59 @@ const SignupPage = () => {
           >
             <h2>Sign Up</h2>
             <div className="signup-name-row">
-              <div className="name-input">
-                <label htmlFor="firstName">First Name *</label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={form.firstName}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="name-input">
-                <label htmlFor="middleName">Middle Name</label>
-                <input
-                  type="text"
-                  id="middleName"
-                  name="middleName"
-                  value={form.middleName}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="name-input">
-                <label htmlFor="lastName">Last Name *</label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={form.lastName}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-            <label className="mobile-label" htmlFor="mobile">
-              Mobile Number *
-            </label>
+  <div className="name-input">
+    <label htmlFor="firstName">First Name *</label>
+    <input
+      type="text"
+      id="firstName"
+      name="firstName"
+      value={form.firstName}
+      onChange={handleChange}
+      required
+    />
+  </div>
+
+  <div className="name-input">
+    <label htmlFor="middleName">Middle Name</label>
+    <input
+      type="text"
+      id="middleName"
+      name="middleName"
+      value={form.middleName}
+      onChange={handleChange}
+    />
+  </div>
+
+  <div className="last-name-sex-row">
+    <div className="name-input">
+      <label htmlFor="lastName">Last Name *</label>
+      <input
+        type="text"
+        id="lastName"
+        name="lastName"
+        value={form.lastName}
+        onChange={handleChange}
+        required
+      />
+    </div>
+
+    <div className="sex-selection">
+      <label className="sex-label">Sex *</label>
+        <select
+      id="sex"
+      name="sex"
+      value={form.sex}
+      onChange={handleChange}
+      required
+    >
+      <option value="">Select</option>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+    </div>
+  </div>
+</div>
+            <label className="mobile-label" htmlFor="mobile">Mobile Number *</label>
             <div className="signup-mobile-input">
               <img src={IndiaFlag} alt="India" className="signup-flag" />
               <span className="signup-code">+91</span>
@@ -137,9 +150,8 @@ const SignupPage = () => {
                 onChange={handleChange}
               />
             </div>
-            <label className="password-label" htmlFor="password">
-              Password *
-            </label>
+
+            <label className="password-label" htmlFor="password">Password *</label>
             <div className="signup-password-input">
               <input
                 type={showPassword ? "text" : "password"}
@@ -156,12 +168,9 @@ const SignupPage = () => {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
-            {passwordStrengthError && (
-              <div className="signup-error">{passwordStrengthError}</div>
-            )}
-            <label className="confirm-password-label" htmlFor="confirmPassword">
-              Confirm Password *
-            </label>
+            {passwordStrengthError && <div className="signup-error">{passwordStrengthError}</div>}
+
+            <label className="confirm-password-label" htmlFor="confirmPassword">Confirm Password *</label>
             <div className="signup-password-input">
               <input
                 type={showConfirmPassword ? "text" : "password"}
@@ -173,23 +182,18 @@ const SignupPage = () => {
               />
               <span
                 className="signup-eye-icon"
-                onClick={() =>
-                  setShowConfirmPassword(!showConfirmPassword)
-                }
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
                 {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
+
             {error && <div className="signup-error">{error}</div>}
-            <button className="signup-button" type="submit">
-              Sign Up
-            </button>
+            <button className="signup-button" type="submit">Sign Up</button>
             <hr className="signup-divider" />
             <div className="signup-login-prompt">
               Already have an account?{" "}
-              <Link to="/login" className="signup-login-link">
-                Login
-              </Link>
+              <Link to="/login" className="signup-login-link">Login</Link>
             </div>
           </form>
         </div>

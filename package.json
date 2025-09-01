@@ -33,6 +33,7 @@
     "jsonwebtoken": "^9.0.2",
     "lottie-react": "^2.4.1",
     "mongodb": "^6.19.0",
+    "multer": "^2.0.2",
     "nprogress": "^0.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

@@ -93,6 +93,10 @@
   position: relative;
   display: inline-block;
 }
+.welcome-container span{
+  color: var(--secondary-color);
+  cursor: pointer;
+}
 
 .dropdown-menu {
   position: absolute;
@@ -105,7 +109,7 @@
   z-index: 999;
   border-radius: 6px;
   padding: 8px 0;
-  min-width: 120px;
+  min-width: 140px;
   opacity: 0;
   transform: scaleY(0);
   transform-origin: top;
@@ -113,53 +117,22 @@
 }
 
 .dropdown-menu.open {
+  width: 100%;
   opacity: 1;
   transform: scaleY(1);
 }
-
-.logout-btn {
-  background: none;
-  border: none;
-  color: var(--text-color);
-  padding: 8px 8px;
-  width: 100%;
-  text-align: center;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.logout-btn:hover {
-  background-color: maroon;
-  color: rgb(236, 208, 156);
-}
-
-.delete-account-btn {
-  width: 100%;
-  padding: 8px 12px;
-  border: none;
-  cursor: pointer;
-  border-radius: 4px;
-  font-weight: bold;
-}
-
-.delete-account-btn:hover {
-  background-color: #b71c1c;
-}
-
 
 .welcome-text {
   padding: 0.1rem 0.3rem;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 0.8rem;
   display: flex;
   align-items: center;
   background-color: #F0E6BD;
   color: #200000;
-  font-weight: 600;
-  font-size:0.8rem;
   border: 1px solid maroon;
   text-decoration: none;
 }
@@ -168,60 +141,87 @@
   font-size: 20px;
 }
 
+.avatar-and-welcome, .avatar-and-welcome-mobile{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.avatar-img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+.avatar-img-mobile {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
 .signin-btn {
   padding: 0.1rem 0.3rem;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 0.8rem;
   display: flex;
   align-items: center;
   background-color: #F0E6BD;
   color: #200000;
-  font-weight: 600;
-  font-size:0.8rem;
   border: 1px solid maroon;
   text-decoration: none;
 }
 
-.signin-btn:hover{
+.signin-btn:hover {
   background-color: transparent;
-  color:rgb(240, 230, 189) ;
+  color: rgb(240, 230, 189);
   opacity: 0.85;
   border: 1px solid rgb(240, 230, 189);
 }
 
 .avatar-icon {
-  width: 20px;            
-  height: 20px;   
-  color: maroon; 
+  width: 20px;
+  height: 20px;
+  color: maroon;
   cursor: pointer;
-  transition: color 0.3s ease;
   border-radius: 50%;
   background-color: transparent;
   padding: 4px;
-  display: inline-block;  
+  display: inline-block;
+  transition: color 0.3s ease;
 }
 
 .signin-btn:hover .avatar-icon {
   color: rgb(240, 230, 189);
-  background-color: transparent;
 }
 
 .dashboard-btn {
   display: flex;
   align-items: center;
   gap: 1rem;
-  color:rgb(240, 230, 189) ;
-  padding:0;
+  color: rgb(240, 230, 189);
+  padding: 0;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  background-color: transparent;
   font-size: 0.75rem;
+  background-color: transparent;
 }
 
 .dashboard-label:hover {
@@ -240,7 +240,7 @@
   font-family: 'Alika Misely';
   src: url('../Fonts/alika/AlikaMisely.ttf') format('truetype');
   font-weight: normal;
-  font-style:normal;
+  font-style: normal;
 }
 
 .sub-header .nav-link {
@@ -274,13 +274,13 @@
   width: 100%;
 }
 
-.menu-toggle{
+.menu-toggle {
   display: none;
 }
 
 .theme-toggle-mobile {
   padding: 0;
-  margin:0;
+  margin: 0;
   width: 50%;
   display: flex;
   justify-content: center;
@@ -298,7 +298,6 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  pointer-events: all;
 }
 
 body.modal-open {
@@ -311,7 +310,7 @@ body.modal-open {
   border-radius: 20px;
   text-align: center;
   width: 500px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .modal-actions {
@@ -321,7 +320,7 @@ body.modal-open {
   gap: 1rem;
 }
 
-.yes-btn {
+.yes-btn, .cancel-btn {
   background-color: transparent;
   color: var(--link-hover);
   padding: 8px 16px;
@@ -330,16 +329,7 @@ body.modal-open {
   cursor: pointer;
 }
 
-.cancel-btn {
-  background-color:transparent;
-  border: 1px solid var(--faq-color);
-  color: var(--link-hover);
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.yes-btn:hover, .cancel-btn:hover{
+.yes-btn:hover, .cancel-btn:hover {
   background-color: var(--faq-color);
   color: var(--bg-color);
 }
@@ -349,24 +339,11 @@ body.modal-open {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  text-align: "center";
-}
-
-.Welcome-text-mobile{
-  display: flex;
-  flex-direction: column;
-  cursor: pointer;
-  align-items: center;
-}
-
-.welcome-container-mobile .avatar-icon {
-  font-size: 2.2rem;
-  color: rgb(238, 213, 167);
-  align-self: flex-end;
+  text-align: center;
 }
 
 .welcome-container-mobile span {
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   margin: 0px !important;
   color: rgb(238, 213, 167);
   font-weight: 500;
@@ -374,11 +351,11 @@ body.modal-open {
 
 .dropdown-menu button {
   width: 100%;
-  padding: 10px 14px;
+  padding: 0.5rem;
   background: none;
   border: none;
   text-align: left;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   cursor: pointer;
   color: var(--text-color);
   transition: background 0.2s ease;
@@ -389,16 +366,36 @@ body.modal-open {
   color: var(--secondary-color);
 }
 
-.logout-btn {
+.edit-profile-btn, .logout-btn, .delete-account-btn {
+  width: 100%;
+  padding: 0.2rem;
+  border: none;
+  cursor: pointer;
   border-radius: 4px;
-  margin-top: 5px;
   font-weight: 600;
+  margin-top: 5px;
+  font-size: 0rem;
+  color: var(--text-color);
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  transition: background 0.2s ease;
+  text-decoration: none;
 }
 
-.delete-account-btn {
-  border-radius: 4px;
-  margin-top: 5px;
-  font-weight: 600;
+.edit-profile-btn:hover {
+  background-color: maroon;
+  color: rgb(236, 208, 156);
+}
+
+@media (max-width: 1024px) {
+  .header { padding: 0; border-radius: 0; justify-content: space-between; gap: 0.5rem; width: 100vw; }
+  .logo-img img { height: 3.5rem; max-width: 130px; }
+  .search-bar { width: 140px; font-size: 0.85rem; padding: 0.3rem 0.6rem; }
+  .signin-btn span, .dashboard-label { display: none !important; }
+  .avatar-icon { width: 26px; height: 26px; padding: 4px; }
 }
 
 @media (max-width: 768px) {

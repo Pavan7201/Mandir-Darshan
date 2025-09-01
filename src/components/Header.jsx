@@ -7,6 +7,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle } from "@fortawesome/free-regular-svg-icons";
 import ThemeToggle from "../components/ThemeToggle";
 import { AuthContext } from "../AuthContext";
+import { faSignOutAlt, faTrashAlt, faUserEdit } from "@fortawesome/free-solid-svg-icons";
+import womenAvatar from "../assets/woman.png";
+import menAvatar from "../assets/boy.png";
 
 const Header = () => {
   const [hide, setHide] = useState(false);
@@ -18,14 +21,17 @@ const Header = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
 
-  const { user, logout, loading, deleteAccount, welcomeMessage, setWelcomeMessage } =
-    useContext(AuthContext);
-
+  const { user, logout, loading, deleteAccount, welcomeMessage, setWelcomeMessage } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
   const headerRef = useRef();
   const menuRef = useRef();
   const toggleRef = useRef();
+
+  const getAvatarUrl = (user) => {
+    if (!user) return menAvatar;
+    return user.avatar || (user.sex === "female" ? womenAvatar : menAvatar);
+  };
 
   const handleDeleteClick = () => setShowDeleteDialog(true);
 
@@ -44,7 +50,11 @@ const Header = () => {
     sessionStorage.setItem("redirectAfterLogout", "signup");
     navigate("/signup");
   };
-
+  const handleEditProfile = () => {
+    setDropdownOpen(false);
+    setShowDeleteDialog(false);
+    navigate("/editprofile");
+  };
   const toggleMenu = () => setMenuOpen(prev => !prev);
 
   const showHeader = hovered || !hide;
@@ -111,7 +121,7 @@ const Header = () => {
       setShowWelcome(true);
       const timer = setTimeout(() => {
         setShowWelcome(false);
-        setWelcomeMessage(""); 
+        setWelcomeMessage("");
       }, 3000);
       return () => clearTimeout(timer);
     } else {
@@ -160,15 +170,22 @@ const Header = () => {
               {!loading && user ? (
                 <div className="welcome-container-mobile">
                   <div
-                    className="Welcome-text-mobile"
+                    className="avatar-and-welcome-mobile"
                     onClick={() => setDropdownOpen(prev => !prev)}
                   >
-                    <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
-                    <span>{showWelcome ? `Welcome ${user?.firstName || "User"}` : user?.firstName || "User"}</span>
+                    <img src={getAvatarUrl(user)} alt="Avatar" className="avatar-img-mobile" />
+                    <span className="welcome-firstname">{showWelcome ? `Welcome ${user.firstName}` : user.firstName}</span>
                   </div>
                   <div className={`dropdown-menu ${dropdownOpen ? "open" : ""}`}>
-                    <button className="logout-btn" onClick={handleLogout}>Logout</button>
-                    <button className="delete-account-btn" onClick={handleDeleteClick}>Delete Account</button>
+                    <button className="edit-profile-btn" onClick={handleEditProfile}>
+                      Edit Profile <FontAwesomeIcon icon={faUserEdit} />
+                    </button>
+                    <button className="logout-btn" onClick={handleLogout}>
+                      Logout <FontAwesomeIcon icon={faSignOutAlt} />
+                    </button>
+                    <button className="delete-account-btn" onClick={handleDeleteClick}>
+                      Delete Account <FontAwesomeIcon icon={faTrashAlt} />
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -200,14 +217,21 @@ const Header = () => {
 
                 {!loading && user ? (
                   <div className="welcome-container fade-in delay-4">
-                    <div className="welcome-text" onClick={() => setDropdownOpen(prev => !prev)}>
-                      <span className="signin-text">{showWelcome ? `Welcome ${user?.firstName || "User"}` : user?.firstName || "User"}</span>
-                      <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
+                    <div className="avatar-and-welcome" onClick={() => setDropdownOpen(prev => !prev)}>
+                      <img src={getAvatarUrl(user)} alt={`${user.firstName || "User"} avatar`} className="avatar-img" />
+                      <span className="welcome-firstname">{showWelcome ? `Welcome ${user.firstName}` : user.firstName}</span>
                     </div>
 
                     <div className={`dropdown-menu ${dropdownOpen ? "open" : ""}`}>
-                      <button className="logout-btn" onClick={handleLogout}>Logout</button>
-                      <button className="delete-account-btn" onClick={handleDeleteClick}>Delete Account</button>
+                      <button className="edit-profile-btn" onClick={handleEditProfile}>
+                        Edit Profile <FontAwesomeIcon icon={faUserEdit} />
+                      </button>
+                      <button className="logout-btn" onClick={handleLogout}>
+                        Logout <FontAwesomeIcon icon={faSignOutAlt} />
+                      </button>
+                      <button className="delete-account-btn" onClick={handleDeleteClick}>
+                        Delete Account <FontAwesomeIcon icon={faTrashAlt} />
+                      </button>
                     </div>
                   </div>
                 ) : (

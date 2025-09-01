@@ -18,6 +18,7 @@
   import LoginPage from "./Pages/LoginPage";
   import SignUpPage from "./Pages/SignUpPage";
   import NotFound from "./Pages/NotFoundPage";
+  import ProfileEdit from "./Pages/ProfileEdit"; 
   import { ThemeProvider } from "./ThemeContext";
   import { AuthContext } from "./AuthContext";
 
@@ -55,7 +56,7 @@
     location.pathname.startsWith(path)
   );
 
-  const noFooterRoutes = ["/notfound", "/login", "/signup"];
+  const noFooterRoutes = ["/notfound", "/login", "/signup","/editprofile"];
   const showFooterAllowed = !noFooterRoutes.includes(location.pathname);
 
   const redirectAfterLogout = sessionStorage.getItem("redirectAfterLogout");
@@ -92,6 +93,7 @@
       <Routes>
         <Route path="/" element={ user ? ( <Homepage /> ) : redirectAfterLogout === "login" ? ( <Navigate to="/login" replace /> ) : ( <Navigate to="/signup" replace />)} />
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
+        <Route path="/editprofile" element={<ProfileEdit />} />
         <Route path="/signup" element={user ? <Navigate to="/" replace /> : <SignUpPage />} />
         <Route path="/temples" element={<PrivateRoute> <TemplesPage /> </PrivateRoute>} />
         <Route path="/sevas-&-booking" element={ <PrivateRoute> <Sevas /> </PrivateRoute> } />
