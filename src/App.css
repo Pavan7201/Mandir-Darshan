@@ -34,6 +34,9 @@ body.dark {
   --signup-bg-button:rgb(243, 243, 136);
   --logout-signup-hover-bg-btn:rgb(63, 59, 59);
   --visit-link:#f7edd6;
+  --pe-form-bg:linear-gradient(135deg,rgb(60, 58, 57), #000000);
+  --pe-avatar-edit-delete:#f0e6bd ;
+  --radio-color:orange;
   background-color: var(--bg-color);
   color: var(--text-color);
 }
@@ -73,7 +76,13 @@ body {
   --signup-button:purple;
   --signup-bg-button:rgb(210, 187, 210);
   --logout-signup-hover-bg-btn:maroon;
+
+  --pe-form-bg:linear-gradient(135deg,rgb(232, 201, 158), #d09b2f);
   --visit-link:orange;
+  --pe-avatar-edit-delete: maroon;
+  --radio-color:maroon;
+
+
 
 }
 

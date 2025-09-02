@@ -30,7 +30,7 @@ const Header = () => {
 
   const getAvatarUrl = (user) => {
     if (!user) return menAvatar;
-    return user.avatar || (user.sex === "female" ? womenAvatar : menAvatar);
+    return user.avatar || (user.gender === "female" ? womenAvatar : menAvatar);
   };
 
   const handleDeleteClick = () => setShowDeleteDialog(true);

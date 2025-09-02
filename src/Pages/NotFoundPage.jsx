@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import Lottie from "lottie-react";
 import lightAnimation from "../loader/Under Construction Light.json";
 import darkAnimation from "../loader/Under Construction Dark.json";

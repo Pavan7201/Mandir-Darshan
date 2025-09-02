@@ -80,8 +80,8 @@ app.get("/", (_req, res) => res.send("Backend is running 🚀"));
 
 app.post("/api/signup", async (req, res) => {
   try {
-    const { firstName, middleName, lastName, mobile, password, sex } = req.body;
-    if (!firstName || !lastName || !mobile || !password || !sex) {
+    const { firstName, middleName, lastName, mobile, password, gender } = req.body;
+    if (!firstName || !lastName || !mobile || !password || !gender) {
       return res.status(400).json({ error: "All required fields must be filled." });
     }
 
@@ -89,12 +89,12 @@ app.post("/api/signup", async (req, res) => {
     if (existingMobile) return res.status(400).json({ error: "User already exists" });
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const newUser = { firstName, middleName, lastName, mobile, passwordHash, sex };
+    const newUser = { firstName, middleName, lastName, mobile, passwordHash, gender };
 
     const { insertedId } = await usersCollection.insertOne(newUser);
 
     const token = jwt.sign(
-      { _id: insertedId.toString(), firstName, mobile, sex },
+      { _id: insertedId.toString(), firstName, mobile, gender },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -102,7 +102,7 @@ app.post("/api/signup", async (req, res) => {
     res.status(201).json({
       message: "User created",
       token,
-      user: { _id: insertedId.toString(), firstName, middleName, lastName, mobile, sex },
+      user: { _id: insertedId.toString(), firstName, middleName, lastName, mobile, gender },
     });
   } catch (err) {
     console.error("Signup error:", err);
@@ -126,7 +126,7 @@ app.post("/api/login", async (req, res) => {
     await blacklistedTokensCollection.deleteMany({ userId: user._id });
 
     const token = jwt.sign(
-      { _id: user._id.toString(), firstName: user.firstName, mobile: user.mobile, sex: user.sex },
+      { _id: user._id.toString(), firstName: user.firstName, mobile: user.mobile, gender: user.gender },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -140,7 +140,7 @@ app.post("/api/login", async (req, res) => {
         middleName: user.middleName,
         lastName: user.lastName,
         mobile: user.mobile,
-        sex: user.sex,
+        gender: user.gender,
       },
     });
   } catch (err) {
@@ -160,7 +160,7 @@ app.put("/api/editprofile", authenticateUserMiddleware, upload.single("avatar"),
       middleName,
       lastName,
       mobile,
-      sex,
+      gender,
       currentPassword,
       newPassword,
       removeAvatar 
@@ -174,7 +174,7 @@ app.put("/api/editprofile", authenticateUserMiddleware, upload.single("avatar"),
     if (middleName) updateFields.middleName = middleName.trim();
     if (lastName) updateFields.lastName = lastName.trim();
     if (mobile) updateFields.mobile = mobile.trim();
-    if (sex) updateFields.sex = sex;
+    if (gender) updateFields.gender = gender;
 
     if (currentPassword && newPassword) {
       const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);

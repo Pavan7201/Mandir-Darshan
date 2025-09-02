@@ -3,20 +3,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  width: 95vw;
-  max-width: 800px;
+  min-height: 100vh ;
+  width: 98.9vw;
   margin: auto;
   padding: 2rem;
-  background: linear-gradient(135deg, #f5f7fa, #f0e2c7);
-  border-radius: 12px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  background: var(--pe-form-bg);
 }
 
 .pe-title {
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  color: #333;
+  font-family: 'Alika Misely', serif;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  color: var(--faq-color);
   text-align: center;
 }
 
@@ -25,7 +23,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
+  gap: 0.4rem;
 }
 
 .pe-avatar-img,
@@ -35,45 +34,59 @@
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 0.5rem;
-  border: 2px solid #ddd;
+  border: 2px solid var(--faq-color);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .pe-avatar-remove {
-  margin-top: 0.5rem;
-  background-color: #ff4d4f;
-  color: white;
+  background: var(--pe-avatar-edit-delete);
+  color: var(--faq-q-color);
   border: none;
-  padding: 4px 10px;
-  border-radius: 4px;
+  padding: 5px 7px;
+  border-radius: 100%;
   font-size: 0.85rem;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
-.pe-avatar-remove:hover {
-  background-color: #e04344;
-}
-
 .pe-avatar-placeholder {
-  background: #e0e0e0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #888;
+  background: transparent;
 }
 
 .pe-avatar-input {
+  display: none;
+}
+
+.pe-avatar-edit {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--pe-avatar-edit-delete);
+  color: var(--faq-q-color);
+  border: none;
+  border-radius: 50%;
+  padding: 0.3rem;
   cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.pe-avatar-edit:hover, .pe-avatar-remove:hover {
+  background: var(--q-hover-focus-color);
+  color: var(--faq-color);
+  transform: scale(1.1);
 }
 
 .pe-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
-  width: 100%;
+  gap: 0.8rem;
+  width: 60%;
   margin-bottom: 1.5rem;
 }
 
@@ -81,7 +94,18 @@
   display: flex;
   flex-direction: column;
   font-weight: 500;
-  color: #555;
+  color: var(--faq-color);
+}
+
+.pe-form input[type="text"],
+.pe-form input[type="tel"],
+.pe-form input[type="password"] {
+  color: var(--faq-color); 
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .pe-label input,
@@ -89,15 +113,17 @@
   margin-top: 0.3rem;
   padding: 0.65rem 0.8rem;
   border-radius: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--faq-color);
   font-size: 1rem;
   transition: border-color 0.3s, box-shadow 0.3s;
+  background: transparent;
 }
 
 .pe-label input:focus,
 .pe-label select:focus {
-  border-color: #4a90e2;
-  box-shadow: 0 0 5px rgba(74,144,226,0.4);
+  border-color:var(--faq-color);
+  color: var(--diety-color);
+  box-shadow: 0 0 5px var(--faq-color);
   outline: none;
 }
 
@@ -116,18 +142,18 @@
   position: absolute;
   right: 0.5rem;
   cursor: pointer;
-  color: #555;
+  color: var(--faq-color);
   background: none;
   border: none;
 }
 
-.pe-sex-options {
+.pe-gender-options {
   display: flex;
   gap: 1rem;
   margin-top: 0.5rem;
 }
 
-.pe-sex-options label {
+.pe-gender-options label {
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -135,15 +161,26 @@
   cursor: pointer;
 }
 
+.pe-gender-options input[type="radio"]{
+  outline: none;
+  box-shadow: none;
+  accent-color: var(--radio-color);
+}
+
 .pe-error {
-  color: #e74c3c;
+  color: red;
   margin-bottom: 1rem;
   font-weight: 500;
 }
 
+.success-animation-container{
+  width: 300px;
+  height: 300px;
+}
+
 .pe-success {
-  color: #27ae60;
-  margin-bottom: 1rem;
+  text-align: center;
+  color: brown;
   font-weight: 500;
 }
 
@@ -156,11 +193,11 @@
 
 .pe-btn {
   padding: 0.75rem 1.2rem;
-  background-color: #4a90e2;
-  color: #fff;
+  background-color: var(--faq-color);
+  color: var(--q-hover-focus-color);
   font-size: 1rem;
   font-weight: 600;
-  border: none;
+  border: 1px solid var(--faq-color);
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s, transform 0.2s;
@@ -169,31 +206,44 @@
 }
 
 .pe-btn:hover {
-  background-color: #357ABD;
+  background-color:transparent;
   transform: translateY(-2px);
+  color:var(--faq-color);
+  border: 1px solid var(--faq-color);
 }
 
 .pe-btn:disabled {
-  background-color: #a0c4ff;
+  background-color: transparent;
+  color: maroon;
+  border: 1px solid maroon;
   cursor: not-allowed;
 }
 
 @media (max-width: 768px) {
   .pe-form {
-    padding: 1.5rem 1rem;
+    padding: 1rem 1.5rem;
+    width: 100%;
+    height: auto; 
+    overflow-y: auto;
+    justify-content: center;
+    border-radius: 0;
   }
 
   .pe-avatar-img,
   .pe-avatar-placeholder {
-    width: 100px;
-    height: 100px;
+    width: 70px;
+    height: 70px;
   }
 
   .pe-row {
     grid-template-columns: 1fr;
+    width: auto;
+    justify-items: flex-start;
+    text-align: left;
   }
 
-  .pe-sex-options {
+  .pe-gender-options {
     gap: 0.5rem;
+    justify-content: center;
   }
 }

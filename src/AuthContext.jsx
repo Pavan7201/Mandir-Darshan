@@ -131,7 +131,7 @@ export const AuthProvider = ({ children }) => {
         middleName: data.user.middleName,
         lastName: data.user.lastName,
         mobile: data.user.mobile,
-        sex: data.user.sex || "",
+        gender: data.user.gender || "",
       });
 
       setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
