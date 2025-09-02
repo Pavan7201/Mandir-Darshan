@@ -76,7 +76,7 @@
   display: flex;
   gap: 1rem;
   align-items: center;
-  padding-bottom: 0.7rem;
+  padding-bottom: 0.5rem;
 }
 
 .search-bar {
@@ -99,13 +99,14 @@
   display: inline-block;
 }
 .welcome-container span{
+  font-size: 0.9rem;
   color: var(--secondary-color);
   cursor: pointer;
 }
 
 .dropdown-menu {
   position: absolute;
-  top: 100%;
+  top: 79%;
   right: -0.5px;
   margin-top: 0.72rem;
   background-color: var(--bg-color);
@@ -114,7 +115,7 @@
   z-index: 999;
   border-radius: 6px;
   padding: 8px 0;
-  min-width: 140px;
+  min-width: 180px;
   opacity: 0;
   transform: scaleY(0);
   transform-origin: top;
@@ -154,8 +155,8 @@
 }
 
 .avatar-img {
-  width: 35px;
-  height: 35px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #fff;
@@ -258,7 +259,7 @@
   transition: color 0.3s ease-in-out;
   white-space: nowrap;
   text-align: center;
-  margin-top: 2rem;
+  margin-top: 2.5rem;
 }
 
 .sub-header .nav-link::after {
@@ -371,7 +372,7 @@ body.modal-open {
   color: var(--secondary-color);
 }
 
-.edit-profile-btn, .logout-btn, .delete-account-btn {
+.edit-profile-btn, .logout-btn, .delete-account-btn, .change-password-btn {
   width: 100%;
   padding: 0.2rem;
   border: none;
@@ -388,11 +389,6 @@ body.modal-open {
   gap: 0.5rem;
   transition: background 0.2s ease;
   text-decoration: none;
-}
-
-.edit-profile-btn:hover {
-  background-color: maroon;
-  color: rgb(236, 208, 156);
 }
 
 @media (max-width: 1024px) {
@@ -547,9 +543,18 @@ body.modal-open {
   }
 
   .dropdown-menu {
-    top: 104%;
-    right: -0.9rem;
-    transform: translateY(-5%);
+    width: auto;
+    max-width: 180px;
+    min-width: 140px;
+    height: auto;
+    top: 90%;
+    right:-1.6rem;
+    transform: translateY(-2%);
+    pointer-events: none;
+  }
+
+  .dropdown-menu.open{
+    pointer-events: auto;
   }
 
   .modal-content {
@@ -638,6 +643,14 @@ body.modal-open {
   .dashboard-btn {
     font-size: 0.7rem;
     gap: 0.3rem;
+  }
+
+  .dropdown-menu {
+    max-width: 180px;
+    min-width: 140px;
+    height: auto;
+    top: 90%;
+    transform: translateY(-2%);
   }
 
   .header-wrapper {

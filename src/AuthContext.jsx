@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }) => {
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [loadMode, setLoadMode] = useState("idle");
+  const [loggedOut, setLoggedOut] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -211,6 +212,7 @@ export const AuthProvider = ({ children }) => {
 
       NProgress.done();
       setUser(null);
+      setLoggedOut(true);
       setWelcomeMessage("");
       setToken("");
       localStorage.removeItem("token");

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useContext } from "react";
 import { AuthContext } from "../AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash, faPencilAlt, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faPencilAlt, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate, useLocation } from "react-router-dom";
 import Lottie from "lottie-react";
 import successAnimation from "../loader/Success.json";
@@ -23,30 +23,20 @@ const ProfileEdit = () => {
     gender: "",
     avatarFile: null,
     avatarPreview: "",
-    currentPassword: "",
-    newPassword: "",
-    confirmNewPassword: "",
   });
 
-  const [passwordVisibility, setPasswordVisibility] = useState({ new: false, confirm: false });
   const [message, setMessage] = useState({ error: "", success: "" });
-  const [passwordStrengthError, setPasswordStrengthError] = useState("");
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-
-  const StrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
   const showMessage = (type, text) => {
     if (type === "error") {
       setMessage({ error: text, success: "" });
-    } else {
-      setMessage({ error: "", success: text });
-    }
-
-    if (type === "error") {
       setTimeout(() => {
         setMessage({ error: "", success: "" });
       }, 2000);
+    } else {
+      setMessage({ error: "", success: text });
     }
   };
 
@@ -60,22 +50,12 @@ const ProfileEdit = () => {
         gender: user.gender || "",
         avatarFile: null,
         avatarPreview: user.avatar || "",
-        currentPassword: "",
-        newPassword: "",
-        confirmNewPassword: "",
       });
     }
   }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "newPassword") {
-      setPasswordStrengthError(
-        StrongPassword.test(value)
-          ? ""
-          : "Weak password. Use 8+ chars, uppercase, lowercase, number, special char."
-      );
-    }
     setFormData((prev) => ({ ...prev, [name]: value }));
     setMessage({ error: "", success: "" });
   };
@@ -121,18 +101,6 @@ const ProfileEdit = () => {
     setMessage({ error: "", success: "" });
   };
 
-  const validate = () => {
-    if (formData.newPassword && !StrongPassword.test(formData.newPassword)) {
-      showMessage("error", "Password must be at least 8 chars with uppercase, lowercase, number, special char.");
-      return false;
-    }
-    if (formData.newPassword !== formData.confirmNewPassword) {
-      showMessage("error", "Passwords do not match");
-      return false;
-    }
-    return true;
-  };
-
   const hasChanges = () => {
     if (!user) return false;
     return (
@@ -141,9 +109,7 @@ const ProfileEdit = () => {
       formData.lastName !== user.lastName ||
       formData.mobile !== user.mobile ||
       formData.gender !== user.gender ||
-      formData.avatarFile ||
-      formData.currentPassword ||
-      formData.newPassword
+      formData.avatarFile
     );
   };
 
@@ -154,7 +120,6 @@ const ProfileEdit = () => {
       showMessage("error", "No changes detected");
       return;
     }
-    if (!validate()) return;
 
     setIsSaving(true);
     const payload = {
@@ -165,11 +130,6 @@ const ProfileEdit = () => {
       gender: formData.gender,
     };
 
-    if (formData.currentPassword && formData.newPassword) {
-      payload.currentPassword = formData.currentPassword;
-      payload.newPassword = formData.newPassword;
-    }
-
     try {
       if (formData.avatarFile) {
         const fd = new FormData();
@@ -179,10 +139,6 @@ const ProfileEdit = () => {
         fd.append("lastName", formData.lastName);
         fd.append("mobile", formData.mobile);
         fd.append("gender", formData.gender);
-        if (formData.currentPassword && formData.newPassword) {
-          fd.append("currentPassword", formData.currentPassword);
-          fd.append("newPassword", formData.newPassword);
-        }
         await editProfile(fd, true);
       } else {
         await editProfile(payload);
@@ -192,9 +148,6 @@ const ProfileEdit = () => {
       setMessage({ success: "Profile updated successfully", error: "" });
       setFormData((prev) => ({
         ...prev,
-        currentPassword: "",
-        newPassword: "",
-        confirmNewPassword: "",
         avatarFile: null,
       }));
       if (fileRef.current) fileRef.current.value = "";
@@ -204,11 +157,7 @@ const ProfileEdit = () => {
         navigate(from);
       }, 3500);
     } catch (err) {
-      if (err?.message === "Invalid current password") {
-        showMessage("error", "Current password is invalid");
-      } else {
-        showMessage("error", err?.message || "Profile update failed");
-      }
+      showMessage("error", err?.message || "Profile update failed");
     } finally {
       setIsSaving(false);
     }
@@ -300,59 +249,6 @@ const ProfileEdit = () => {
             </div>
           </div>
 
-          <div className="pe-row">
-            <label className="pe-label">
-              Current Password
-              <input
-                type="password"
-                name="currentPassword"
-                value={formData.currentPassword}
-                onChange={handleChange}
-              />
-            </label>
-            <label className="pe-label">
-              New Password
-              <div className="pe-pass-wrapper">
-                <input
-                  type={passwordVisibility.new ? "text" : "password"}
-                  name="newPassword"
-                  value={formData.newPassword}
-                  onChange={handleChange}
-                />
-                <button
-                  type="button"
-                  className="pe-pass-toggle"
-                  onClick={() =>
-                    setPasswordVisibility((prev) => ({ ...prev, new: !prev.new }))
-                  }
-                >
-                  <FontAwesomeIcon icon={passwordVisibility.new ? faEyeSlash : faEye} />
-                </button>
-              </div>
-            </label>
-            <label className="pe-label">
-              Confirm Password
-              <div className="pe-pass-wrapper">
-                <input
-                  type={passwordVisibility.confirm ? "text" : "password"}
-                  name="confirmNewPassword"
-                  value={formData.confirmNewPassword}
-                  onChange={handleChange}
-                />
-                <button
-                  type="button"
-                  className="pe-pass-toggle"
-                  onClick={() =>
-                    setPasswordVisibility((prev) => ({ ...prev, confirm: !prev.confirm }))
-                  }
-                >
-                  <FontAwesomeIcon icon={passwordVisibility.confirm ? faEyeSlash : faEye} />
-                </button>
-              </div>
-            </label>
-          </div>
-
-          {passwordStrengthError && <p className="pe-error">{passwordStrengthError}</p>}
           {message.error && <p className="pe-error">{message.error}</p>}
 
           <div className="pe-btn-row">

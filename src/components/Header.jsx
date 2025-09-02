@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useContext } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import "../css/header.css";
 import MandirLogo from "../assets/logo.webp";
-import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faLock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle } from "@fortawesome/free-regular-svg-icons";
 import ThemeToggle from "../components/ThemeToggle";
@@ -109,14 +109,6 @@ const Header = () => {
   }, [menuOpen, dropdownOpen]);
 
   useEffect(() => {
-    if (menuRef.current && isMobile) {
-      menuRef.current.toggleAttribute("inert", !menuOpen);
-    } else if (menuRef.current) {
-      menuRef.current.removeAttribute("inert");
-    }
-  }, [menuOpen, isMobile]);
-
-  useEffect(() => {
     if (location.pathname === "/" && welcomeMessage) {
       setShowWelcome(true);
       const timer = setTimeout(() => {
@@ -180,6 +172,9 @@ const Header = () => {
                     <button className="edit-profile-btn" onClick={handleEditProfile}>
                       Edit Profile <FontAwesomeIcon icon={faUserEdit} />
                     </button>
+                    <button className="change-password-btn" onClick={() => { setDropdownOpen(false); navigate("/changepassword") }}>
+                        Change Password <FontAwesomeIcon icon={faLock} />
+                      </button>
                     <button className="logout-btn" onClick={handleLogout}>
                       Logout <FontAwesomeIcon icon={faSignOutAlt} />
                     </button>
@@ -225,6 +220,9 @@ const Header = () => {
                     <div className={`dropdown-menu ${dropdownOpen ? "open" : ""}`}>
                       <button className="edit-profile-btn" onClick={handleEditProfile}>
                         Edit Profile <FontAwesomeIcon icon={faUserEdit} />
+                      </button>
+                      <button className="change-password-btn" onClick={() => { setDropdownOpen(false); navigate("/changepassword") }}>
+                        Change Password <FontAwesomeIcon icon={faLock} />
                       </button>
                       <button className="logout-btn" onClick={handleLogout}>
                         Logout <FontAwesomeIcon icon={faSignOutAlt} />

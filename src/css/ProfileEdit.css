@@ -2,13 +2,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  min-height: 100vh ;
-  width: 98.9vw;
+  justify-content: flex-start;
+  flex: 1;
+  width: 100%;
   margin: auto;
   padding: 2rem;
   background: var(--pe-form-bg);
+  box-sizing: border-box;
 }
+
 
 .pe-title {
   font-family: 'Alika Misely', serif;
@@ -76,7 +78,8 @@
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.pe-avatar-edit:hover, .pe-avatar-remove:hover {
+.pe-avatar-edit:hover,
+.pe-avatar-remove:hover {
   background: var(--q-hover-focus-color);
   color: var(--faq-color);
   transform: scale(1.1);
@@ -98,9 +101,8 @@
 }
 
 .pe-form input[type="text"],
-.pe-form input[type="tel"],
-.pe-form input[type="password"] {
-  color: var(--faq-color); 
+.pe-form input[type="tel"] {
+  color: var(--faq-color);
   padding: 8px;
   border-radius: 6px;
   font-size: 14px;
@@ -121,30 +123,10 @@
 
 .pe-label input:focus,
 .pe-label select:focus {
-  border-color:var(--faq-color);
+  border-color: var(--faq-color);
   color: var(--diety-color);
   box-shadow: 0 0 5px var(--faq-color);
   outline: none;
-}
-
-.pe-pass-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.pe-pass-wrapper input {
-  width: 100%;
-  padding-right: 2.5rem;
-}
-
-.pe-pass-toggle {
-  position: absolute;
-  right: 0.5rem;
-  cursor: pointer;
-  color: var(--faq-color);
-  background: none;
-  border: none;
 }
 
 .pe-gender-options {
@@ -161,7 +143,7 @@
   cursor: pointer;
 }
 
-.pe-gender-options input[type="radio"]{
+.pe-gender-options input[type="radio"] {
   outline: none;
   box-shadow: none;
   accent-color: var(--radio-color);
@@ -173,7 +155,7 @@
   font-weight: 500;
 }
 
-.success-animation-container{
+.success-animation-container {
   width: 300px;
   height: 300px;
 }
@@ -206,9 +188,9 @@
 }
 
 .pe-btn:hover {
-  background-color:transparent;
+  background-color: transparent;
   transform: translateY(-2px);
-  color:var(--faq-color);
+  color: var(--faq-color);
   border: 1px solid var(--faq-color);
 }
 
@@ -219,13 +201,11 @@
   cursor: not-allowed;
 }
 
-
-
 @media (max-width: 768px) {
   .pe-form {
     padding: 1rem;
     width: 100%;
-    height: auto; 
+    height: auto;
     overflow-y: auto;
     justify-content: center;
     border-radius: 0;
@@ -254,4 +234,3 @@
     padding-left: 0.5rem;
   }
 }
-
