@@ -75,18 +75,23 @@
 .search-signin {
   display: flex;
   gap: 1rem;
-  justify-content: center;
   align-items: center;
   padding-bottom: 0.7rem;
 }
 
 .search-bar {
-  padding: 0.4rem 1rem;
-  border: 1px solid #d4a373;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--secondary-color);
   border-radius: 5px;
   outline: none;
   font-size: 1rem;
-  width: 300px;
+  width: 250px;
+  background: transparent;
+  color: var(--secondary-color);
+}
+
+.search-bar::placeholder{
+  color: rgba(234, 194, 141, 0.85);
 }
 
 .welcome-container {
@@ -149,8 +154,8 @@
 }
 
 .avatar-img {
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #fff;
@@ -164,8 +169,8 @@
 }
 
 .avatar-img-mobile {
-  width: 25px;
-  height: 25px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #fff;

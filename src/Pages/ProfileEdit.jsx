@@ -36,6 +36,20 @@ const ProfileEdit = () => {
 
   const StrongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
+  const showMessage = (type, text) => {
+    if (type === "error") {
+      setMessage({ error: text, success: "" });
+    } else {
+      setMessage({ error: "", success: text });
+    }
+
+    if (type === "error") {
+      setTimeout(() => {
+        setMessage({ error: "", success: "" });
+      }, 2000);
+    }
+  };
+
   useEffect(() => {
     if (user) {
       setFormData({
@@ -62,47 +76,44 @@ const ProfileEdit = () => {
           : "Weak password. Use 8+ chars, uppercase, lowercase, number, special char."
       );
     }
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
     setMessage({ error: "", success: "" });
   };
 
   const handleRemoveAvatar = async () => {
-  // If avatarFile exists but not saved → just clear selection locally
-  if (formData.avatarFile) {
-    setFormData(prev => ({
-      ...prev,
-      avatarFile: null,
-      avatarPreview: "", // reset completely, fallback will show default avatar
-    }));
-    if (fileRef.current) fileRef.current.value = "";
-    return;
-  }
+    if (formData.avatarFile) {
+      setFormData((prev) => ({
+        ...prev,
+        avatarFile: null,
+        avatarPreview: "",
+      }));
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
 
-  // Otherwise → delete from backend
-  try {
-    const payload = { removeAvatar: true };
-    await editProfile(payload);
+    try {
+      const payload = { removeAvatar: true };
+      await editProfile(payload);
 
-    setFormData(prev => ({
-      ...prev,
-      avatarFile: null,
-      avatarPreview: "", // remove DB avatar
-    }));
-    if (fileRef.current) fileRef.current.value = "";
-  } catch (err) {
-    setMessage({ error: err?.message || "Failed to remove avatar", success: "" });
-  }
-};
-
+      setFormData((prev) => ({
+        ...prev,
+        avatarFile: null,
+        avatarPreview: "",
+      }));
+      if (fileRef.current) fileRef.current.value = "";
+    } catch (err) {
+      showMessage("error", err?.message || "Failed to remove avatar");
+    }
+  };
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      setMessage({ error: "Invalid image file", success: "" });
+      showMessage("error", "Invalid image file");
       return;
     }
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       avatarFile: file,
       avatarPreview: URL.createObjectURL(file),
@@ -112,11 +123,11 @@ const ProfileEdit = () => {
 
   const validate = () => {
     if (formData.newPassword && !StrongPassword.test(formData.newPassword)) {
-      setMessage({ error: "Password must be at least 8 chars with uppercase, lowercase, number, special char.", success: "" });
+      showMessage("error", "Password must be at least 8 chars with uppercase, lowercase, number, special char.");
       return false;
     }
     if (formData.newPassword !== formData.confirmNewPassword) {
-      setMessage({ error: "Passwords do not match", success: "" });
+      showMessage("error", "Passwords do not match");
       return false;
     }
     return true;
@@ -140,13 +151,19 @@ const ProfileEdit = () => {
     e.preventDefault();
 
     if (!hasChanges()) {
-      setMessage({ error: "No changes detected", success: "" });
+      showMessage("error", "No changes detected");
       return;
     }
     if (!validate()) return;
 
     setIsSaving(true);
-    const payload = { firstName: formData.firstName, middleName: formData.middleName, lastName: formData.lastName, mobile: formData.mobile, gender: formData.gender };
+    const payload = {
+      firstName: formData.firstName,
+      middleName: formData.middleName,
+      lastName: formData.lastName,
+      mobile: formData.mobile,
+      gender: formData.gender,
+    };
 
     if (formData.currentPassword && formData.newPassword) {
       payload.currentPassword = formData.currentPassword;
@@ -173,7 +190,13 @@ const ProfileEdit = () => {
 
       setShowSuccessAnimation(true);
       setMessage({ success: "Profile updated successfully", error: "" });
-      setFormData(prev => ({ ...prev, currentPassword: "", newPassword: "", confirmNewPassword: "", avatarFile: null }));
+      setFormData((prev) => ({
+        ...prev,
+        currentPassword: "",
+        newPassword: "",
+        confirmNewPassword: "",
+        avatarFile: null,
+      }));
       if (fileRef.current) fileRef.current.value = "";
 
       setTimeout(() => {
@@ -182,9 +205,9 @@ const ProfileEdit = () => {
       }, 3500);
     } catch (err) {
       if (err?.message === "Invalid current password") {
-        setMessage({ error: "Current password is invalid", success: "" });
+        showMessage("error", "Current password is invalid");
       } else {
-        setMessage({ error: err?.message || "Profile update failed", success: "" });
+        showMessage("error", err?.message || "Profile update failed");
       }
     } finally {
       setIsSaving(false);
@@ -204,12 +227,26 @@ const ProfileEdit = () => {
         <>
           <h2 className="pe-title">Edit Profile</h2>
           <div className="pe-avatar">
-            <img src={formData.avatarPreview || getDefaultAvatar(formData.gender)} alt="Avatar" className="pe-avatar-img" />
-            <input type="file" accept="image/*" ref={fileRef} onChange={handleAvatarChange} style={{ display: "none" }} />
-            <button type="button" className="pe-avatar-edit" onClick={() => fileRef.current && fileRef.current.click()}>
+            <img
+              src={formData.avatarPreview || getDefaultAvatar(formData.gender)}
+              alt="Avatar"
+              className="pe-avatar-img"
+            />
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileRef}
+              onChange={handleAvatarChange}
+              style={{ display: "none" }}
+            />
+            <button
+              type="button"
+              className="pe-avatar-edit"
+              onClick={() => fileRef.current && fileRef.current.click()}
+            >
               <FontAwesomeIcon icon={faPencilAlt} />
             </button>
-            {(!showSuccessAnimation && formData.avatarPreview && !formData.avatarFile) && (
+            {!showSuccessAnimation && formData.avatarPreview && !formData.avatarFile && (
               <button type="button" className="pe-avatar-remove" onClick={handleRemoveAvatar}>
                 <FontAwesomeIcon icon={faTrashCan} />
               </button>
@@ -239,8 +276,26 @@ const ProfileEdit = () => {
             <div className="pe-label">
               Gender
               <div className="pe-gender-options">
-                <label><input type="radio" name="gender" value="male" checked={formData.gender === "male"} onChange={handleChange} /> Male</label>
-                <label><input type="radio" name="gender" value="female" checked={formData.gender === "female"} onChange={handleChange} /> Female</label>
+                <label>
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="male"
+                    checked={formData.gender === "male"}
+                    onChange={handleChange}
+                  />{" "}
+                  Male
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="female"
+                    checked={formData.gender === "female"}
+                    onChange={handleChange}
+                  />{" "}
+                  Female
+                </label>
               </div>
             </div>
           </div>
@@ -248,13 +303,29 @@ const ProfileEdit = () => {
           <div className="pe-row">
             <label className="pe-label">
               Current Password
-              <input type="password" name="currentPassword" value={formData.currentPassword} onChange={handleChange} />
+              <input
+                type="password"
+                name="currentPassword"
+                value={formData.currentPassword}
+                onChange={handleChange}
+              />
             </label>
             <label className="pe-label">
               New Password
               <div className="pe-pass-wrapper">
-                <input type={passwordVisibility.new ? "text" : "password"} name="newPassword" value={formData.newPassword} onChange={handleChange} />
-                <button type="button" className="pe-pass-toggle" onClick={() => setPasswordVisibility(prev => ({ ...prev, new: !prev.new }))}>
+                <input
+                  type={passwordVisibility.new ? "text" : "password"}
+                  name="newPassword"
+                  value={formData.newPassword}
+                  onChange={handleChange}
+                />
+                <button
+                  type="button"
+                  className="pe-pass-toggle"
+                  onClick={() =>
+                    setPasswordVisibility((prev) => ({ ...prev, new: !prev.new }))
+                  }
+                >
                   <FontAwesomeIcon icon={passwordVisibility.new ? faEyeSlash : faEye} />
                 </button>
               </div>
@@ -262,8 +333,19 @@ const ProfileEdit = () => {
             <label className="pe-label">
               Confirm Password
               <div className="pe-pass-wrapper">
-                <input type={passwordVisibility.confirm ? "text" : "password"} name="confirmNewPassword" value={formData.confirmNewPassword} onChange={handleChange} />
-                <button type="button" className="pe-pass-toggle" onClick={() => setPasswordVisibility(prev => ({ ...prev, confirm: !prev.confirm }))}>
+                <input
+                  type={passwordVisibility.confirm ? "text" : "password"}
+                  name="confirmNewPassword"
+                  value={formData.confirmNewPassword}
+                  onChange={handleChange}
+                />
+                <button
+                  type="button"
+                  className="pe-pass-toggle"
+                  onClick={() =>
+                    setPasswordVisibility((prev) => ({ ...prev, confirm: !prev.confirm }))
+                  }
+                >
                   <FontAwesomeIcon icon={passwordVisibility.confirm ? faEyeSlash : faEye} />
                 </button>
               </div>
@@ -275,7 +357,7 @@ const ProfileEdit = () => {
 
           <div className="pe-btn-row">
             <button type="submit" className="pe-btn" disabled={loading || isSaving}>
-              {loading || isSaving ? "Saving..." : "Save"}
+              {loading || isSaving ? "Updating..." : "Update"}
             </button>
           </div>
         </>

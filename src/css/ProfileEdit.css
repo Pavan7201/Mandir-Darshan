@@ -219,9 +219,11 @@
   cursor: not-allowed;
 }
 
+
+
 @media (max-width: 768px) {
   .pe-form {
-    padding: 1rem 1.5rem;
+    padding: 1rem;
     width: 100%;
     height: auto; 
     overflow-y: auto;
@@ -231,19 +233,25 @@
 
   .pe-avatar-img,
   .pe-avatar-placeholder {
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
   }
 
   .pe-row {
     grid-template-columns: 1fr;
-    width: auto;
-    justify-items: flex-start;
-    text-align: left;
+    width: 90%;
+    justify-items: stretch;
+  }
+
+  .pe-label input,
+  .pe-label select {
+    width: 100%;
   }
 
   .pe-gender-options {
     gap: 0.5rem;
-    justify-content: center;
+    justify-content: flex-start;
+    padding-left: 0.5rem;
   }
 }
+
