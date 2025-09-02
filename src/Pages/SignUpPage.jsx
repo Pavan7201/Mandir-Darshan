@@ -16,7 +16,7 @@ const SignupPage = () => {
     middleName: "",
     lastName: "",
     mobile: "",
-    sex: "",
+    gender: "",
     password: "",
     confirmPassword: "",
   });
@@ -46,7 +46,7 @@ const SignupPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { firstName, middleName, lastName, mobile, sex, password, confirmPassword } = form;
+    const { firstName, middleName, lastName, mobile, gender, password, confirmPassword } = form;
 
     if (mobile.length !== 10) {
       return setError("Please enter a valid 10-digit mobile number.");
@@ -65,7 +65,7 @@ const SignupPage = () => {
     setError("");
 
     try {
-      await signup({ firstName, middleName, lastName, mobile, sex, password });
+      await signup({ firstName, middleName, lastName, mobile, gender, password });
       navigate("/");
     } catch (err) {
       setError(err?.message || "Signup failed");
@@ -107,7 +107,7 @@ const SignupPage = () => {
     />
   </div>
 
-  <div className="last-name-sex-row">
+  <div className="last-name-gender-row">
     <div className="name-input">
       <label htmlFor="lastName">Last Name *</label>
       <input
@@ -120,12 +120,12 @@ const SignupPage = () => {
       />
     </div>
 
-    <div className="sex-selection">
-      <label className="sex-label">Sex *</label>
+    <div className="gender-selection">
+      <label className="gender-label">Gender *</label>
         <select
-      id="sex"
-      name="sex"
-      value={form.sex}
+      id="gender"
+      name="gender"
+      value={form.gender}
       onChange={handleChange}
       required
     >

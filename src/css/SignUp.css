@@ -144,7 +144,7 @@
 .mobile-label,
 .password-label,
 .confirm-password-label,
-.sex-label {
+.gender-label {
   color: var(--signup-text);
 }
 
@@ -252,27 +252,27 @@
   text-decoration: underline;
 }
 
-.last-name-sex-row {
+.last-name-gender-row {
   display: flex;
   gap: 8px;
   margin-bottom: 20px;
   flex-wrap: wrap;
 }
 
-.last-name-sex-row .name-input {
+.last-name-gender-row .name-input {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-.last-name-sex-row label {
+.last-name-gender-row label {
   font-weight: 500;
   margin-bottom: 6px;
   font-size: 14px;
   color: var(--signup-text);
 }
 
-.last-name-sex-row select {
+.last-name-gender-row select {
   padding: 10px 12px;
   border: 1px solid var(--signup-input);
   border-radius: 6px;
