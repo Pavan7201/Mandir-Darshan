@@ -275,21 +275,29 @@ const Header = () => {
           {!isMobile && (
             <div className="header-actions">
               {!loading && !user ? (
-                <div className="toggle fade-in delay-5">
-                <ThemeToggle />
-                <button className="dashboard-btn fade-in delay-5" onClick={handleAdminClick} >
-                   <span className="dashboard-label">ADMIN LOGIN</span>
-                </button>
-                </div>
-                ) : (
-                  <div className="toggle fade-in delay-5">
-                <ThemeToggle />
-                <button className="dashboard-btn fade-in delay-5">
-                  <span className="dashboard-label">PUBLIC DASHBOARD</span>
-                </button>
-                  </div>
-                )}
-
+  <div className="toggle fade-in delay-5">
+    <ThemeToggle />
+    <button className="dashboard-btn fade-in delay-5" onClick={handleAdminClick}>
+      <span className="dashboard-label">ADMIN LOGIN</span>
+    </button>
+  </div>
+) : (
+  <div className="toggle fade-in delay-5">
+    <ThemeToggle />
+    {isAdmin ? (
+      <button
+        className="dashboard-btn fade-in delay-5"
+        onClick={() => navigate("/admin")}
+      >
+        <span className="dashboard-label">ADMIN DASHBOARD</span>
+      </button>
+    ) : (
+      <button className="dashboard-btn fade-in delay-5">
+        <span className="dashboard-label">PUBLIC DASHBOARD</span>
+      </button>
+    )}
+  </div>
+)}
               <div className="search-signin">
                 <input
                   type="text"

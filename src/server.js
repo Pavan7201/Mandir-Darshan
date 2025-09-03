@@ -18,6 +18,7 @@ const DB_NAME = process.env.DB_NAME || "test";
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(",").filter(Boolean);
 
 app.use(express.json());
+
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -313,6 +314,34 @@ app.get("/api/assets", async (_req, res) => {
   } catch (err) {
     console.error("Get assets error:", err);
     res.status(500).json({ error: "Failed to fetch assets" });
+  }
+});
+
+app.post("/api/assets", authenticateUserMiddleware, async (req, res) => {
+  try {
+    if (!req.user.role || req.user.role !== "admin") {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const { category, items } = req.body;
+    if (!category || !items || !Array.isArray(items)) {
+      return res.status(400).json({ error: "Invalid request body" });
+    }
+    const categoryDoc = await assetsCollection.findOne({ category });
+    if (categoryDoc) {
+      categoryDoc.items.push(...items);
+      await assetsCollection.updateOne(
+        { _id: categoryDoc._id },
+        { $set: { items: categoryDoc.items } }
+      );
+    } else {
+      await assetsCollection.insertOne({ category, items });
+    }
+
+    res.json({ message: "Temple items added successfully" });
+  } catch (err) {
+    console.error("Error adding temple items:", err);
+    res.status(500).json({ error: "Failed to add temple items" });
   }
 });
 
