@@ -74,6 +74,46 @@ export const AuthProvider = ({ children }) => {
     return () => controller.abort();
   }, [token]);
 
+const adminLogin = async (userId, passcode) => {
+  NProgress.start();
+  const minLoaderTime = 2500;
+  const startTime = Date.now();
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/admin/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, passcode }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || "Admin login failed");
+
+    setUser(data.user);
+    setToken(data.token);
+    localStorage.setItem("token", data.token);
+
+    setWelcomeMessage(`Welcome ${data.user.firstName || "Admin"}`);
+    setLoadMode("authenticating");
+    setLoading(true);
+
+    const elapsed = Date.now() - startTime;
+    if (elapsed < minLoaderTime) {
+      await new Promise((resolve) => setTimeout(resolve, minLoaderTime - elapsed));
+    }
+
+    return data.user;
+  } catch (err) {
+    throw err;
+  } finally {
+    NProgress.done();
+    setLoading(false);
+    setLoadMode("done");
+  }
+};
+
+
+
   const signup = async (userData) => {
     NProgress.start();
     const minLoaderTime = 3200;
@@ -89,7 +129,7 @@ export const AuthProvider = ({ children }) => {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Signup failed");
 
-      setUser(data.user);
+      setUser(data.user); 
       setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
       setToken(data.token);
       localStorage.setItem("token", data.token);
@@ -125,15 +165,7 @@ export const AuthProvider = ({ children }) => {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Login failed");
-
-      setUser({
-        _id: data.user._id,
-        firstName: data.user.firstName,
-        middleName: data.user.middleName,
-        lastName: data.user.lastName,
-        mobile: data.user.mobile,
-        gender: data.user.gender || "",
-      });
+      setUser(data.user);
 
       setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
       setToken(data.token);
@@ -156,43 +188,43 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
- const editProfile = async (updatedData, isFormData = false) => {
-  NProgress.start();
-  const minLoaderTime = 2000;
-  const startTime = Date.now();
+  const editProfile = async (updatedData, isFormData = false) => {
+    NProgress.start();
+    const minLoaderTime = 2000;
+    const startTime = Date.now();
 
-  try {
-    const headers = { Authorization: `Bearer ${token}` };
-    if (!isFormData) headers["Content-Type"] = "application/json";
+    try {
+      const headers = { Authorization: `Bearer ${token}` };
+      if (!isFormData) headers["Content-Type"] = "application/json";
 
-    const res = await fetch(`${API_BASE_URL}/api/editprofile`, {
-      method: "PUT",
-      headers,
-      body: isFormData ? updatedData : JSON.stringify(updatedData),
-    });
+      const res = await fetch(`${API_BASE_URL}/api/editprofile`, {
+        method: "PUT",
+        headers,
+        body: isFormData ? updatedData : JSON.stringify(updatedData),
+      });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || "Profile update failed");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Profile update failed");
 
-    setUser(data.user);
+      setUser(data.user);
 
-    if (data.token) {
-      setToken(data.token);
-      localStorage.setItem("token", data.token);
+      if (data.token) {
+        setToken(data.token);
+        localStorage.setItem("token", data.token);
+      }
+
+      const elapsed = Date.now() - startTime;
+      if (elapsed < minLoaderTime) await new Promise((resolve) => setTimeout(resolve, minLoaderTime - elapsed));
+
+      return data.user;
+    } catch (err) {
+      throw err;
+    } finally {
+      NProgress.done();
+      setLoading(false);
+      setLoadMode("done");
     }
-
-    const elapsed = Date.now() - startTime;
-    if (elapsed < minLoaderTime) await new Promise((resolve) => setTimeout(resolve, minLoaderTime - elapsed));
-
-    return data.user;
-  } catch (err) {
-    throw err;
-  } finally {
-    NProgress.done();
-    setLoading(false);
-    setLoadMode("done");
-  }
-};
+  };
 
   const logout = async () => {
     NProgress.start();
@@ -252,6 +284,7 @@ export const AuthProvider = ({ children }) => {
     setUser,
     signup,
     login,
+    adminLogin,
     editProfile,
     logout,
     deleteAccount,
@@ -260,6 +293,7 @@ export const AuthProvider = ({ children }) => {
     welcomeMessage,
     setWelcomeMessage,
     token,
+    isAdmin: user?.role === "admin" || user?.isAdmin === true,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -57,6 +57,7 @@
 }
 
 .temple-card img {
+  display: block;
   width: 100%;
   height: 180px;
   object-fit: cover;
@@ -145,6 +146,22 @@
 .temple-card.animate-on-scroll.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+.edit-image-btn {
+  position: absolute;
+  top:8px;
+  right: 0.5rem;
+  background:rgba(0,0,0,0.5);
+  border: none;
+  border-radius: 50%;
+  padding: 7px;
+  cursor: pointer;
+  color: white;
+}
+
+.edit-image-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
 }
 
 @media (max-width: 768px) {

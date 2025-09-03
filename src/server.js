@@ -152,6 +152,45 @@ app.post("/api/login", async (req, res) => {
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+app.post("/api/admin/login", async (req, res) => {
+  try {
+    const { userId, passcode } = req.body;
+    if (!userId || !passcode || passcode.length !== 6) {
+      return res.status(400).json({ error: "UserId and 6-digit passcode required" });
+    }
+
+    const adminUser = await usersCollection.findOne({ userId, isAdmin: true });
+    if (!adminUser) {
+      return res.status(401).json({ error: "Invalid UserID or Passcode" });
+    }
+
+    const passcodeMatches = await bcrypt.compare(passcode, adminUser.passcodeHash);
+    if (!passcodeMatches) {
+      return res.status(401).json({ error: "Invalid UserID or Passcode" });
+    }
+    
+    const token = jwt.sign(
+      { _id: adminUser._id.toString(), userId: adminUser.userId, role: "admin" },
+      JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    return res.status(200).json({
+      message: "Admin login successful",
+      token,
+      user: {
+        _id: adminUser._id.toString(),
+        userId: adminUser.userId,
+        firstName: adminUser.firstName,
+        role: "admin"
+      }
+    });
+  } catch (err) {
+    console.error("Admin login error:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.put("/api/editprofile", authenticateUserMiddleware, upload.single("avatar"), async (req, res) => {
   try {
     const userId = new ObjectId(req.user._id);
@@ -276,5 +315,41 @@ app.get("/api/assets", async (_req, res) => {
     res.status(500).json({ error: "Failed to fetch assets" });
   }
 });
+
+app.put("/api/assets/temple/:id/image", authenticateUserMiddleware, async (req, res) => {
+  try {
+    const itemId = req.params.id;
+    const { image } = req.body;
+
+    if (!image || typeof image !== "string") {
+      return res.status(400).json({ error: "New image URL is required." });
+    }
+    
+    const templeDocument = await assetsCollection.findOne({ category: "temple" });
+    if (!templeDocument) {
+      return res.status(404).json({ error: "Temple category document not found" });
+    }
+
+    const itemIndex = templeDocument.items.findIndex((item) => item.id === itemId);
+    if (itemIndex === -1) {
+      return res.status(404).json({ error: "Temple item not found" });
+    }
+    templeDocument.items[itemIndex].image = image.trim();
+
+    await assetsCollection.updateOne(
+      { _id: templeDocument._id },
+      { $set: { items: templeDocument.items } }
+    );
+
+    res.json({
+      message: "Temple image updated successfully",
+      updatedItem: templeDocument.items[itemIndex],
+    });
+  } catch (err) {
+    console.error("Error updating temple image:", err);
+    res.status(500).json({ error: "Failed to update temple image" });
+  }
+});
+
 
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

@@ -391,6 +391,32 @@ body.modal-open {
   text-decoration: none;
 }
 
+.mobile-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle{
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dashboard-btn-mobile {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dashboard-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 @media (max-width: 1024px) {
   .header { padding: 0; border-radius: 0; justify-content: space-between; gap: 0.5rem; width: 100vw; }
   .logo-img img { height: 3.5rem; max-width: 130px; }
@@ -518,10 +544,6 @@ body.modal-open {
 
   .header {
     padding: 0 0.8rem;
-  }
-
-  .mobile-header-actions{
-    margin-top: rem;
   }
 
   .menu-toggle {

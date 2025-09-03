@@ -21,7 +21,9 @@ const Header = () => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
 
-  const { user, logout, loading, deleteAccount, welcomeMessage, setWelcomeMessage } = useContext(AuthContext);
+  const { user, logout, loading, deleteAccount, welcomeMessage, setWelcomeMessage, isAdmin } =
+    useContext(AuthContext);
+
   const navigate = useNavigate();
   const location = useLocation();
   const headerRef = useRef();
@@ -34,6 +36,16 @@ const Header = () => {
   };
 
   const handleDeleteClick = () => setShowDeleteDialog(true);
+
+  const handleAdminClick = () => {
+  setDropdownOpen(false); 
+  if (user && isAdmin) {
+    navigate("/admin");
+  } else {
+    navigate("/adminlogin");
+  }
+};
+
 
   const handleLogout = async () => {
     await logout();
@@ -50,12 +62,14 @@ const Header = () => {
     sessionStorage.setItem("redirectAfterLogout", "signup");
     navigate("/signup");
   };
+
   const handleEditProfile = () => {
     setDropdownOpen(false);
     setShowDeleteDialog(false);
     navigate("/editprofile");
   };
-  const toggleMenu = () => setMenuOpen(prev => !prev);
+
+  const toggleMenu = () => setMenuOpen((prev) => !prev);
 
   const showHeader = hovered || !hide;
 
@@ -85,7 +99,7 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    const handleClickOutside = event => {
+    const handleClickOutside = (event) => {
       if (
         menuOpen &&
         menuRef.current &&
@@ -142,7 +156,14 @@ const Header = () => {
         ref={headerRef}
       >
         <header className="header">
-          <button className="menu-toggle fade-in delay-1" aria-label="Toggle menu" aria-expanded={menuOpen} aria-controls="main-navigation" onClick={toggleMenu} ref={toggleRef} >
+          <button
+            className="menu-toggle fade-in delay-1"
+            aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+            aria-controls="main-navigation"
+            onClick={toggleMenu}
+            ref={toggleRef}
+          >
             <FontAwesomeIcon icon={faBars} aria-hidden="true" />
           </button>
 
@@ -163,18 +184,37 @@ const Header = () => {
                 <div className="welcome-container-mobile">
                   <div
                     className="avatar-and-welcome-mobile"
-                    onClick={() => setDropdownOpen(prev => !prev)}
+                    onClick={() => setDropdownOpen((prev) => !prev)}
                   >
                     <img src={getAvatarUrl(user)} alt="Avatar" className="avatar-img-mobile" />
-                    <span className="welcome-firstname">{showWelcome ? `Welcome ${user.firstName}` : user.firstName}</span>
+                    <span className="welcome-firstname">
+                      {showWelcome ? `Welcome ${user.firstName}` : user.firstName}
+                    </span>
                   </div>
                   <div className={`dropdown-menu ${dropdownOpen ? "open" : ""}`}>
+                    {isAdmin && (
+                      <button
+                        className="admin-dashboard-btn"
+                        onClick={() => {
+                          setDropdownOpen(false);
+                          navigate("/admin");
+                        }}
+                      >
+                        Admin Dashboard
+                      </button>
+                    )}
                     <button className="edit-profile-btn" onClick={handleEditProfile}>
                       Edit Profile <FontAwesomeIcon icon={faUserEdit} />
                     </button>
-                    <button className="change-password-btn" onClick={() => { setDropdownOpen(false); navigate("/changepassword") }}>
-                        Change Password <FontAwesomeIcon icon={faLock} />
-                      </button>
+                    <button
+                      className="change-password-btn"
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        navigate("/changepassword");
+                      }}
+                    >
+                      Change Password <FontAwesomeIcon icon={faLock} />
+                    </button>
                     <button className="logout-btn" onClick={handleLogout}>
                       Logout <FontAwesomeIcon icon={faSignOutAlt} />
                     </button>
@@ -191,37 +231,92 @@ const Header = () => {
             </div>
           )}
 
-          <nav ref={menuRef} id="main-navigation" className={`sub-header fade-in delay-2 ${menuOpen ? "menu-open" : ""}`}>
-            <NavLink to="/Temples" className="nav-link" onClick={() => setMenuOpen(false)}>Temples</NavLink>
-            <NavLink to="/Sevas-&-Booking" className="nav-link" onClick={() => setMenuOpen(false)}>Sevas & Bookings</NavLink>
-            <NavLink to="/Donation" className="nav-link" onClick={() => setMenuOpen(false)}>Donation</NavLink>
-            <NavLink to="/Media" className="nav-link" onClick={() => setMenuOpen(false)}>Media Room</NavLink>
-            <NavLink to="/Support" className="nav-link" onClick={() => setMenuOpen(false)}>Support</NavLink>
+          <nav
+            ref={menuRef}
+            id="main-navigation"
+            className={`sub-header fade-in delay-2 ${menuOpen ? "menu-open" : ""}`}
+          >
+            <NavLink to="/Temples" className="nav-link" onClick={() => setMenuOpen(false)}>
+              Temples
+            </NavLink>
+            <NavLink to="/Sevas-&-Booking" className="nav-link" onClick={() => setMenuOpen(false)}>
+              Sevas & Bookings
+            </NavLink>
+            <NavLink to="/Donation" className="nav-link" onClick={() => setMenuOpen(false)}>
+              Donation
+            </NavLink>
+            <NavLink to="/Media" className="nav-link" onClick={() => setMenuOpen(false)}>
+              Media Room
+            </NavLink>
+            <NavLink to="/Support" className="nav-link" onClick={() => setMenuOpen(false)}>
+              Support
+            </NavLink>
             {isMobile && <div className="theme-toggle-mobile"><ThemeToggle /></div>}
           </nav>
 
           {!isMobile && (
             <div className="header-actions">
-              <button className="dashboard-btn fade-in delay-5">
+              {!loading && !user ? (
+                <div className="toggle fade-in delay-5">
                 <ThemeToggle />
-                <span className="dashboard-label">PUBLIC DASHBOARD</span>
-              </button>
+                <button className="dashboard-btn fade-in delay-5" onClick={handleAdminClick} >
+                   <span className="dashboard-label">ADMIN LOGIN</span>
+                </button>
+                </div>
+                ) : (
+                  <div className="toggle fade-in delay-5">
+                <ThemeToggle />
+                <button className="dashboard-btn fade-in delay-5">
+                  <span className="dashboard-label">PUBLIC DASHBOARD</span>
+                </button>
+                  </div>
+                )}
 
               <div className="search-signin">
-                <input type="text" placeholder="Search Temples" className="search-bar fade-in delay-3" />
+                <input
+                  type="text"
+                  placeholder="Search Temples"
+                  className="search-bar fade-in delay-3"
+                />
 
                 {!loading && user ? (
                   <div className="welcome-container fade-in delay-4">
-                    <div className="avatar-and-welcome" onClick={() => setDropdownOpen(prev => !prev)}>
-                      <img src={getAvatarUrl(user)} alt={`${user.firstName || "User"} avatar`} className="avatar-img" />
-                      <span className="welcome-firstname">{showWelcome ? `Welcome ${user.firstName}` : user.firstName}</span>
+                    <div
+                      className="avatar-and-welcome"
+                      onClick={() => setDropdownOpen((prev) => !prev)}
+                    >
+                      <img
+                        src={getAvatarUrl(user)}
+                        alt={`${user.firstName || "User"} avatar`}
+                        className="avatar-img"
+                      />
+                      <span className="welcome-firstname">
+                        {showWelcome ? `Welcome ${user.firstName}` : user.firstName}
+                      </span>
                     </div>
 
                     <div className={`dropdown-menu ${dropdownOpen ? "open" : ""}`}>
+                      {isAdmin && (
+                        <button
+                          className="admin-dashboard-btn"
+                          onClick={() => {
+                            setDropdownOpen(false);
+                            navigate("/admin");
+                          }}
+                        >
+                          Admin Dashboard
+                        </button>
+                      )}
                       <button className="edit-profile-btn" onClick={handleEditProfile}>
                         Edit Profile <FontAwesomeIcon icon={faUserEdit} />
                       </button>
-                      <button className="change-password-btn" onClick={() => { setDropdownOpen(false); navigate("/changepassword") }}>
+                      <button
+                        className="change-password-btn"
+                        onClick={() => {
+                          setDropdownOpen(false);
+                          navigate("/changepassword");
+                        }}
+                      >
                         Change Password <FontAwesomeIcon icon={faLock} />
                       </button>
                       <button className="logout-btn" onClick={handleLogout}>
@@ -249,8 +344,12 @@ const Header = () => {
           <div className="modal-content">
             <h3>Are you sure you want to delete your account?</h3>
             <div className="modal-actions">
-              <button className="yes-btn" onClick={confirmDeleteAccount}>Yes</button>
-              <button className="cancel-btn" onClick={() => setShowDeleteDialog(false)}>Cancel</button>
+              <button className="yes-btn" onClick={confirmDeleteAccount}>
+                Yes
+              </button>
+              <button className="cancel-btn" onClick={() => setShowDeleteDialog(false)}>
+                Cancel
+              </button>
             </div>
           </div>
         </div>

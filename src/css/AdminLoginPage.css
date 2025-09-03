@@ -1,0 +1,225 @@
+.admin-login-section {
+  height: 86vh;
+  background-color: var(--bg-color);
+}
+
+.admin-login-page {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  height: 100%;
+}
+
+.admin-login-left {
+  flex: 0.2;
+  display: flex;
+  justify-content: center;
+  height: 100%;
+}
+
+.admin-login-right {
+  position: relative;
+  flex: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-login-right img,
+.admin-login-right .lottie {
+  border-radius: 8px;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.admin-login-right::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 2;
+  background-image: 
+    linear-gradient(to right, var(--bg-color), transparent 45%, transparent 45%, var(--bg-color)),
+    linear-gradient(to bottom, var(--bg-color), transparent 30%, transparent 90%, var(--bg-color));
+}
+
+.admin-login-right:hover::before {
+  opacity: 1;
+}
+
+.admin-login-container {
+  background: transparent;
+  box-shadow: none;
+  padding: 30px 25px;
+  color: var(--login-color);
+  border-radius: 0;
+  margin: auto;
+}
+
+.login-form{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.admin-login-container h2 {
+  font-family: 'Alika Misely', serif;
+  letter-spacing: 3px;
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.admin-login-container label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 12px 0 8px;
+}
+
+.admin-login-container label span {
+  flex-shrink: 0;
+  width: 60px;
+  text-align: center;
+  user-select: none;
+}
+
+.admin-login-container input[type="text"]:not(.passcode-digit) {
+  flex-grow: 1;
+  padding: 10px 5px 8px;
+  border: none;
+  border-bottom: 2px solid var(--login-color);
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-color);
+  font-size: 1.2rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.admin-login-container input[type="text"]:not(.passcode-digit)::placeholder {
+    opacity: 0.6;
+  color: var(--faq-color);
+}
+
+.admin-login-container input[type="text"]:not(.passcode-digit):focus {
+  border-bottom-color: var(--faq-color);
+  box-shadow: none;
+}
+
+.passcode-input-group {
+  display: flex;
+  gap: 10px;
+  flex-grow: 1;
+}
+
+.passcode-digit {
+  width: 30px;
+  height: 35px;
+  font-size: 1.2rem;
+  text-align: center;
+  margin-top: 1rem;
+  border: none;
+  border: 2px solid var(--login-color);
+  background: transparent;
+  color: var(--text-color);
+  outline: none;
+  transition: border-color 0.3s ease;
+  border-radius: 0;
+}
+
+.passcode-digit:focus {
+  border-bottom-color: var(--faq-color);
+  box-shadow: none;
+}
+
+.admin-login-container button {
+  background-color: var(--faq-color);
+  color: var(--q-hover-focus-color);
+  padding: 14px;
+  margin-top: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  border: 1.5px solid var(--faq-color);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  width: 50%;
+}
+
+.admin-login-container button:hover {
+  background-color: transparent;
+  color: var(--q-hover-focus-bg-color);
+  box-shadow: 0 0 18px var(--faq-color);
+}
+
+.error-message {
+  margin-top: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: red;
+  text-align: center;
+}
+
+@media screen and (max-width: 1024px) {
+  .admin-login-page {
+    flex-direction: row;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .admin-login-left {
+    flex: unset;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .admin-login-right {
+    flex: unset;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .admin-login-container {
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .admin-login-page {
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .admin-login-right {
+    display: none;
+  }
+
+  .admin-login-left {
+    width: 100%;
+  }
+
+  .admin-login-container {
+    width: 100%;
+    max-width: none;
+    padding: 16px;
+  }
+
+  .admin-login-container h2 {
+    font-size: 1.4rem;
+  }
+
+  .admin-login-container input,
+  .admin-login-container button {
+    font-size: 0.95rem;
+  }
+}
