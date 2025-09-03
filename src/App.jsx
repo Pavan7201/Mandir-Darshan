@@ -38,7 +38,7 @@ function AppRoutes() {
 
   const layoutRoutes = [
     "/", "/home", "/temples", "/sevas-&-booking", "/donation",
-    "/media", "/support", "/notfound"
+    "/media", "/support", "/notfound", "/admin"
   ];
   const showHeader = layoutRoutes.some(path => location.pathname.startsWith(path));
 
@@ -48,7 +48,8 @@ function AppRoutes() {
     "/signup",
     "/editprofile",
     "/changepassword",
-    "/adminlogin"
+    "/adminlogin",
+    "/admin"
   ];
   const showFooterAllowed = !noFooterRoutes.includes(location.pathname);
 

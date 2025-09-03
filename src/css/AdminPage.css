@@ -1,0 +1,28 @@
+.admin-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 83vh;
+  text-align: center;
+  background-color: rgb(247, 232, 204);
+}
+
+.lottie-animation {
+  max-width: 100vw; 
+  height: auto;     
+}
+
+@media (max-width: 480px) {
+  .admin-container {
+    min-height: 89.9dvh;
+  }
+
+  .admin-container h1 {
+    font-size: 1.5rem;
+  }
+
+  .lottie-animation {
+    width: 180px;
+  }
+}

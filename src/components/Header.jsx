@@ -192,17 +192,6 @@ const Header = () => {
                     </span>
                   </div>
                   <div className={`dropdown-menu ${dropdownOpen ? "open" : ""}`}>
-                    {isAdmin && (
-                      <button
-                        className="admin-dashboard-btn"
-                        onClick={() => {
-                          setDropdownOpen(false);
-                          navigate("/admin");
-                        }}
-                      >
-                        Admin Dashboard
-                      </button>
-                    )}
                     <button className="edit-profile-btn" onClick={handleEditProfile}>
                       Edit Profile <FontAwesomeIcon icon={faUserEdit} />
                     </button>
@@ -224,9 +213,38 @@ const Header = () => {
                   </div>
                 </div>
               ) : (
-                <NavLink to="/login" className="nav-link">
-                  <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
-                </NavLink>
+                // <NavLink to="/login" className="nav-link">
+                //   <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
+                // </NavLink>
+                <div className="welcome-container-mobile">
+        <div
+          className="avatar-and-welcome-mobile"
+          onClick={() => setDropdownOpen((prev) => !prev)}
+        >
+          <img src={menAvatar} alt="Avatar" className="avatar-img-mobile" />
+          <span className="welcome-firstname">Sign In</span>
+        </div>
+        <div className={`dropdown-menu ${dropdownOpen ? "open" : ""}`}>
+          <button
+            className="user-login-btn"
+            onClick={() => {
+              setDropdownOpen(false);
+              navigate("/login");
+            }}
+          >
+            User Login
+          </button>
+          <button
+            className="admin-login-btn"
+            onClick={() => {
+              setDropdownOpen(false);
+              navigate("/adminlogin");
+            }}
+          >
+            Admin Login
+          </button>
+        </div>
+      </div>
               )}
             </div>
           )}
@@ -296,17 +314,6 @@ const Header = () => {
                     </div>
 
                     <div className={`dropdown-menu ${dropdownOpen ? "open" : ""}`}>
-                      {isAdmin && (
-                        <button
-                          className="admin-dashboard-btn"
-                          onClick={() => {
-                            setDropdownOpen(false);
-                            navigate("/admin");
-                          }}
-                        >
-                          Admin Dashboard
-                        </button>
-                      )}
                       <button className="edit-profile-btn" onClick={handleEditProfile}>
                         Edit Profile <FontAwesomeIcon icon={faUserEdit} />
                       </button>
