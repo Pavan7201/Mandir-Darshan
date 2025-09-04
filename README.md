@@ -1,6 +1,6 @@
 # Indian Temple Project
 
-This is a frontend web project showcasing an Indian temple theme using HTML, CSS, and JavaScript.
+This is a frontend web project showcasing an Indian temple theme using HTML, CSS, React JS and JavaScript.
 
 ## Features
 

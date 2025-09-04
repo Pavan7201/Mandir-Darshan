@@ -380,5 +380,61 @@ app.put("/api/assets/temple/:id/image", authenticateUserMiddleware, async (req, 
   }
 });
 
+app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) => {
+  try {
+    if (!req.user.role || req.user.role !== "admin") {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const itemId = req.params.id;
+    const updatedData = req.body;
+
+    const templeDocument = await assetsCollection.findOne({ category: "temple" });
+    if (!templeDocument) {
+      const newItem = { ...updatedData, id: itemId };
+      await assetsCollection.insertOne({
+        category: "temple",
+        items: [newItem],
+      });
+      return res.status(201).json({
+        message: "Temple created successfully",
+        createdItem: newItem,
+      });
+    }
+
+    const itemIndex = templeDocument.items.findIndex((item) => item.id === itemId);
+
+    if (itemIndex === -1) {
+      const newItem = { ...updatedData, id: itemId };
+      templeDocument.items.push(newItem);
+      await assetsCollection.updateOne(
+        { _id: templeDocument._id },
+        { $set: { items: templeDocument.items } }
+      );
+      return res.status(201).json({
+        message: "Temple created successfully",
+        createdItem: newItem,
+      });
+    }
+
+    templeDocument.items[itemIndex] = {
+      ...templeDocument.items[itemIndex],
+      ...updatedData,
+    };
+
+    await assetsCollection.updateOne(
+      { _id: templeDocument._id },
+      { $set: { items: templeDocument.items } }
+    );
+
+    res.json({
+      message: "Temple updated successfully",
+      updatedItem: templeDocument.items[itemIndex],
+    });
+  } catch (err) {
+    console.error("Error upserting temple info:", err);
+    res.status(500).json({ error: "Failed to upsert temple info" });
+  }
+});
 
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

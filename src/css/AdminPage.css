@@ -1,3 +1,11 @@
+.admin-form-section{
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center;     
+  min-height: 100vh;
+}
+
 .admin-form-container {
   max-width: 900px;
   margin: 0 auto;
@@ -17,7 +25,6 @@
   color: #444;
 }
 
-/* Temple Preview Card */
 .temple-preview-card {
   display: flex;
   align-items: flex-start;
@@ -26,24 +33,28 @@
   border-radius: 12px;
   padding: 15px;
   margin-bottom: 20px;
-  background: #fafafa;
-  transition: box-shadow 0.2s ease-in-out;
+  background: var(--bg-color);
+  color: var(--faq-color);
+  transition: color 1s, background 1s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 .temple-preview-card:hover {
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-.temple-preview-card img {
-  width: 200px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
 .temple-info {
+  display: flex;
+  flex-direction: column;
   flex: 1;
 }
+
+.temple-info p {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  align-items: start;
+  margin: 0;
+}
+
 
 .temple-info h3 {
   margin: 0 0 10px 0;
@@ -55,38 +66,42 @@
   font-size: 14px;
 }
 
-/* Image Upload */
-.image-upload-box {
-  width: 60vw;
-  height: 30vh;
-  border: 2px dashed #aaa;
-  border-radius: 12px;
+.image-wrapper {
+  position: relative;
+  width: 200px;
+  height: 150px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.edit-icon {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  padding: 6px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 25px auto;
-  background: #fdfdfd;
-  transition: border-color 0.2s;
 }
 
-.image-upload-box:hover {
-  border-color: #007bff;
+.edit-icon:hover {
+  background: var(--edit-bg);
+  color: var(--faq-color);
+  transform: scale(1.1);
 }
 
-.image-upload-box img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.plus-icon {
-  font-size: 50px;
-  color: #777;
-  font-weight: bold;
-  user-select: none;
-}
-
-/* Grid Layout */
 .admin-form-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -95,8 +110,10 @@
 }
 
 .admin-form-grid input {
+  background: transparent;
+  color:var(--faq-color);
   padding: 10px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--faq-color);
   border-radius: 6px;
   font-size: 14px;
   outline: none;
@@ -107,7 +124,6 @@
   border-color: #007bff;
 }
 
-/* Buttons */
 .button-wrapper {
   grid-column: span 3;
   display: flex;
@@ -120,42 +136,55 @@
 .update-btn,
 .clear-btn {
   padding: 10px 18px;
-  border: none;
+  border: 1px solid var(--faq-color);
   border-radius: 6px;
   font-size: 14px;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition: background 1s,color 1s ease-in-out, transform 0.1s;
 }
 
 .update-btn {
-  background: #007bff;
-  color: white;
+  background:var(--faq-color);
+  color: var(--q-hover-focus-color);
 }
 
 .update-btn:hover {
-  background: #0056b3;
+  background:transparent;
+  color: var(--faq-color);
+  border: 1px solid var(--faq-color);
   transform: scale(1.05);
 }
 
 .clear-btn {
-  background: #dc3545;
-  color: white;
+  background:var(--faq-color);
+  color: var(--q-hover-focus-color);
 }
 
 .clear-btn:hover {
-  background: #a71d2a;
+  background: transparent;
+  color: var(--faq-color);
   transform: scale(1.05);
 }
 
-/* Status */
 .status {
   text-align: center;
   font-size: 15px;
   margin-top: 15px;
-  color: green;
+  color: rgb(4, 191, 4);
 }
 
-/* Mobile Responsive */
+.loading-animation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 150px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: var(--bg-color);
+  margin-bottom: 20px;
+}
+
 @media (max-width: 768px) {
   .temple-preview-card {
     flex-direction: column;
@@ -163,14 +192,19 @@
     text-align: center;
   }
 
-  .temple-preview-card img {
+  .image-wrapper {
     width: 100%;
+    max-width: 300px;
     height: auto;
+    max-height: 200px;
+    margin: 0 auto;
   }
 
-  .image-upload-box {
-    width: 90vw;
-    height: 25vh;
+  .image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    border-radius: 8px;
   }
 
   .admin-form-grid {
@@ -190,25 +224,89 @@
   }
 }
 
+
 @media (max-width: 480px) {
   .admin-form-container {
     padding: 10px;
   }
 
+  .temple-preview-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .image-wrapper {
+    width: 120px;
+    height: 80px;
+    margin: 0 auto 15px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
   .temple-info h3 {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .temple-info p {
-    font-size: 13px;
+    text-align: left;
+    font-size: 12px;
   }
 
-  .plus-icon {
-    font-size: 40px;
+  .admin-form-grid {
+    grid-template-columns: 1fr;
   }
 
   .admin-form-grid input {
     font-size: 13px;
     padding: 8px;
+  }
+
+  .button-wrapper {
+    grid-column: span 1;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .update-btn,
+  .clear-btn {
+    width: 100%;
+    font-size: 14px;
+  }
+
+  .edit-icon {
+    padding: 5px;
+    font-size: 12px;
+  }
+
+  .clear-btn:hover,
+  .update-btn:hover {
+    transform: none;
+  }
+
+  .loading-animation {
+    width: 300px;
+    height: 310px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 0;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg-color);
+  }
+
+  .loading-animation lottie-player,
+  .loading-animation > div {
+    width: 100%;
+    height: 100%;
   }
 }

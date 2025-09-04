@@ -37,22 +37,17 @@ const Header = () => {
 
   const handleDeleteClick = () => setShowDeleteDialog(true);
 
-  const handleAdminClick = () => {
-  setDropdownOpen(false); 
-  if (user && isAdmin) {
-    navigate("/admin");
-  } else {
-    navigate("/adminlogin");
-  }
-};
-
-
   const handleLogout = async () => {
     await logout();
     setDropdownOpen(false);
     setShowDeleteDialog(false);
-    sessionStorage.setItem("redirectAfterLogout", "login");
-    navigate("/login");
+    if (isAdmin) {
+      sessionStorage.setItem("redirectAfterLogout", "adminlogin");
+      navigate("/adminlogin");
+    } else {
+      sessionStorage.setItem("redirectAfterLogout", "login");
+      navigate("/login");
+    }
   };
 
   const confirmDeleteAccount = async () => {
@@ -70,21 +65,18 @@ const Header = () => {
   };
 
   const toggleMenu = () => setMenuOpen((prev) => !prev);
-
   const showHeader = hovered || !hide;
 
   useEffect(() => {
     const handleScroll = () => {
       const isTablet = window.innerWidth <= 768;
       const triggerY = window.innerHeight * 0.2;
-      if (window.scrollY > window.innerHeight * 0.2) {
-        setDropdownOpen(false);
-      }
+      if (window.scrollY > triggerY) setDropdownOpen(false);
       setHide(!isTablet && window.scrollY > triggerY && !hovered);
     };
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 480);
-    };
+
+    const handleResize = () => setIsMobile(window.innerWidth <= 480);
+
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("resize", handleResize);
     return () => {
@@ -117,23 +109,20 @@ const Header = () => {
         setDropdownOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuOpen, dropdownOpen]);
 
   useEffect(() => {
-    if (location.pathname === "/" && welcomeMessage) {
-      setShowWelcome(true);
-      const timer = setTimeout(() => {
-        setShowWelcome(false);
-        setWelcomeMessage("");
-      }, 3000);
-      return () => clearTimeout(timer);
-    } else {
+  if ((location.pathname === "/" || location.pathname === "/admin") && welcomeMessage) {
+    setShowWelcome(true);
+    const timer = setTimeout(() => {
       setShowWelcome(false);
-    }
-  }, [location.pathname, welcomeMessage, setWelcomeMessage]);
+      setWelcomeMessage("");
+    }, 3000);
+    return () => clearTimeout(timer);
+  } else setShowWelcome(false);
+}, [location.pathname, welcomeMessage, setWelcomeMessage]);
 
   useEffect(() => {
     if (!menuOpen && document.activeElement && menuRef.current?.contains(document.activeElement)) {
@@ -144,6 +133,20 @@ const Header = () => {
   useEffect(() => {
     document.body.classList.toggle("modal-open", showDeleteDialog);
   }, [showDeleteDialog]);
+
+  const fetchUserId = async () => {
+  try {
+    const response = await fetch('/api/user', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+    const data = await response.json();
+    return data.userId;
+  } catch (error) {
+    console.error('Error fetching user ID:', error);
+  }
+};
 
   return (
     <>
@@ -167,56 +170,68 @@ const Header = () => {
             <FontAwesomeIcon icon={faBars} aria-hidden="true" />
           </button>
 
-          <NavLink
-            to="/"
-            onClick={(e) => {
-              e.preventDefault();
-              navigate("/");
-            }}
-            className="logo-img fade-in delay-1"
-          >
-            <img src={MandirLogo} alt="Mandir Logo" />
-          </NavLink>
+          {!isAdmin ? (
+            <NavLink
+              to="/"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/");
+              }}
+              className="logo-img fade-in delay-1"
+            >
+              <img src={MandirLogo} alt="Mandir Logo" />
+            </NavLink>
+          ) : (
+            <div className="logo-img fade-in delay-1">
+              <img src={MandirLogo} alt="Mandir Logo" />
+            </div>
+          )}
 
           {isMobile && (
             <div className="mobile-header-actions fade-in delay-3">
-              {!loading && user ? (
-                <div className="welcome-container-mobile">
-                  <div
-                    className="avatar-and-welcome-mobile"
-                    onClick={() => setDropdownOpen((prev) => !prev)}
-                  >
-                    <img src={getAvatarUrl(user)} alt="Avatar" className="avatar-img-mobile" />
-                    <span className="welcome-firstname">
-                      {showWelcome ? `Welcome ${user.firstName}` : user.firstName}
-                    </span>
-                  </div>
-                  <div className={`dropdown-menu ${dropdownOpen ? "open" : ""}`}>
-                    <button className="edit-profile-btn" onClick={handleEditProfile}>
-                      Edit Profile <FontAwesomeIcon icon={faUserEdit} />
-                    </button>
-                    <button
-                      className="change-password-btn"
-                      onClick={() => {
-                        setDropdownOpen(false);
-                        navigate("/changepassword");
-                      }}
-                    >
-                      Change Password <FontAwesomeIcon icon={faLock} />
-                    </button>
-                    <button className="logout-btn" onClick={handleLogout}>
-                      Logout <FontAwesomeIcon icon={faSignOutAlt} />
-                    </button>
-                    <button className="delete-account-btn" onClick={handleDeleteClick}>
-                      Delete Account <FontAwesomeIcon icon={faTrashAlt} />
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                // <NavLink to="/login" className="nav-link">
-                //   <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
-                // </NavLink>
-                <div className="welcome-container-mobile">
+    {!loading && user ? (
+      <div className="welcome-container-mobile">
+        <div
+          className="avatar-and-welcome-mobile"
+          onClick={() => setDropdownOpen((prev) => !prev)}
+        >
+          <img
+            src={getAvatarUrl(user)}
+            alt={`${user.firstName || "User"} avatar`}
+            className="avatar-img-mobile"
+          />
+          <span className="welcome-firstname">
+            {showWelcome ? `Welcome ${user.firstName}` : user.firstName}
+          </span>
+        </div>
+
+        <div className={`dropdown-menu ${dropdownOpen ? "open" : ""}`}>
+          {!isAdmin && (
+            <>
+              <button className="edit-profile-btn" onClick={handleEditProfile}>
+                Edit Profile <FontAwesomeIcon icon={faUserEdit} />
+              </button>
+              <button
+                className="change-password-btn"
+                onClick={() => {
+                  setDropdownOpen(false);
+                  navigate("/changepassword");
+                }}
+              >
+                Change Password <FontAwesomeIcon icon={faLock} />
+              </button>
+              <button className="delete-account-btn" onClick={handleDeleteClick}>
+                Delete Account <FontAwesomeIcon icon={faTrashAlt} />
+              </button>
+            </>
+          )}
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout <FontAwesomeIcon icon={faSignOutAlt} />
+          </button>
+        </div>
+      </div>
+    ) : (
+      <div className="welcome-container-mobile">
         <div
           className="avatar-and-welcome-mobile"
           onClick={() => setDropdownOpen((prev) => !prev)}
@@ -245,59 +260,57 @@ const Header = () => {
           </button>
         </div>
       </div>
-              )}
-            </div>
-          )}
-
-          <nav
-            ref={menuRef}
-            id="main-navigation"
-            className={`sub-header fade-in delay-2 ${menuOpen ? "menu-open" : ""}`}
-          >
-            <NavLink to="/Temples" className="nav-link" onClick={() => setMenuOpen(false)}>
-              Temples
-            </NavLink>
-            <NavLink to="/Sevas-&-Booking" className="nav-link" onClick={() => setMenuOpen(false)}>
-              Sevas & Bookings
-            </NavLink>
-            <NavLink to="/Donation" className="nav-link" onClick={() => setMenuOpen(false)}>
-              Donation
-            </NavLink>
-            <NavLink to="/Media" className="nav-link" onClick={() => setMenuOpen(false)}>
-              Media Room
-            </NavLink>
-            <NavLink to="/Support" className="nav-link" onClick={() => setMenuOpen(false)}>
-              Support
-            </NavLink>
-            {isMobile && <div className="theme-toggle-mobile"><ThemeToggle /></div>}
-          </nav>
-
-          {!isMobile && (
-            <div className="header-actions">
-              {!loading && !user ? (
-  <div className="toggle fade-in delay-5">
-    <ThemeToggle />
-    <button className="dashboard-btn fade-in delay-5" onClick={handleAdminClick}>
-      <span className="dashboard-label">ADMIN LOGIN</span>
-    </button>
-  </div>
-) : (
-  <div className="toggle fade-in delay-5">
-    <ThemeToggle />
-    {isAdmin ? (
-      <button
-        className="dashboard-btn fade-in delay-5"
-        onClick={() => navigate("/admin")}
-      >
-        <span className="dashboard-label">ADMIN DASHBOARD</span>
-      </button>
-    ) : (
-      <button className="dashboard-btn fade-in delay-5">
-        <span className="dashboard-label">PUBLIC DASHBOARD</span>
-      </button>
     )}
   </div>
 )}
+          <nav
+  ref={menuRef}
+  id="main-navigation"
+  className={`sub-header fade-in delay-2 ${menuOpen ? "menu-open" : ""}`}
+>
+  {!isAdmin && (
+    <>
+      <NavLink to="/Temples" className="nav-link" onClick={() => setMenuOpen(false)}>
+        Temples
+      </NavLink>
+      <NavLink to="/Sevas-&-Booking" className="nav-link" onClick={() => setMenuOpen(false)}>
+        Sevas & Bookings
+      </NavLink>
+      <NavLink to="/Donation" className="nav-link" onClick={() => setMenuOpen(false)}>
+        Donation
+      </NavLink>
+      <NavLink to="/Media" className="nav-link" onClick={() => setMenuOpen(false)}>
+        Media Room
+      </NavLink>
+      <NavLink to="/Support" className="nav-link" onClick={() => setMenuOpen(false)}>
+        Support
+      </NavLink>
+    {isMobile && <ThemeToggle />}
+    </>
+  )}
+  {isAdmin && (
+  <>
+    <NavLink to="/admin" className="nav-link" onClick={() => setMenuOpen(false)}>
+      Update Temple
+    </NavLink>
+    {isMobile && <ThemeToggle />}
+  </>
+)}
+
+</nav>
+
+
+          {!isMobile && !isAdmin && (
+            <div className="header-actions">
+              <div className="toggle fade-in delay-5">
+                <ThemeToggle />
+                {!loading && !user && (
+                  <button className="dashboard-btn fade-in delay-5" onClick={() => navigate("/adminlogin")}>
+                    <span className="dashboard-label">ADMIN LOGIN</span>
+                  </button>
+                )}
+              </div>
+
               <div className="search-signin">
                 <input
                   type="text"
@@ -320,7 +333,6 @@ const Header = () => {
                         {showWelcome ? `Welcome ${user.firstName}` : user.firstName}
                       </span>
                     </div>
-
                     <div className={`dropdown-menu ${dropdownOpen ? "open" : ""}`}>
                       <button className="edit-profile-btn" onClick={handleEditProfile}>
                         Edit Profile <FontAwesomeIcon icon={faUserEdit} />
@@ -348,6 +360,32 @@ const Header = () => {
                     <FontAwesomeIcon icon={faUserCircle} className="avatar-icon" />
                   </NavLink>
                 )}
+              </div>
+            </div>
+          )}
+
+          {!isMobile && isAdmin && (
+            <div className={`header-actions${isAdmin ? " admin" : ""}`}>
+              <ThemeToggle />
+              <div className="welcome-container fade-in delay-4">
+                <div
+                  className="avatar-and-welcome"
+                  onClick={() => setDropdownOpen((prev) => !prev)}
+                >
+                  <img
+                    src={getAvatarUrl(user)}
+                    alt={`${user.firstName || "Admin"} avatar`}
+                    className="avatar-img"
+                  />
+                  <span className="welcome-firstname">
+                    {showWelcome ? `Welcome ${user.firstName}` : user.firstName}
+                  </span>
+                </div>
+                <div className={`dropdown-menu ${dropdownOpen ? "open" : ""}`}>
+                  <button className="logout-btn" onClick={handleLogout}>
+                    Logout <FontAwesomeIcon icon={faSignOutAlt} />
+                  </button>
+                </div>
               </div>
             </div>
           )}

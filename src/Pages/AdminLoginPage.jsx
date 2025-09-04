@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
 import Lottie from "lottie-react";
@@ -10,23 +10,27 @@ const AdminLoginPage = () => {
   const [passcodeDigits, setPasscodeDigits] = useState(new Array(6).fill(""));
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const [maskedDigits, setMaskedDigits] = useState(new Array(6).fill(""));
   const { adminLogin } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handlePasscodeChange = (e, idx) => {
-    const val = e.target.value;
-    if (/^\d?$/.test(val)) {
-      const newPasscodeDigits = [...passcodeDigits];
-      newPasscodeDigits[idx] = val;
-      setPasscodeDigits(newPasscodeDigits);
+  const val = e.target.value;
+  if (/^\d?$/.test(val)) {
+    const newPasscodeDigits = [...passcodeDigits];
+    newPasscodeDigits[idx] = val;
+    setPasscodeDigits(newPasscodeDigits);
 
-      if (val && idx < passcodeDigits.length - 1) {
-        const nextInput = document.getElementById(`passcode-${idx + 1}`);
-        if (nextInput) nextInput.focus();
-      }
+    const newMasked = [...maskedDigits];
+    newMasked[idx] = val ? "*" : "";
+    setMaskedDigits(newMasked);
+
+    if (val && idx < passcodeDigits.length - 1) {
+      const nextInput = document.getElementById(`passcode-${idx + 1}`);
+      if (nextInput) nextInput.focus();
     }
-  };
+  }
+};
 
   const handlePasscodeKeyDown = (e, idx) => {
     if (e.key === "Backspace") {
@@ -43,24 +47,31 @@ const AdminLoginPage = () => {
     setLoading(true);
 
     const passcode = passcodeDigits.join("");
-  if (
-    passcode.length !== 6 ||
-    passcodeDigits.some((digit) => digit.trim() === "")
-  ) {
-    setError("Please enter a complete 6-digit passcode.");
-    setLoading(false);
-    return;
-  }
+    if (
+      passcode.length !== 6 ||
+      passcodeDigits.some((digit) => digit.trim() === "")
+    ) {
+      setError("Please enter a complete 6-digit passcode.");
+      setLoading(false);
+      return;
+    }
 
     try {
       await adminLogin(userId.trim(), passcode);
-    navigate("/admin");
+      navigate("/admin");
     } catch (err) {
       setError(err.message || "Invalid UserID or Passcode");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   return (
     <section className="admin-login-section">
@@ -85,19 +96,20 @@ const AdminLoginPage = () => {
                 <div className="passcode-input-group">
                   {passcodeDigits.map((digit, idx) => (
                     <input
-                      key={idx}
-                      id={`passcode-${idx}`}
-                      type="text"
-                      inputMode="numeric"
-                      maxLength="1"
-                      value={digit}
-                      onChange={(e) => handlePasscodeChange(e, idx)}
-                      onKeyDown={(e) => handlePasscodeKeyDown(e, idx)}
-                      required
-                      autoComplete="one-time-code"
-                      className="passcode-digit"
-                      aria-label={`Passcode digit ${idx + 1}`}
-                    />
+                    key={idx}
+                    id={`passcode-${idx}`}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength="1"
+                    value={maskedDigits[idx]}
+                    onChange={(e) => handlePasscodeChange(e, idx)}
+                    onKeyDown={(e) => handlePasscodeKeyDown(e, idx)}
+                    required
+                    autoComplete="one-time-code"
+                    className="passcode-digit"
+                    aria-label={`Passcode digit ${idx + 1}`}
+/>
+
                   ))}
                 </div>
               </label>
