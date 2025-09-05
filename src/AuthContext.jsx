@@ -74,43 +74,50 @@ export const AuthProvider = ({ children }) => {
     return () => controller.abort();
   }, [token]);
 
-const adminLogin = async (userId, passcode) => {
-  NProgress.start();
-  const minLoaderTime = 2500;
-  const startTime = Date.now();
+  // 🔹 Normalize values (so "tamil-nadu" → "Tamil Nadu")
+  const normalizeValue = (val) => {
+    if (!val) return "";
+    return val.replace(/-/g, " ").trim();
+  };
 
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/admin/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, passcode }),
-    });
+  // 🔹 Admin login
+  const adminLogin = async (userId, passcode) => {
+    NProgress.start();
+    const minLoaderTime = 2500;
+    const startTime = Date.now();
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || "Admin login failed");
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/admin/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, passcode }),
+      });
 
-    setUser(data.user);
-    setToken(data.token);
-    localStorage.setItem("token", data.token);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Admin login failed");
 
-    setWelcomeMessage(`Welcome ${data.user.firstName || "Admin"}`);
-    setLoadMode("authenticating");
-    setLoading(true);
+      setUser(data.user);
+      setToken(data.token);
+      localStorage.setItem("token", data.token);
 
-    const elapsed = Date.now() - startTime;
-    if (elapsed < minLoaderTime) {
+      setWelcomeMessage(`Welcome ${data.user.firstName || "Admin"}`);
+      setLoadMode("authenticating");
+      setLoading(true);
+
+      const elapsed = Date.now() - startTime;
+      if (elapsed < minLoaderTime) {
       await new Promise((resolve) => setTimeout(resolve, minLoaderTime - elapsed));
-    }
+      }
 
-    return data.user;
-  } catch (err) {
-    throw err;
-  } finally {
-    NProgress.done();
-    setLoading(false);
-    setLoadMode("done");
-  }
-};
+      return data.user;
+    } catch (err) {
+      throw err;
+    } finally {
+      NProgress.done();
+      setLoading(false);
+      setLoadMode("done");
+    }
+  };
 
 
 
@@ -129,7 +136,7 @@ const adminLogin = async (userId, passcode) => {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Signup failed");
 
-      setUser(data.user); 
+      setUser(data.user);
       setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
       setToken(data.token);
       localStorage.setItem("token", data.token);
@@ -185,6 +192,29 @@ const adminLogin = async (userId, passcode) => {
       NProgress.done();
       setLoading(false);
       setLoadMode("done");
+    }
+  };
+
+  const fetchTemples = async ({ searchTerm = "", category = "", state = "", sortBy = "" }) => {
+    try {
+      const queryParams = new URLSearchParams();
+
+      if (searchTerm) queryParams.append("searchTerm", searchTerm);
+      if (category) queryParams.append("category", normalizeValue(category));
+      if (state) queryParams.append("state", normalizeValue(state));
+      if (sortBy) queryParams.append("sortBy", sortBy);
+
+      const res = await fetch(
+        `${API_BASE_URL}/api/temples?${queryParams.toString()}`
+      );
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data?.error || "Failed to fetch temples");
+
+      return data;
+    } catch (err) {
+      console.error("Temple fetch error:", err);
+      throw err;
     }
   };
 
@@ -284,6 +314,7 @@ const adminLogin = async (userId, passcode) => {
     setUser,
     signup,
     login,
+    fetchTemples,
     adminLogin,
     editProfile,
     logout,
@@ -293,8 +324,10 @@ const adminLogin = async (userId, passcode) => {
     welcomeMessage,
     setWelcomeMessage,
     token,
-    isAdmin: user?.role === "admin" || user?.isAdmin === true,
+    isAdmin: user?.role === "admin", // ✅ simplified
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  );
 };

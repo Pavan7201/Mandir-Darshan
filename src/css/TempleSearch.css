@@ -5,11 +5,17 @@
   padding: 1.2rem 2rem;
   justify-content: center;
   align-items: center;
-  background-color: #f7edd6;
+  background-color: var(--bg-color);
   border-radius: 12px;
-  margin: 2rem auto;
-  max-width: 90%;
+  margin: 3rem 0 0 0;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  transition: background 1s ease-in-out;
+}
+
+.temple-search-wrapper {
+  display: flex;
+  align-items: center;
+  margin: 0;
 }
 
 .temple-search-input-wrapper {
@@ -17,41 +23,52 @@
   width: 100%;
   max-width: 400px;
   flex: 1 1 200px;
+  overflow: hidden;
 }
 
 .temple-search-input {
   width: 100%;
   padding: 0.65rem 2.5rem 0.65rem 0.75rem;
   font-size: 1rem;
-  border: 1px solid #d4a373;
+  border: 1px solid var(--faq-color);
   border-radius: 8px;
   outline: none;
   transition: border-color 0.2s ease-in-out, box-shadow 0.2s;
-  background-color: #fffdf9;
+  background-color: transparent;
   text-align: left;
 }
 
 .temple-search-input:focus {
-  border-color: rgb(238, 144, 76);
-  box-shadow: 0 0 0 2px rgba(163, 90, 0, 0.2);
+  border-color: var(--faq-color);
+  box-shadow: 0 0 0 2px rgba(146, 26, 2, 0.283);
 }
 
 .temple-search-icon-button {
   position: absolute;
-  right: 10px;
-  top: 50%;
+  top:50%;
+  right: 1px;
   transform: translateY(-50%);
-  background: none;
+  background: var(--bg-color);
+  color:var(--primary-color);
   border: none;
+  border-radius: 7px;
+  padding: 0.71rem 0.55rem;
+  font-size: 1rem;
   cursor: pointer;
-  color: #a35a00;
-  font-size: 1.2rem;
-  padding: 0;
-  transition: color 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.5s ease-in, color 0.5s ease-in;
 }
 
 .temple-search-icon-button:hover {
-  color: #f26a2e;
+  background: transparent;
+  color:var(--ts-hover-color);
+}
+
+.temple-search-icon-button svg {
+  margin-left: 5px;
+  font-size: 1rem;
 }
 
 .temple-search-select {
@@ -62,25 +79,75 @@
   min-width: 200px;
   flex: 1 1 200px;
   outline: none;
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s;
-  background-color: #fffdf9;
+  transition: color 1s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s;
+  background-color: transparent;
   text-align: center;
+  color: var(--faq-color);
 }
 
 .temple-search-select:focus {
-  border-color: rgb(238, 144, 76);
+  border-color: var(--faq-color);
   box-shadow: 0 0 0 2px rgba(163, 90, 0, 0.2);
   outline: none;
 }
 
 .temple-search-select option {
-  background-color: #e2bf9cab;
-  color: #663300;
+  background-color: var(--bg-color);
+  color: var(--faq-color);
   font-size: 1rem;
 }
 
 .custom-select-wrapper {
   flex: 1 1 200px;
+}
+
+.temple-suggestions-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%; /* Full width of input wrapper */
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 0 0 8px 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 1000;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.temple-suggestion-item {
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.temple-suggestion-item:hover {
+  background: #f2f2f2;
+}
+
+.scroll-placeholder {
+  position: absolute;
+  top: 50%;
+  white-space: nowrap;
+  color: var(--faq-color);
+  opacity: 0.8;
+  font-size: 1rem;
+  pointer-events: none;
+  user-select: none;
+  transform: translateY(-50%);
+  animation: scroll 10s linear infinite;
+}
+
+@keyframes scroll {
+  0% {
+    left: 100%;
+  }
+  100% {
+    left: -120%;
+  }
 }
 
 @media (max-width: 768px) {
@@ -93,26 +160,31 @@
     margin: 0;
   }
 
-  .temple-search-wrapper{
+  .temple-search-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    margin:2rem 0 0rem 0;
+    margin: 2rem 0 0rem 0;
     padding: 0;
   }
 
-  .temple-search-input-wrapper{
+  .temple-search-input-wrapper {
     flex: 1 1 100%;
     max-width: 100%;
   }
 
-  .temple-search-select{
+  .temple-search-select {
     display: none;
   }
 
   .custom-select-wrapper {
     display: none;
+  }
+
+  /* 🔹 Suggestions dropdown on mobile also full width */
+  .temple-suggestions-list {
+    max-width: 100%;
   }
 }
 

@@ -38,6 +38,7 @@ body.dark {
   --pe-avatar-edit-delete:#f0e6bd ;
   --radio-color:orange;
   --edit-bg:rgba(242, 213, 179, 0.6);
+  --ts-hover-color:#f7edd6;
 
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -84,6 +85,7 @@ body {
   --pe-avatar-edit-delete: maroon;
   --radio-color:maroon;
   --edit-bg:rgba(0,0,0,0.6);
+  --ts-hover-color:orange;
 
   background-color: var(--bg-color);
   color: var(--text-color);

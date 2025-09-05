@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useLocation } from "react-router-dom";
 import "../css/TemplePageBanner.css";
 import TempleSearch from "./TempleSearch";
 import TemplesCards from "../components/TemplesCards";
+import { AuthContext } from "../AuthContext";
 
 const TemplePageBanner = () => {
   const [animate, setAnimate] = useState(false);
@@ -13,10 +14,8 @@ const TemplePageBanner = () => {
   const [heading, setHeading] = useState("");
   const [paragraph, setParagraph] = useState("");
 
-  const API_BASE_URL =
-    import.meta.env.MODE === "production"
-      ? "https://mandir-darshan.onrender.com"
-      : "http://localhost:4000";
+  const [temples, setTemples] = useState([]); // shared state for temples
+  const { fetchTemples } = useContext(AuthContext);
 
   useEffect(() => {
     setAnimate(false);
@@ -24,26 +23,34 @@ const TemplePageBanner = () => {
     return () => clearTimeout(timeout);
   }, [location]);
 
+  // 🔹 Fetch Banner
   useEffect(() => {
     const fetchBanner = async () => {
-      const cachedAssets = sessionStorage.getItem("assets");
-      if (cachedAssets) {
-        const data = JSON.parse(cachedAssets);
-        const banner = data.find((b) => b.category === "Banner");
-        if (banner && banner.items && banner.items.length > 1) {
-          const templeBanner = banner.items[2];
-          setBannerUrl(templeBanner.bannerUrl);
-          setAltText(templeBanner.alt);
-          setHeading(templeBanner.h2);
-          setParagraph(templeBanner.p);
-        }
-      }
       try {
-        const res = await fetch(`${API_BASE_URL}/api/assets`);
+        // Try cache first
+        const cachedAssets = sessionStorage.getItem("assets");
+        if (cachedAssets) {
+          const data = JSON.parse(cachedAssets);
+          const banner = data.find((b) => b.category === "Banner");
+          if (banner && banner.items?.[2]) {
+            const templeBanner = banner.items[2];
+            setBannerUrl(templeBanner.bannerUrl);
+            setAltText(templeBanner.alt);
+            setHeading(templeBanner.h2);
+            setParagraph(templeBanner.p);
+          }
+        }
+
+        // Always refresh from backend
+        const res = await fetch(
+          import.meta.env.MODE === "production"
+            ? "https://mandir-darshan.onrender.com/api/assets"
+            : "http://localhost:4000/api/assets"
+        );
         const data = await res.json();
         sessionStorage.setItem("assets", JSON.stringify(data));
         const banner = data.find((b) => b.category === "Banner");
-        if (banner && banner.items && banner.items.length > 1) {
+        if (banner && banner.items?.[2]) {
           const templeBanner = banner.items[2];
           setBannerUrl(templeBanner.bannerUrl);
           setAltText(templeBanner.alt);
@@ -56,20 +63,39 @@ const TemplePageBanner = () => {
     };
     fetchBanner();
   }, []);
+  
+  useEffect(() => {
+    const loadTemples = async () => {
+      try {
+        const data = await fetchTemples({ sortBy: "id" });
+        setTemples(data);
+      } catch (err) {
+        console.error("Error fetching temples:", err);
+      }
+    };
+    loadTemples();
+  }, [fetchTemples]);
 
   return (
     <div className={`temple-banner-section ${animate ? "animate" : ""}`}>
       <div className="TemplePagebanner-container">
-          <img src={bannerUrl} alt={altText} className="TemplePageBanner-image"/>
+        {bannerUrl && (
+          <img
+            src={bannerUrl}
+            alt={altText}
+            className="TemplePageBanner-image"
+          />
+        )}
         <div className="TemplePageBanner-caption">
           <h2>{heading}</h2>
           <p>{paragraph}</p>
         </div>
       </div>
+
       <div className="temple-search-wrapper">
-        <TempleSearch />
+        <TempleSearch setTemples={setTemples} />
       </div>
-      <TemplesCards />
+      <TemplesCards temples={temples} />
     </div>
   );
 };

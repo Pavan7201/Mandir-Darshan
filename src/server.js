@@ -36,6 +36,7 @@ app.use(
 let usersCollection, blacklistedTokensCollection, assetsCollection;
 const client = new MongoClient(MONGODB_URI);
 
+// Db connection
 async function connectDB() {
   try {
     await client.connect();
@@ -57,6 +58,12 @@ async function connectDB() {
 }
 connectDB();
 
+// Helper to escape regex special chars in user input
+function escapeRegexSafe(str = "") {
+  return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+// Middleware
 const authenticateUserMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -79,6 +86,7 @@ const authenticateUserMiddleware = async (req, res, next) => {
 
 app.get("/", (_req, res) => res.send("Backend is running 🚀"));
 
+// User Signup
 app.post("/api/signup", async (req, res) => {
   try {
     const { firstName, middleName, lastName, mobile, password, gender } = req.body;
@@ -111,7 +119,7 @@ app.post("/api/signup", async (req, res) => {
   }
 });
 
-
+// User login
 app.post("/api/login", async (req, res) => {
   try {
     const { mobile, password } = req.body;
@@ -150,6 +158,70 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+// searching Temple
+app.get("/api/temples", async (req, res) => {
+  try {
+    const { searchTerm, category, state, sortBy } = req.query;
+
+    const templeDoc = await assetsCollection.findOne({ category: "temple" });
+    if (!templeDoc) return res.json([]);
+
+    let results = Array.isArray(templeDoc.items) ? [...templeDoc.items] : [];
+
+    // 🔹 If searchTerm provided: do prefix (starts-with) match for name/location/deity
+    if (searchTerm && typeof searchTerm === "string" && searchTerm.trim()) {
+      const term = escapeRegexSafe(searchTerm.trim());
+      const startsRegex = new RegExp("^" + term, "i"); // anchor at start, case-insensitive
+
+      results = results.filter(
+        (t) =>
+          startsRegex.test(t.name || "") ||
+          startsRegex.test(t.location || "") ||
+          startsRegex.test(t.deity || "")
+      );
+    }
+
+    // 🔹 Category filter (deity specific) - substring match (case-insensitive)
+    if (category && typeof category === "string" && category.trim()) {
+      const catRegex = new RegExp(escapeRegexSafe(category.trim()), "i");
+      results = results.filter((t) => catRegex.test(t.deity || ""));
+    }
+
+    // 🔹 State filter (match anywhere in location to account for "City, State" format)
+    if (state && typeof state === "string" && state.trim()) {
+      const stateTerm = escapeRegexSafe(state.trim().replace(/-/g, " "));
+      const stateRegex = new RegExp(stateTerm, "i");
+      results = results.filter((t) => stateRegex.test(t.location || ""));
+    }
+
+    // 🔹 Sorting
+    const sortKey = sortBy || (results[0]?.id ? "id" : "");
+    if (sortKey) {
+      if (sortKey === "name") {
+        results.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+      } else if (sortKey === "location") {
+        results.sort((a, b) => (a.location || "").localeCompare(b.location || ""));
+      } else if (sortKey === "popularity" && results[0]?.popularity !== undefined) {
+        results.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+      } else if (sortKey === "id") {
+        results.sort((a, b) => {
+          const ai = Number(a.id);
+          const bi = Number(b.id);
+          if (!isNaN(ai) && !isNaN(bi)) return ai - bi;
+          // fallback string compare
+          return String(a.id || "").localeCompare(String(b.id || ""));
+        });
+      }
+    }
+
+    res.json(results);
+  } catch (err) {
+    console.error("Temple search error:", err);
+    res.status(500).json({ error: "Failed to fetch temples" });
+  }
+});
+
+// Admin login 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
@@ -192,6 +264,7 @@ app.post("/api/admin/login", async (req, res) => {
   }
 });
 
+// User Profile Edit 
 app.put("/api/editprofile", authenticateUserMiddleware, upload.single("avatar"), async (req, res) => {
   try {
     const userId = new ObjectId(req.user._id);
@@ -252,6 +325,7 @@ app.put("/api/editprofile", authenticateUserMiddleware, upload.single("avatar"),
   }
 });
 
+// User logout 
 app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
@@ -275,7 +349,7 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
   }
 });
 
-
+// User fetching
 app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
   try {
     const user = await usersCollection.findOne(
@@ -296,6 +370,7 @@ app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
   }
 });
 
+// User delete account 
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
     const userId = new ObjectId(req.user._id);
@@ -307,6 +382,7 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
   }
 });
 
+// assets fetching 
 app.get("/api/assets", async (_req, res) => {
   try {
     const assets = await assetsCollection.find().toArray();
@@ -317,6 +393,7 @@ app.get("/api/assets", async (_req, res) => {
   }
 });
 
+// admin uploading assets 
 app.post("/api/assets", authenticateUserMiddleware, async (req, res) => {
   try {
     if (!req.user.role || req.user.role !== "admin") {
@@ -345,6 +422,7 @@ app.post("/api/assets", authenticateUserMiddleware, async (req, res) => {
   }
 });
 
+// admin updating temple image
 app.put("/api/assets/temple/:id/image", authenticateUserMiddleware, async (req, res) => {
   try {
     const itemId = req.params.id;
@@ -380,6 +458,7 @@ app.put("/api/assets/temple/:id/image", authenticateUserMiddleware, async (req, 
   }
 });
 
+// temple updation and new temple adding by admin 
 app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) => {
   try {
     if (!req.user.role || req.user.role !== "admin") {
@@ -437,4 +516,5 @@ app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) =
   }
 });
 
+// server 
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
