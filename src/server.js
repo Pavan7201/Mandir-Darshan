@@ -420,23 +420,22 @@ app.post("/api/assets", authenticateUserMiddleware, async (req, res) => {
 // admin updating temple image
 app.put("/api/assets/temple/:id/image", authenticateUserMiddleware, async (req, res) => {
   try {
-    if (!req.user.role || req.user.role !== "admin") {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-
     const itemId = req.params.id;
     const { image } = req.body;
 
     if (!image || typeof image !== "string") {
       return res.status(400).json({ error: "New image URL is required." });
     }
-
+    
     const templeDocument = await assetsCollection.findOne({ category: "temple" });
-    if (!templeDocument) return res.status(404).json({ error: "Temple category document not found" });
+    if (!templeDocument) {
+      return res.status(404).json({ error: "Temple category document not found" });
+    }
 
     const itemIndex = templeDocument.items.findIndex((item) => item.id === itemId);
-    if (itemIndex === -1) return res.status(404).json({ error: "Temple item not found" });
-
+    if (itemIndex === -1) {
+      return res.status(404).json({ error: "Temple item not found" });
+    }
     templeDocument.items[itemIndex].image = image.trim();
 
     await assetsCollection.updateOne(
@@ -463,10 +462,6 @@ app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) =
 
     const itemId = req.params.id;
     const updatedData = req.body;
-
-    if (!itemId || typeof itemId !== "string") {
-      return res.status(400).json({ error: "Temple ID is required" });
-    }
 
     const templeDocument = await assetsCollection.findOne({ category: "temple" });
     if (!templeDocument) {

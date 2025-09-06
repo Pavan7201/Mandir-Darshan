@@ -1,5 +1,6 @@
 import { useState, useContext, useEffect, useRef } from "react";
 import { AuthContext } from "../AuthContext";
+import { FaPencilAlt } from "react-icons/fa";
 import "../css/AdminPage.css";
 import Lottie from "lottie-react";
 import loading from "../loader/loading data.json";
@@ -21,9 +22,11 @@ const AdminForm = () => {
   const [status, setStatus] = useState("");
   const [templesCount, setTemplesCount] = useState(0);
   const [fetchedTemple, setFetchedTemple] = useState(null);
+  const [preview, setPreview] = useState(null);
   const [loadingTemple, setLoadingTemple] = useState(false);
 
   const debounceRef = useRef(null);
+  // const fileInputRef = useRef(null);
 
   const API_BASE_URL =
     import.meta.env.MODE === "production"
@@ -59,6 +62,18 @@ const AdminForm = () => {
     }
   };
 
+  // const handleImageChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = () => {
+  //       setTempleItem((prev) => ({ ...prev, image: reader.result }));
+  //       setPreview(reader.result);
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
+
   const fetchTempleById = async (id) => {
     setLoadingTemple(true);
     try {
@@ -84,7 +99,7 @@ const AdminForm = () => {
       }
     } catch (err) {
       console.error("Error fetching temple by ID:", err);
-    } finally {
+    }finally{
       setLoadingTemple(false);
     }
   };
@@ -147,15 +162,17 @@ const AdminForm = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Failed to update image");
       setStatus("Temple image updated successfully!");
+      setFetchedTemple({ ...fetchedTemple, image: templeItem.image });
       setTimeout(() =>{
         setStatus("")
       },3000);
-      setFetchedTemple({ ...fetchedTemple, image: templeItem.image });
-      setTimeout(() => setStatus(""), 3000);
+      // setTempleItem((prev) => ({ ...prev, image: "" }));
     } catch (err) {
       console.error(err);
       setStatus("Error updating temple image");
-      setTimeout(() => setStatus(""), 3000);
+      setTimeout(() =>{
+        setStatus("")
+      },3000);
     }
   };
 
@@ -172,136 +189,69 @@ const AdminForm = () => {
     });
     setFetchedTemple(null);
     setStatus("");
+    setPreview(null);
   };
+
+  // const triggerFileInput = () => {
+  //   fileInputRef.current.click();
+  // };
 
   return (
     <section className="admin-form-section">
-      <div className="admin-form-container">
-        <h2>Update Temple Data</h2>
-        <p className="temple-count">Total Temples Data: {templesCount}</p>
-        {loadingTemple ? (
-          <div className="loading-animation">
-            <Lottie loop={true} animationData={loading} play />
+    <div className="admin-form-container">
+      <h2>Update Temple Data</h2>
+      <p className="temple-count">Total Temples Data: {templesCount}</p>
+      {loadingTemple ? (
+        <div className="loading-animation">
+          <Lottie loop={true} animationData={loading} play />
+        </div>
+) : (
+      fetchedTemple && (
+        <div className="temple-preview-card">
+          <div className="image-wrapper">
+            {fetchedTemple?.image ? (
+              <img src={fetchedTemple.image} alt={fetchedTemple.name} />
+            ) : (
+              <div className="no-image">No Image Available</div>
+            )}
+            {/* <div className="edit-icon" onClick={triggerFileInput}>
+              <FaPencilAlt />
+            </div> */}
           </div>
-        ) : (
-          fetchedTemple && (
-            <div className="temple-preview-card">
-              <div className="image-wrapper">
-                {templeItem.image ? (
-                  <img src={templeItem.image} alt="Temple" />
-                ) : (
-                  <div className="no-image">No Image Available</div>
-                )}
-              </div>
-              <div className="temple-info">
-                <h3>{fetchedTemple.name}</h3>
-                <p>
-                  <span>
-                    <strong>Location:</strong>
-                  </span>{" "}
-                  {fetchedTemple.location}
-                </p>
-                <p>
-                  <span>
-                    <strong>Deity:</strong>
-                  </span>{" "}
-                  {fetchedTemple.deity}
-                </p>
-                <p>
-                  <span>
-                    <strong>Hours:</strong>
-                  </span>{" "}
-                  {fetchedTemple.hours}
-                </p>
-                <p>
-                  <span>
-                    <strong>Caption:</strong>
-                  </span>{" "}
-                  {fetchedTemple.caption}
-                </p>
-                {status && <h1 className="status">{status}</h1>}
-              </div>
-            </div>
+          <div className="temple-info">
+            <h3>{fetchedTemple.name}</h3>
+            <p><span><strong>Location:</strong></span> {fetchedTemple.location}</p>
+            <p><span><strong>Deity:</strong></span> {fetchedTemple.deity}</p>
+            <p><span><strong>Hours:</strong></span> {fetchedTemple.hours}</p>
+            <p><span><strong>Caption:</strong></span> {fetchedTemple.caption}</p>
+            {status && <h1 className="status">{status}</h1>}
+          </div>
+        </div>
           )
-        )}
+      )}
 
-        <form onSubmit={(e) => e.preventDefault()} className="admin-form-grid">
-          <input
-            type="text"
-            name="id"
-            placeholder="ID"
-            value={templeItem.id}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="text"
-            name="name"
-            placeholder="Temple Complete Name"
-            value={templeItem.name}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="text"
-            name="location"
-            placeholder="Temple Location"
-            value={templeItem.location}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="text"
-            name="deity"
-            placeholder="Deity"
-            value={templeItem.deity}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="text"
-            name="caption"
-            placeholder="Caption"
-            value={templeItem.caption}
-            onChange={handleChange}
-          />
-          <input
-            type="text"
-            name="hours"
-            placeholder="Visiting Hours"
-            value={templeItem.hours}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="text"
-            name="link"
-            placeholder="Link"
-            value={templeItem.link}
-            onChange={handleChange}
-            required
-          />
-          <input
-            type="text"
-            name="image"
-            placeholder="Image URL"
-            value={templeItem.image}
-            onChange={handleChange}
-          />
-
-          <div className="button-wrapper">
-            <button type="button" onClick={handleUpdateInfo} className="update-btn">
-              Update Info
-            </button>
-            <button type="button" onClick={handleUpdateImage} className="update-btn">
-              Update Image
-            </button>
-            <button type="button" onClick={handleClear} className="clear-btn">
-              Clear Fields
-            </button>
-          </div>
-        </form>
-      </div>
+      <form onSubmit={(e) => e.preventDefault()} className="admin-form-grid">
+        <input type="text" name="id" placeholder="ID" value={templeItem.id} onChange={handleChange} required />
+        <input type="text" name="name" placeholder="Temple Complete Name" value={templeItem.name} onChange={handleChange} required />
+        <input type="text" name="location" placeholder="Temple Location" value={templeItem.location} onChange={handleChange} required />
+        <input type="text" name="deity" placeholder="Deity" value={templeItem.deity} onChange={handleChange} required />
+        <input type="text" name="caption" placeholder="Caption" value={templeItem.caption} onChange={handleChange} />
+        <input type="text" name="hours" placeholder="Visiting Hours" value={templeItem.hours} onChange={handleChange} required />
+        <input type="text" name="link" placeholder="Link" value={templeItem.link} onChange={handleChange} required />
+        <input type="text" name="image" placeholder="Image URL" value={templeItem.image} onChange={handleChange}/>
+        <div className="button-wrapper">
+          <button type="button" onClick={handleUpdateInfo} className="update-btn">
+            Update Info
+          </button>
+          <button type="button" onClick={handleUpdateImage} className="update-btn">
+            Update Image
+          </button>
+          <button type="button" onClick={handleClear} className="clear-btn">
+            Clear Fields
+          </button>
+        </div>
+      </form>
+    </div>
     </section>
   );
 };
