@@ -309,6 +309,11 @@ const Header = () => {
                     <span className="dashboard-label">ADMIN LOGIN</span>
                   </button>
                 )}
+                {!loading && user && (
+                  <button className="dashboard-btn fade-in delay-5" onClick={() => navigate("/publicdashboard")}>
+                    <span className="dashboard-label">PUBLIC DASHBOARD</span>
+                  </button>
+                )}
               </div>
 
               <div className="search-signin">

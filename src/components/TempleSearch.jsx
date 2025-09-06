@@ -8,7 +8,6 @@ const TempleSearch = ({ setTemples }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("");
   const [state, setState] = useState("");
-  const [sortBy, setSortBy] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [suggestions, setSuggestions] = useState([]);
@@ -20,9 +19,29 @@ const TempleSearch = ({ setTemples }) => {
   const [states, setStates] = useState([]);
 
   const inputRef = useRef(null);
-  const [showCustomPlaceholder, setShowCustomPlaceholder] = useState(true);
-
   const suggestionBoxRef = useRef(null);
+
+  // placeholder state
+  const [showCustomPlaceholder, setShowCustomPlaceholder] = useState(true);
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const placeholders = [
+    "Search by Temple Name",
+    "Search by District",
+    "Search by State",
+  ];
+
+  useEffect(() => {
+    if (!showCustomPlaceholder) return;
+    const interval = setInterval(() => {
+      setPlaceholderIndex((prev) => (prev + 1) % placeholders.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [showCustomPlaceholder]);
+
+  useEffect(() => {
+    setShowCustomPlaceholder(searchTerm.length === 0);
+  }, [searchTerm]);
+
   const { fetchTemples } = useContext(AuthContext);
 
   const fetchAndSetTemples = async (term = searchTerm) => {
@@ -32,7 +51,6 @@ const TempleSearch = ({ setTemples }) => {
         searchTerm: term.trim() || undefined,
         category,
         state,
-        sortBy: sortBy === "" ? "id" : sortBy,
       });
       setTemples(temples);
       return temples;
@@ -45,22 +63,22 @@ const TempleSearch = ({ setTemples }) => {
   };
 
   const filterTemples = async (selectedDeity, selectedState) => {
-  try {
-    const temples = await fetchTemples({ searchTerm: undefined });
+    try {
+      const temples = await fetchTemples({ searchTerm: undefined });
 
-    const filtered = temples.filter((t) => {
+      const filtered = temples.filter((t) => {
       const tState = t.location ? t.location.split(",").slice(-1)[0].trim() : "";
       const deityMatch = selectedDeity ? t.deity?.startsWith(selectedDeity) : true;
-      const stateMatch = selectedState ? tState === selectedState : true;
-      return deityMatch && stateMatch;
-    });
+        const stateMatch = selectedState ? tState === selectedState : true;
+        return deityMatch && stateMatch;
+      });
 
-    setTemples(filtered);
-  } catch (err) {
-    console.error("Error filtering temples:", err);
-    setTemples([]);
-  }
-};
+      setTemples(filtered);
+    } catch (err) {
+      console.error("Error filtering temples:", err);
+      setTemples([]);
+    }
+  };
 
   const fetchSuggestions = async (term) => {
     try {
@@ -95,7 +113,7 @@ const TempleSearch = ({ setTemples }) => {
     if (!searchTerm.trim()) {
       setSuggestions([]);
       setSuggestionsLoaded(false);
-      fetchAndSetTemples(); 
+      fetchAndSetTemples();
       return;
     }
     const delayDebounce = setTimeout(() => {
@@ -132,50 +150,41 @@ const TempleSearch = ({ setTemples }) => {
   }, []);
 
   useEffect(() => {
-  const loadFilters = async () => {
-    try {
-      const temples = await fetchTemples({});
-      const deityMap = {};
-      temples.forEach((t) => {
-        if (!t.deity) return;
-        const words = t.deity.split(" ");
-        const key = words.slice(0, 2).join(" "); 
-        if (!deityMap[key]) deityMap[key] = [];
-        deityMap[key].push(t.deity);
-      });
-      const uniqueDeities = Object.keys(deityMap);
+    const loadFilters = async () => {
+      try {
+        const temples = await fetchTemples({});
+        const deityMap = {};
+        temples.forEach((t) => {
+          if (!t.deity) return;
+          const words = t.deity.split(" ");
+          const key = words.slice(0, 2).join(" ");
+          if (!deityMap[key]) deityMap[key] = [];
+          deityMap[key].push(t.deity);
+        });
+        const uniqueDeities = Object.keys(deityMap);
 
-      const uniqueStates = [
-        ...new Set(
-          temples
-            .map((t) => {
-              if (t.location) {
-                const parts = t.location.split(",");
-                return parts[parts.length - 1].trim();
-              }
-              return null;
-            })
-            .filter(Boolean)
-        ),
-      ];
+        const uniqueStates = [
+          ...new Set(
+            temples
+              .map((t) => {
+                if (t.location) {
+                  const parts = t.location.split(",");
+                  return parts[parts.length - 1].trim();
+                }
+                return null;
+              })
+              .filter(Boolean)
+          ),
+        ];
 
-      setDeities(uniqueDeities);
-      setStates(uniqueStates);
-    } catch (err) {
-      console.error("Error fetching filters:", err);
-    }
-  };
-  loadFilters();
-}, [fetchTemples]);
-
-useEffect(() => {
-    setShowCustomPlaceholder(searchTerm.length === 0);
-  }, [searchTerm]);
-
-  const handleFocus = () => setShowCustomPlaceholder(false);
-  const handleBlur = () => {
-    if (searchTerm.length === 0) setShowCustomPlaceholder(true);
-  };
+        setDeities(uniqueDeities);
+        setStates(uniqueStates);
+      } catch (err) {
+        console.error("Error fetching filters:", err);
+      }
+    };
+    loadFilters();
+  }, [fetchTemples]);
 
   return (
     <section
@@ -199,15 +208,22 @@ useEffect(() => {
           }}
           className="temple-search-input"
           ref={inputRef}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
+          onFocus={() => setShowCustomPlaceholder(false)}
+          onBlur={() => {
+            if (searchTerm.length === 0) setShowCustomPlaceholder(true);
+          }}
           autoComplete="off"
         />
         {showCustomPlaceholder && (
-          <span className="scroll-placeholder">
-            Search Temples by Temple Name or State.
-          </span>
-        )}
+  <div className="scroll-placeholder-wrapper">
+    <span
+      key={placeholderIndex}
+      className="scroll-placeholder"
+    >
+      {placeholders[placeholderIndex]}
+    </span>
+  </div>
+)}
         <button className="temple-search-icon-button"
           onClick={() => fetchAndSetTemples()}
           aria-label="Search"
@@ -242,38 +258,38 @@ useEffect(() => {
       )}
 
       <select
-  value={category}
-  onChange={(e) => {
-    const selected = e.target.value;
-    setCategory(selected);
-    filterTemples(selected, state);
-  }}
-  className="temple-search-select"
->
-  <option value="">All Deity</option>
-  {deities.map((d, i) => (
-    <option key={i} value={d}>
-      {d}
-    </option>
-  ))}
-</select>
+        value={category}
+        onChange={(e) => {
+          const selected = e.target.value;
+          setCategory(selected);
+          filterTemples(selected, state);
+        }}
+        className="temple-search-select"
+      >
+        <option value="">All Deity</option>
+        {deities.map((d, i) => (
+          <option key={i} value={d}>
+            {d}
+          </option>
+        ))}
+      </select>
 
-<select
-  value={state}
-  onChange={(e) => {
-    const selected = e.target.value;
-    setState(selected);
-    filterTemples(category, selected);
-  }}
-  className="temple-search-select"
->
-  <option value="">All States</option>
-  {states.map((s, i) => (
-    <option key={i} value={s}>
-      {s}
-    </option>
-  ))}
-</select>
+      <select
+        value={state}
+        onChange={(e) => {
+          const selected = e.target.value;
+          setState(selected);
+          filterTemples(category, selected);
+        }}
+        className="temple-search-select"
+      >
+        <option value="">All States</option>
+        {states.map((s, i) => (
+          <option key={i} value={s}>
+            {s}
+          </option>
+        ))}
+      </select>
     </section>
   );
 };

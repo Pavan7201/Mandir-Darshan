@@ -105,7 +105,7 @@
   position: absolute;
   top: 100%;
   left: 0;
-  width: 100%; /* Full width of input wrapper */
+  width: 100%; 
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 0 0 8px 8px;
@@ -128,27 +128,46 @@
   background: #f2f2f2;
 }
 
-.scroll-placeholder {
+.scroll-placeholder-wrapper {
   position: absolute;
   top: 50%;
-  white-space: nowrap;
-  color: var(--faq-color);
-  opacity: 0.8;
-  font-size: 1rem;
-  pointer-events: none;
-  user-select: none;
+  left: 1rem;
   transform: translateY(-50%);
-  animation: scroll 10s linear infinite;
+  height: 1.5rem;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  pointer-events: none;
 }
 
-@keyframes scroll {
+.scroll-placeholder {
+  font-size: 1rem;
+  color: var(--search-scroll-color);
+  opacity: 0.8;
+  pointer-events: none;
+  white-space: nowrap;
+  animation: slideUp 2.5s ease forwards;
+}
+
+@keyframes slideUp {
   0% {
-    left: 100%;
+    transform: translateY(70%);
+    opacity: 0;
+  }
+  20% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(0);
+    opacity: 1;
   }
   100% {
-    left: -120%;
+    transform: translateY(-100%);
+    opacity: 0;
   }
 }
+
 
 @media (max-width: 768px) {
   .temple-search-container {

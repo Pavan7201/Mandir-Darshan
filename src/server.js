@@ -168,10 +168,9 @@ app.get("/api/temples", async (req, res) => {
 
     let results = Array.isArray(templeDoc.items) ? [...templeDoc.items] : [];
 
-    // 🔹 If searchTerm provided: do prefix (starts-with) match for name/location/deity
     if (searchTerm && typeof searchTerm === "string" && searchTerm.trim()) {
       const term = escapeRegexSafe(searchTerm.trim());
-      const startsRegex = new RegExp("^" + term, "i"); // anchor at start, case-insensitive
+      const startsRegex = new RegExp("^" + term, "i");
 
       results = results.filter(
         (t) =>
@@ -181,20 +180,17 @@ app.get("/api/temples", async (req, res) => {
       );
     }
 
-    // 🔹 Category filter (deity specific) - substring match (case-insensitive)
     if (category && typeof category === "string" && category.trim()) {
       const catRegex = new RegExp(escapeRegexSafe(category.trim()), "i");
       results = results.filter((t) => catRegex.test(t.deity || ""));
     }
 
-    // 🔹 State filter (match anywhere in location to account for "City, State" format)
     if (state && typeof state === "string" && state.trim()) {
       const stateTerm = escapeRegexSafe(state.trim().replace(/-/g, " "));
       const stateRegex = new RegExp(stateTerm, "i");
       results = results.filter((t) => stateRegex.test(t.location || ""));
     }
 
-    // 🔹 Sorting
     const sortKey = sortBy || (results[0]?.id ? "id" : "");
     if (sortKey) {
       if (sortKey === "name") {
@@ -208,7 +204,6 @@ app.get("/api/temples", async (req, res) => {
           const ai = Number(a.id);
           const bi = Number(b.id);
           if (!isNaN(ai) && !isNaN(bi)) return ai - bi;
-          // fallback string compare
           return String(a.id || "").localeCompare(String(b.id || ""));
         });
       }
@@ -425,22 +420,23 @@ app.post("/api/assets", authenticateUserMiddleware, async (req, res) => {
 // admin updating temple image
 app.put("/api/assets/temple/:id/image", authenticateUserMiddleware, async (req, res) => {
   try {
+    if (!req.user.role || req.user.role !== "admin") {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
     const itemId = req.params.id;
     const { image } = req.body;
 
     if (!image || typeof image !== "string") {
       return res.status(400).json({ error: "New image URL is required." });
     }
-    
+
     const templeDocument = await assetsCollection.findOne({ category: "temple" });
-    if (!templeDocument) {
-      return res.status(404).json({ error: "Temple category document not found" });
-    }
+    if (!templeDocument) return res.status(404).json({ error: "Temple category document not found" });
 
     const itemIndex = templeDocument.items.findIndex((item) => item.id === itemId);
-    if (itemIndex === -1) {
-      return res.status(404).json({ error: "Temple item not found" });
-    }
+    if (itemIndex === -1) return res.status(404).json({ error: "Temple item not found" });
+
     templeDocument.items[itemIndex].image = image.trim();
 
     await assetsCollection.updateOne(
@@ -467,6 +463,10 @@ app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) =
 
     const itemId = req.params.id;
     const updatedData = req.body;
+
+    if (!itemId || typeof itemId !== "string") {
+      return res.status(400).json({ error: "Temple ID is required" });
+    }
 
     const templeDocument = await assetsCollection.findOne({ category: "temple" });
     if (!templeDocument) {
