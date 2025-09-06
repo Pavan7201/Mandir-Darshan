@@ -127,6 +127,7 @@
 }
 
 .dropdown-menu.open {
+  right: 0px;
   width: 100%;
   opacity: 1;
   transform: scaleY(1);
@@ -587,6 +588,8 @@ body.modal-open {
   }
 
   .dropdown-menu.open{
+    padding: 0;
+    right: -9px;
     pointer-events: auto;
   }
 
@@ -614,7 +617,6 @@ body.modal-open {
 .welcome-firstname{
   min-width: 78px;
 }
-
 }
 
 @media screen and (min-width: 768px) and (max-width: 1024px) {
