@@ -111,7 +111,7 @@
 .dropdown-menu {
   position: absolute;
   top: 79%;
-  right: -0.5px;
+  right: -20%;
   margin-top: 0.72rem;
   background-color: var(--bg-color);
   border: 1px solid #ccc;
@@ -127,7 +127,6 @@
 }
 
 .dropdown-menu.open {
-  right: 0px;
   width: 100%;
   opacity: 1;
   transform: scaleY(1);
@@ -577,21 +576,28 @@ body.modal-open {
   }
 
   .dropdown-menu {
-    width: auto;
-    max-width: 180px;
-    min-width: 140px;
-    height: auto;
-    top: 90%;
-    right:-1.6rem;
-    transform: translateY(-2%);
-    pointer-events: none;
-  }
+  position: absolute;
+  top: 87%;
+  right: -9px;
+  min-width:160px;
+  background-color: var(--bg-color);
+  border-radius: 6px;
+  padding: 0;
+  opacity: 0;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  overflow: hidden;
+  z-index: 999;
+  pointer-events: none;
+  white-space: nowrap;
+}
 
-  .dropdown-menu.open{
-    padding: 0;
-    right: -9px;
-    pointer-events: auto;
-  }
+.dropdown-menu.open {
+  opacity: 1;
+  transform: scaleY(1);
+  pointer-events: auto;
+}
 
   .modal-content {
     font-size: 0.9rem;
@@ -617,6 +623,12 @@ body.modal-open {
 .welcome-firstname{
   min-width: 78px;
 }
+
+.user-login-btn, .admin-login-btn{
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
 }
 
 @media screen and (min-width: 768px) and (max-width: 1024px) {
@@ -632,6 +644,7 @@ body.modal-open {
   .logo-img{
     padding-right: 0;
   }
+  
   .logo-img img {
     height: 3.5rem;
     max-width: 130px;

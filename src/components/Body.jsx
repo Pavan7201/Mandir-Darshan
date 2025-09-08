@@ -81,7 +81,7 @@ const Body = () => {
       <hr className="animate-on-scroll" />
       <div>
         <Banner className="animate-on-scroll" />
-        <FeaturedTemples className="animate-on-scroll" />
+        <FeaturedTemples />
         <hr className="animate-on-scroll" />
         <DevoteServices className="animate-on-scroll" />
         <hr className="animate-on-scroll" />

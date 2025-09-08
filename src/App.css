@@ -1,14 +1,14 @@
 body.dark {
-  --bg-color: black;
-  --header-color:#2a2a2a;
+  --bg-color: #000;
+  --header-color: #2a2a2a;
   --text-color: #f0e6bd;
-  --heading-color:#f7edd6;
+  --heading-color: #f7edd6;
   --card-color: #2a2a2a;
   --primary-color: #800000;
   --secondary-color: #f7edd6;
   --faq-color: #f0e6bd;
-  --link-hover: #ffffff;
-  --box-shadow:0 4px 12px #f1efea2b;
+  --link-hover: #fff;
+  --box-shadow: 0 4px 12px #f1efea2b;
   --card-shadow: 0 6px 15px rgb(5, 5, 5);
   --card-hover-shadow:0 10px 20px #f0e6bd2e;
   --card-title-color:#dfd6b5;
@@ -23,15 +23,9 @@ body.dark {
   --q-hover-focus-color:maroon;
   --login-color:#f7edd6;
   --signup-bg:transparent;
-  --small-circle:red, orange, yellow;
+  --small-circle:yellow, orange, red;
   --medium-circle:rgb(240, 200, 0), rgba(143, 13, 13, 0.651), rgb(14, 7, 8);
   --large-circle:red, rgb(255, 238, 1), rgb(226, 21, 21), rgb(35, 31, 31);
-  --signup-box-shadow:rgba(250, 113, 0, 0.194);
-  --signup-header:#f0e6bd;
-  --signup-text:#f5e29aa7;
-  --signup-input:#f0e6bd;
-  --signup-button:yellow;
-  --signup-bg-button:rgb(243, 243, 136);
   --logout-signup-hover-bg-btn:rgb(63, 59, 59);
   --visit-link:#f7edd6;
   --pe-form-bg:linear-gradient(135deg,rgb(60, 58, 57), #000000);
@@ -69,16 +63,11 @@ body {
   --q-hover-focus-bg-color:maroon;
   --q-hover-focus-color:rgb(238, 208, 152);
   --login-color:maroon;
-  --signup-bg:rgba(160, 160, 236, 0.78) 0%, white 100%;
+  --signup-bg:rgba(232, 167, 118, 0.78) 0%, white 100%;
   --small-circle:rgb(54, 169, 211), violet, rgb(243, 158, 172);
   --medium-circle:rgb(124, 124, 224), rgba(238, 86, 238, 0.651), rgba(255, 192, 203, 0.695);
   --large-circle:rgb(136, 136, 223), purple, violet, pink;
-  --signup-box-shadow:rgba(0, 0, 0, 0.08);
-  --signup-header:purple;
-  --signup-text:purple;
-  --signup-input:black;
-  --signup-button:purple;
-  --signup-bg-button:rgb(210, 187, 210);
+  --signup-bg-button:rgb(210, 18a7, 210);
   --logout-signup-hover-bg-btn:maroon;
 
   --pe-form-bg:linear-gradient(135deg,rgb(232, 201, 158), #d09b2f);
@@ -115,7 +104,6 @@ footer {
 html,body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   scroll-behavior: smooth;
-  overflow-x: hidden;
 }
 
 .App {

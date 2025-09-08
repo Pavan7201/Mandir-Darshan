@@ -3,7 +3,7 @@ import "../css/FeaturedTemples.css";
 import { useEffect, useRef, useState } from "react";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
-const FeaturedTemples = ({ className = "" }) => {
+const FeaturedTemples = () => {
   const [featureTemple, setFeaturedTemple] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -78,7 +78,7 @@ const FeaturedTemples = ({ className = "" }) => {
 
   return (
     <section
-      className={`featured-temples ${className}`}
+      className="featured-temples"
       id="featured-temples"
       ref={sectionRef}
     >

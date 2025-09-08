@@ -2,9 +2,12 @@ import { useState, useContext } from "react";
 import "../css/SignUp.css";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import Lottie from "lottie-react";
 import IndiaFlag from "../assets/India-flag.png";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 import { AuthContext } from "../AuthContext";
+import adminLoginAnimation from "../loader/admin.json";
+
 
 const SignupPage = () => {
   useScrollAnimation();
@@ -74,8 +77,6 @@ const SignupPage = () => {
 
   return (
     <section className="signup-section">
-      <div className="blurred-circle circle-large"></div>
-      <div className="blurred-circle circle-medium"></div>
       <div className="signup-page">
         <div className="signup-left">
           <form
@@ -84,87 +85,40 @@ const SignupPage = () => {
           >
             <h2>Sign Up</h2>
             <div className="signup-name-row">
-  <div className="name-input">
-    <label htmlFor="firstName">First Name *</label>
-    <input
-      type="text"
-      id="firstName"
-      name="firstName"
-      value={form.firstName}
-      onChange={handleChange}
-      required
-    />
-  </div>
-
-  <div className="name-input">
-    <label htmlFor="middleName">Middle Name</label>
-    <input
-      type="text"
-      id="middleName"
-      name="middleName"
-      value={form.middleName}
-      onChange={handleChange}
-    />
-  </div>
-
-  <div className="last-name-gender-row">
-    <div className="name-input">
-      <label htmlFor="lastName">Last Name *</label>
-      <input
-        type="text"
-        id="lastName"
-        name="lastName"
-        value={form.lastName}
-        onChange={handleChange}
-        required
-      />
-    </div>
-
-    <div className="gender-selection">
-      <label className="gender-label">Gender *</label>
-        <select
-      id="gender"
-      name="gender"
-      value={form.gender}
-      onChange={handleChange}
-      required
-    >
-      <option value="">Select</option>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-    </select>
-    </div>
-  </div>
-</div>
+              <div className="name-input">
+                <label htmlFor="firstName">First Name *</label>
+                <input type="text" id="firstName" name="firstName" value={form.firstName} onChange={handleChange} required />
+              </div>
+              <div className="name-input">
+                <label htmlFor="middleName">Middle Name</label>
+                <input type="text" id="middleName" name="middleName" value={form.middleName} onChange={handleChange} />
+              </div>
+              <div className="last-name-gender-row">
+                <div className="name-input">
+                  <label htmlFor="lastName">Last Name *</label>
+                  <input type="text" id="lastName" name="lastName" value={form.lastName} onChange={handleChange} required />
+                </div>
+                <div className="gender-selection">
+                  <label className="gender-label">Gender *</label>
+                  <select id="gender" name="gender" value={form.gender} onChange={handleChange} required>
+                    <option value="">Select</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </div>
+              </div>
+            </div>
             <label className="mobile-label" htmlFor="mobile">Mobile Number *</label>
             <div className="signup-mobile-input">
               <img src={IndiaFlag} alt="India" className="signup-flag" />
               <span className="signup-code">+91</span>
-              <input
-                type="tel"
-                id="mobile"
-                name="mobile"
-                maxLength="10"
-                required
-                value={form.mobile}
-                onChange={handleChange}
-              />
+              <input type="tel" id="mobile" name="mobile" maxLength="10" required value={form.mobile} onChange={handleChange} />
             </div>
 
             <label className="password-label" htmlFor="password">Password *</label>
             <div className="signup-password-input">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                id="password"
-                value={form.password}
-                onChange={handleChange}
-                required
-              />
-              <span
-                className="signup-eye-icon"
-                onClick={() => setShowPassword(!showPassword)}
-              >
+              <input type={showPassword ? "text" : "password"} name="password" id="password" value={form.password} onChange={handleChange} required />
+              <span className="signup-eye-icon" onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
@@ -172,18 +126,8 @@ const SignupPage = () => {
 
             <label className="confirm-password-label" htmlFor="confirmPassword">Confirm Password *</label>
             <div className="signup-password-input">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                id="confirmPassword"
-                name="confirmPassword"
-                value={form.confirmPassword}
-                onChange={handleChange}
-                required
-              />
-              <span
-                className="signup-eye-icon"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
+              <input type={showConfirmPassword ? "text" : "password"} id="confirmPassword" name="confirmPassword" value={form.confirmPassword} onChange={handleChange} required />
+              <span className="signup-eye-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                 {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
@@ -196,6 +140,15 @@ const SignupPage = () => {
               <Link to="/login" className="signup-login-link">Login</Link>
             </div>
           </form>
+        </div>
+
+        <div className="signup-right animate-on-scroll">
+          <Lottie
+            animationData={adminLoginAnimation}
+            loop={true}
+            autoplay={true}
+            style={{ maxWidth: "400px", width: "100%", height: "auto" }}
+          />
         </div>
       </div>
     </section>
