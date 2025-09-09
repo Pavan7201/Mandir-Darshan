@@ -28,12 +28,12 @@ body.dark {
   --large-circle:red, rgb(255, 238, 1), rgb(226, 21, 21), rgb(35, 31, 31);
   --logout-signup-hover-bg-btn:rgb(63, 59, 59);
   --visit-link:#f7edd6;
-  --pe-form-bg:linear-gradient(135deg,rgb(60, 58, 57), #000000);
   --pe-avatar-edit-delete:#f0e6bd ;
   --radio-color:orange;
   --edit-bg:rgba(242, 213, 179, 0.6);
   --ts-hover-color:#f7edd6;
-  --search-scroll-color:#f7edd664;
+  --search-scroll-color:#f7edd6a3;
+  --suggestions-hover-color:maroon;
 
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -69,14 +69,13 @@ body {
   --large-circle:rgb(136, 136, 223), purple, violet, pink;
   --signup-bg-button:rgb(210, 18a7, 210);
   --logout-signup-hover-bg-btn:maroon;
-
-  --pe-form-bg:linear-gradient(135deg,rgb(232, 201, 158), #d09b2f);
   --visit-link:orange;
   --pe-avatar-edit-delete: maroon;
   --radio-color:maroon;
   --edit-bg:rgba(0,0,0,0.6);
   --ts-hover-color:orange;
-  --search-scroll-color:rgba(128, 0, 0, 0.484);
+  --search-scroll-color:rgba(128, 0, 0, 0.725);
+  --suggestions-hover-color:orange;
 
   background-color: var(--bg-color);
   color: var(--text-color);

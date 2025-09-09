@@ -14,7 +14,7 @@ const TemplePageBanner = () => {
   const [heading, setHeading] = useState("");
   const [paragraph, setParagraph] = useState("");
 
-  const [temples, setTemples] = useState([]); // shared state for temples
+  const [temples, setTemples] = useState([]);
   const { fetchTemples } = useContext(AuthContext);
 
   useEffect(() => {
@@ -23,11 +23,9 @@ const TemplePageBanner = () => {
     return () => clearTimeout(timeout);
   }, [location]);
 
-  // 🔹 Fetch Banner
   useEffect(() => {
     const fetchBanner = async () => {
       try {
-        // Try cache first
         const cachedAssets = sessionStorage.getItem("assets");
         if (cachedAssets) {
           const data = JSON.parse(cachedAssets);
@@ -41,7 +39,6 @@ const TemplePageBanner = () => {
           }
         }
 
-        // Always refresh from backend
         const res = await fetch(
           import.meta.env.MODE === "production"
             ? "https://mandir-darshan.onrender.com/api/assets"
@@ -63,7 +60,7 @@ const TemplePageBanner = () => {
     };
     fetchBanner();
   }, []);
-  
+
   useEffect(() => {
     const loadTemples = async () => {
       try {

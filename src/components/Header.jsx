@@ -10,6 +10,8 @@ import { AuthContext } from "../AuthContext";
 import { faSignOutAlt, faTrashAlt, faUserEdit, faUserTie, faUser } from "@fortawesome/free-solid-svg-icons";
 import womenAvatar from "../assets/woman.png";
 import menAvatar from "../assets/boy.png";
+import Lottie from "lottie-react";
+import logoAnimation from "../loader/Logo.json";
 
 const Header = () => {
   const [hide, setHide] = useState(false);
@@ -165,11 +167,24 @@ const Header = () => {
               }}
               className="logo-img fade-in delay-1"
             >
-              <img src={MandirLogo} alt="Mandir Logo" />
+              <div className="logo-container">
+              <Lottie
+                animationData={logoAnimation}
+                loop={true}
+                autoplay={true}
+              />
+              </div>
             </NavLink>
+
           ) : (
             <div className="logo-img fade-in delay-1">
-              <img src={MandirLogo} alt="Mandir Logo" />
+              <div className="logo-container">
+              <Lottie
+                animationData={logoAnimation}
+                loop={true}
+                autoplay={true}
+              />
+              </div>
             </div>
           )}
 

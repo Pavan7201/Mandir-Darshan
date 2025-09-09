@@ -49,7 +49,7 @@ function AppRoutes() {
     "/editprofile",
     "/changepassword",
     "/adminlogin",
-    "/admin"
+    "/admin",
   ];
   const showFooterAllowed = !noFooterRoutes.includes(location.pathname);
 

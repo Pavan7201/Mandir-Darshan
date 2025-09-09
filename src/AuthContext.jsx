@@ -1,15 +1,7 @@
 import { createContext, useState, useEffect } from "react";
-import NProgress from "nprogress";
-import "./css/nprogress.css";
+import LoadingBar from "react-top-loading-bar";
 
 export const AuthContext = createContext();
-
-NProgress.configure({
-  showSpinner: false,
-  speed: 400,
-  trickleSpeed: 200,
-  minimum: 0.1,
-});
 
 const API_BASE_URL =
   import.meta.env.MODE === "production"
@@ -24,6 +16,38 @@ export const AuthProvider = ({ children }) => {
   const [loadMode, setLoadMode] = useState("idle");
   const [loggedOut, setLoggedOut] = useState(false);
 
+  const [progress, setProgress] = useState(0);
+
+  const startLoader = () => {
+    setProgress(5);
+    const interval = setInterval(() => {
+      setProgress((old) => {
+        if (old >= 95) {
+          clearInterval(interval);
+          return old;
+        }
+        return old + 5;
+      });
+    }, 200);
+  };
+
+  const finishLoader = () => {
+    setProgress(100);
+  };
+
+  const withLoader = async (asyncFn) => {
+    startLoader();
+    try {
+      return await asyncFn();
+    } finally {
+      finishLoader();
+    }
+  };
+
+  useEffect(() => {
+    return () => setProgress(0);
+  }, []);
+
   useEffect(() => {
     if (!token) {
       setUser(null);
@@ -35,11 +59,11 @@ export const AuthProvider = ({ children }) => {
     if (loadMode !== "authenticating") setLoadMode("reloading");
 
     const controller = new AbortController();
-    const minLoaderTime = 3200;
+    const minLoaderTime = 3000;
     const startTime = Date.now();
 
     const fetchUser = async () => {
-      NProgress.start();
+      startLoader();
       try {
         const res = await fetch(`${API_BASE_URL}/api/me`, {
           method: "GET",
@@ -63,10 +87,14 @@ export const AuthProvider = ({ children }) => {
           localStorage.removeItem("token");
         }
       } finally {
-        NProgress.done();
         const elapsed = Date.now() - startTime;
-        const remainingTime = elapsed < minLoaderTime ? minLoaderTime - elapsed : 0;
-        setTimeout(() => setLoading(false), remainingTime);
+        const remainingTime =
+          elapsed < minLoaderTime ? minLoaderTime - elapsed : 0;
+
+        setTimeout(() => {
+          setLoading(false);
+          finishLoader();
+        }, remainingTime);
       }
     };
 
@@ -74,19 +102,16 @@ export const AuthProvider = ({ children }) => {
     return () => controller.abort();
   }, [token]);
 
-  // 🔹 Normalize values (so "tamil-nadu" → "Tamil Nadu")
   const normalizeValue = (val) => {
     if (!val) return "";
     return val.replace(/-/g, " ").trim();
   };
 
-  // 🔹 Admin login
-  const adminLogin = async (userId, passcode) => {
-    NProgress.start();
-    const minLoaderTime = 2500;
-    const startTime = Date.now();
+  const adminLogin = (userId, passcode) =>
+    withLoader(async () => {
+      const minLoaderTime = 3000;
+      const startTime = Date.now();
 
-    try {
       const res = await fetch(`${API_BASE_URL}/api/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -106,27 +131,22 @@ export const AuthProvider = ({ children }) => {
 
       const elapsed = Date.now() - startTime;
       if (elapsed < minLoaderTime) {
-      await new Promise((resolve) => setTimeout(resolve, minLoaderTime - elapsed));
+        await new Promise((resolve) =>
+          setTimeout(resolve, minLoaderTime - elapsed)
+        );
       }
 
-      return data.user;
-    } catch (err) {
-      throw err;
-    } finally {
-      NProgress.done();
       setLoading(false);
       setLoadMode("done");
-    }
-  };
 
+      return data.user;
+    });
 
+  const signup = (userData) =>
+    withLoader(async () => {
+      const minLoaderTime = 3200;
+      const startTime = Date.now();
 
-  const signup = async (userData) => {
-    NProgress.start();
-    const minLoaderTime = 3200;
-    const startTime = Date.now();
-
-    try {
       const res = await fetch(`${API_BASE_URL}/api/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -140,30 +160,28 @@ export const AuthProvider = ({ children }) => {
       setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
       setToken(data.token);
       localStorage.setItem("token", data.token);
+
       setLoadMode("authenticating");
       setLoading(true);
 
       const elapsed = Date.now() - startTime;
       if (elapsed < minLoaderTime) {
-        await new Promise((resolve) => setTimeout(resolve, minLoaderTime - elapsed));
+        await new Promise((resolve) =>
+          setTimeout(resolve, minLoaderTime - elapsed)
+        );
       }
 
-      return data.user;
-    } catch (err) {
-      throw err;
-    } finally {
-      NProgress.done();
       setLoading(false);
       setLoadMode("done");
-    }
-  };
 
-  const login = async (mobile, password) => {
-    NProgress.start();
-    const minLoaderTime = 4000;
-    const startTime = Date.now();
+      return data.user;
+    });
 
-    try {
+  const login = (mobile, password) =>
+    withLoader(async () => {
+      const minLoaderTime = 4000;
+      const startTime = Date.now();
+
       const res = await fetch(`${API_BASE_URL}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -172,28 +190,27 @@ export const AuthProvider = ({ children }) => {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Login failed");
-      setUser(data.user);
 
+      setUser(data.user);
       setWelcomeMessage(`Welcome ${data.user.firstName || ""}`);
       setToken(data.token);
       localStorage.setItem("token", data.token);
+
       setLoadMode("authenticating");
       setLoading(true);
 
       const elapsed = Date.now() - startTime;
       if (elapsed < minLoaderTime) {
-        await new Promise((resolve) => setTimeout(resolve, minLoaderTime - elapsed));
+        await new Promise((resolve) =>
+          setTimeout(resolve, minLoaderTime - elapsed)
+        );
       }
 
-      return data.user;
-    } catch (err) {
-      throw err;
-    } finally {
-      NProgress.done();
       setLoading(false);
       setLoadMode("done");
-    }
-  };
+
+      return data.user;
+    });
 
   const fetchTemples = async ({ searchTerm = "", category = "", state = "", sortBy = "" }) => {
     try {
@@ -207,8 +224,8 @@ export const AuthProvider = ({ children }) => {
       const res = await fetch(
         `${API_BASE_URL}/api/temples?${queryParams.toString()}`
       );
-      const data = await res.json();
 
+      const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed to fetch temples");
 
       return data;
@@ -218,12 +235,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const editProfile = async (updatedData, isFormData = false) => {
-    NProgress.start();
-    const minLoaderTime = 2000;
-    const startTime = Date.now();
+  const editProfile = (updatedData, isFormData = false) =>
+    withLoader(async () => {
+      setLoading(true);
+      setLoadMode("authenticating");
+      const minLoaderTime = 2000;
+      const startTime = Date.now();
 
-    try {
       const headers = { Authorization: `Bearer ${token}` };
       if (!isFormData) headers["Content-Type"] = "application/json";
 
@@ -237,77 +255,81 @@ export const AuthProvider = ({ children }) => {
       if (!res.ok) throw new Error(data?.error || "Profile update failed");
 
       setUser(data.user);
-
       if (data.token) {
         setToken(data.token);
         localStorage.setItem("token", data.token);
       }
 
       const elapsed = Date.now() - startTime;
-      if (elapsed < minLoaderTime) await new Promise((resolve) => setTimeout(resolve, minLoaderTime - elapsed));
+      if (elapsed < minLoaderTime)
+        await new Promise((resolve) =>
+          setTimeout(resolve, minLoaderTime - elapsed)
+        );
 
-      return data.user;
-    } catch (err) {
-      throw err;
-    } finally {
-      NProgress.done();
       setLoading(false);
       setLoadMode("done");
-    }
-  };
 
-  const logout = async () => {
-    NProgress.start();
-    const minLoaderTime = 1000;
-    const startTime = Date.now();
+      return data.user;
+    });
 
-    try {
-      await fetch(`${API_BASE_URL}/api/logout`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      });
-    } catch (err) {
-      console.error("Logout error:", err);
-    } finally {
-      const elapsed = Date.now() - startTime;
-      if (elapsed < minLoaderTime) await new Promise((r) => setTimeout(r, minLoaderTime - elapsed));
+  const logout = () =>
+    withLoader(async () => {
+      const minLoaderTime = 1000;
+      const startTime = Date.now();
 
-      NProgress.done();
-      setUser(null);
-      setLoggedOut(true);
-      setWelcomeMessage("");
-      setToken("");
-      localStorage.removeItem("token");
-    }
-  };
+      try {
+        await fetch(`${API_BASE_URL}/api/logout`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+      } catch (err) {
+        console.error("Logout error:", err);
+      } finally {
+        const elapsed = Date.now() - startTime;
+        if (elapsed < minLoaderTime)
+          await new Promise((r) => setTimeout(r, minLoaderTime - elapsed));
 
-  const deleteAccount = async () => {
-    NProgress.start();
-    const minLoaderTime = 1000;
-    const startTime = Date.now();
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data?.error || "Failed to delete account");
+        setUser(null);
+        setLoggedOut(true);
+        setWelcomeMessage("");
+        setToken("");
+        localStorage.removeItem("token");
       }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      const elapsed = Date.now() - startTime;
-      if (elapsed < minLoaderTime) await new Promise((r) => setTimeout(r, minLoaderTime - elapsed));
+    });
 
-      NProgress.done();
-      setUser(null);
-      setWelcomeMessage("");
-      setToken("");
-      localStorage.removeItem("token");
-    }
-  };
+  const deleteAccount = () =>
+    withLoader(async () => {
+      const minLoaderTime = 1000;
+      const startTime = Date.now();
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/delete-account`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data?.error || "Failed to delete account");
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        const elapsed = Date.now() - startTime;
+        if (elapsed < minLoaderTime)
+          await new Promise((r) => setTimeout(r, minLoaderTime - elapsed));
+
+        setUser(null);
+        setWelcomeMessage("");
+        setToken("");
+        localStorage.removeItem("token");
+      }
+    });
 
   const value = {
     user,
@@ -324,10 +346,21 @@ export const AuthProvider = ({ children }) => {
     welcomeMessage,
     setWelcomeMessage,
     token,
-    isAdmin: user?.role === "admin", // ✅ simplified
+    isAdmin: user?.role === "admin",
+    startLoader,
+    finishLoader,
   };
 
   return (
-    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+    <>
+      <LoadingBar
+        color="orange"
+        progress={progress}
+        onLoaderFinished={() => setProgress(0)}
+        height={2}
+        shadow
+      />
+      <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+    </>
   );
 };

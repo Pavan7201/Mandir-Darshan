@@ -48,9 +48,9 @@
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.8s ease-in-out;
   overflow: hidden;
-  min-height: 380px;      /* maintain same height */
-  max-width: 300px;       /* prevent it from stretching too wide */
-  margin: 0 auto;         /* center single card */
+  min-height: 380px;
+  max-width: 300px; 
+  margin: 0 auto;       
 }
 
 .temple-card *{

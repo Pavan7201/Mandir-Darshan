@@ -21,14 +21,9 @@ const TempleSearch = ({ setTemples }) => {
   const inputRef = useRef(null);
   const suggestionBoxRef = useRef(null);
 
-  // placeholder state
   const [showCustomPlaceholder, setShowCustomPlaceholder] = useState(true);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
-  const placeholders = [
-    "Search by Temple Name",
-    "Search by District",
-    "Search by State",
-  ];
+  const placeholders = ['"Temple Name"', '"District"', '"State"'];
 
   useEffect(() => {
     if (!showCustomPlaceholder) return;
@@ -67,8 +62,8 @@ const TempleSearch = ({ setTemples }) => {
       const temples = await fetchTemples({ searchTerm: undefined });
 
       const filtered = temples.filter((t) => {
-      const tState = t.location ? t.location.split(",").slice(-1)[0].trim() : "";
-      const deityMatch = selectedDeity ? t.deity?.startsWith(selectedDeity) : true;
+        const tState = t.location ? t.location.split(",").slice(-1)[0].trim() : "";
+        const deityMatch = selectedDeity ? t.deity?.startsWith(selectedDeity) : true;
         const stateMatch = selectedState ? tState === selectedState : true;
         return deityMatch && stateMatch;
       });
@@ -106,21 +101,20 @@ const TempleSearch = ({ setTemples }) => {
   };
 
   useEffect(() => {
-    if (suppressSuggestions) {
-      setSuppressSuggestions(false);
-      return;
-    }
     if (!searchTerm.trim()) {
       setSuggestions([]);
       setSuggestionsLoaded(false);
       fetchAndSetTemples();
       return;
     }
+    if (suppressSuggestions) return;
+
     const delayDebounce = setTimeout(() => {
       fetchSuggestions(searchTerm);
     }, 400);
+
     return () => clearTimeout(delayDebounce);
-  }, [searchTerm]);
+  }, [searchTerm, suppressSuggestions]);
 
   const handleSuggestionClick = (temple) => {
     setSearchTerm(temple.name || "");
@@ -215,21 +209,22 @@ const TempleSearch = ({ setTemples }) => {
           autoComplete="off"
         />
         {showCustomPlaceholder && (
-  <div className="scroll-placeholder-wrapper">
-    <span
-      key={placeholderIndex}
-      className="scroll-placeholder"
-    >
-      {placeholders[placeholderIndex]}
-    </span>
-  </div>
-)}
-        <button className="temple-search-icon-button"
+          <div className="scroll-placeholder-wrapper">
+            <span className="scroll-placeholder-static">Search by</span>
+            <span
+              key={placeholderIndex}
+              className="scroll-placeholder-animated"
+            >
+              {placeholders[placeholderIndex]}
+            </span>
+          </div>
+        )}
+        <button
+          className="temple-search-icon-button"
           onClick={() => fetchAndSetTemples()}
           aria-label="Search"
           type="button"
         >
-          
           <FontAwesomeIcon icon={faMagnifyingGlass} />
         </button>
       </div>

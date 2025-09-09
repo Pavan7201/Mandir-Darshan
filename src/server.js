@@ -511,5 +511,4 @@ app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) =
   }
 });
 
-// server 
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

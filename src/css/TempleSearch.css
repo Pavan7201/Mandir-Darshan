@@ -36,6 +36,7 @@
   transition: border-color 0.2s ease-in-out, box-shadow 0.2s;
   background-color: transparent;
   text-align: left;
+  color: var(--faq-color);
 }
 
 .temple-search-input:focus {
@@ -48,7 +49,7 @@
   top:50%;
   right: 1px;
   transform: translateY(-50%);
-  background: var(--bg-color);
+  background: transparent;
   color:var(--primary-color);
   border: none;
   border-radius: 7px;
@@ -106,7 +107,7 @@
   top: 100%;
   left: 0;
   width: 100%; 
-  background: #fff;
+  background:var(--bg-color);
   border: 1px solid #ccc;
   border-radius: 0 0 8px 8px;
   max-height: 220px;
@@ -115,6 +116,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  transition: background 0.8s ease-in-out;
 }
 
 .temple-suggestion-item {
@@ -125,27 +127,34 @@
 }
 
 .temple-suggestion-item:hover {
-  background: #f2f2f2;
+  background: var(--faq-color);
+  color: var(--suggestions-hover-color);
 }
 
 .scroll-placeholder-wrapper {
   position: absolute;
   top: 50%;
-  left: 1rem;
+  left: 0.75rem;
   transform: translateY(-50%);
   height: 1.5rem;
-  overflow: hidden;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   pointer-events: none;
+  white-space: nowrap;
 }
 
-.scroll-placeholder {
+.scroll-placeholder-static {
   font-size: 1rem;
   color: var(--search-scroll-color);
   opacity: 0.8;
-  pointer-events: none;
-  white-space: nowrap;
+  margin-right: 0.3rem;
+}
+
+.scroll-placeholder-animated {
+  font-size: 1rem;
+  color: var(--search-scroll-color);
+  font-weight: 500;
+  display: inline-block;
   animation: slideUp 2.5s ease forwards;
 }
 
@@ -163,10 +172,11 @@
     opacity: 1;
   }
   100% {
-    transform: translateY(-100%);
+    transform: translateY(-80%);
     opacity: 0;
   }
 }
+
 
 
 @media (max-width: 768px) {
@@ -201,7 +211,6 @@
     display: none;
   }
 
-  /* 🔹 Suggestions dropdown on mobile also full width */
   .temple-suggestions-list {
     max-width: 100%;
   }
