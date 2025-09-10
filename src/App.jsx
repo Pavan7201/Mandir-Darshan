@@ -12,9 +12,9 @@ import SupportPage from "./Pages/SupportPage";
 import LoginPage from "./Pages/LoginPage";
 import SignUpPage from "./Pages/SignUpPage";
 import NotFound from "./Pages/NotFoundPage";
-import ProfileEdit from "./Pages/ProfileEdit"; 
+import ProfileEdit from "./Pages/ProfileEdit";
 import ChangePassword from "./Pages/ChangePassword";
-import AdminLoginPage from "./Pages/AdminLoginPage"; 
+import AdminLoginPage from "./Pages/AdminLoginPage";
 import { ThemeProvider } from "./ThemeContext";
 import { AuthContext } from "./AuthContext";
 
@@ -26,7 +26,7 @@ const PrivateRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   const location = useLocation();
 
-  if (loading) return <TempleLoader />; 
+  if (loading) return <TempleLoader />;
   if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
 
   return children;
@@ -82,7 +82,11 @@ function AppRoutes() {
         <Route
           path="/"
           element={
-            user ? (
+            loading ? (
+              <TempleLoader />
+            ) : isAdmin || localStorage.getItem("isAdmin") === "true" ? (
+              <Navigate to="/admin" replace />
+            ) : user ? (
               <Homepage />
             ) : sessionStorage.getItem("redirectAfterLogout") === "login" ? (
               <Navigate to="/login" replace />
@@ -91,7 +95,6 @@ function AppRoutes() {
             )
           }
         />
-
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
         <Route path="/signup" element={user ? <Navigate to="/" replace /> : <SignUpPage />} />
 
@@ -103,7 +106,7 @@ function AppRoutes() {
         <Route path="/temples" element={<PrivateRoute><TemplesPage /></PrivateRoute>} />
         <Route path="/sevas-&-booking" element={<PrivateRoute><Sevas /></PrivateRoute>} />
         <Route path="/donation" element={<PrivateRoute><DonationPage /></PrivateRoute>} />
-        <Route path="/admin" element={<AdminPage />}/>
+        <Route path="/admin" element={<AdminPage />} />
 
         <Route path="/media" element={<MediaRoomPage />} />
         <Route path="/support" element={<SupportPage />} />

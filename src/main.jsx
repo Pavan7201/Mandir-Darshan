@@ -1,4 +1,4 @@
-import {Suspense} from "react";
+import { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { AuthProvider } from "./AuthContext";
@@ -12,11 +12,11 @@ if (redirect) {
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  
+
   <Router basename="/Mandir-Darshan">
     <AuthProvider>
       <Suspense fallback={<TempleLoader />}>
-      <App />
+        <App />
       </Suspense>
     </AuthProvider>
   </Router>

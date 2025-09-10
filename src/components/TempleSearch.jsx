@@ -7,7 +7,7 @@ import { AuthContext } from "../AuthContext";
 const TempleSearch = ({ setTemples }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("");
-  const [state, setState] = useState("");
+  const [selectedState, setSelectedState] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [suggestions, setSuggestions] = useState([]);
@@ -25,6 +25,8 @@ const TempleSearch = ({ setTemples }) => {
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const placeholders = ['"Temple Name"', '"District"', '"State"'];
 
+  const { fetchTemples } = useContext(AuthContext);
+
   useEffect(() => {
     if (!showCustomPlaceholder) return;
     const interval = setInterval(() => {
@@ -37,18 +39,26 @@ const TempleSearch = ({ setTemples }) => {
     setShowCustomPlaceholder(searchTerm.length === 0);
   }, [searchTerm]);
 
-  const { fetchTemples } = useContext(AuthContext);
-
   const fetchAndSetTemples = async (term = searchTerm) => {
     setLoading(true);
     try {
       const temples = await fetchTemples({
         searchTerm: term.trim() || undefined,
         category,
-        state,
+        state: selectedState,
       });
-      setTemples(temples);
-      return temples;
+
+      const lowerTerm = term.trim().toLowerCase();
+      const filtered = temples.filter((t) => {
+        return (
+          t.name?.toLowerCase().includes(lowerTerm) ||
+          t.location?.district?.toLowerCase().includes(lowerTerm) ||
+          t.location?.state?.toLowerCase().includes(lowerTerm)
+        );
+      });
+
+      setTemples(filtered);
+      return filtered;
     } catch (err) {
       console.error("Temple search error:", err);
       return [];
@@ -59,15 +69,17 @@ const TempleSearch = ({ setTemples }) => {
 
   const filterTemples = async (selectedDeity, selectedState) => {
     try {
-      const temples = await fetchTemples({ searchTerm: undefined });
-
+      const temples = await fetchTemples({});
       const filtered = temples.filter((t) => {
-        const tState = t.location ? t.location.split(",").slice(-1)[0].trim() : "";
-        const deityMatch = selectedDeity ? t.deity?.startsWith(selectedDeity) : true;
-        const stateMatch = selectedState ? tState === selectedState : true;
+        const tState = t.location?.state || "";
+        const deityMatch = selectedDeity
+          ? t.deity?.toLowerCase() === selectedDeity.toLowerCase()
+          : true;
+        const stateMatch = selectedState
+          ? tState.toLowerCase() === selectedState.toLowerCase()
+          : true;
         return deityMatch && stateMatch;
       });
-
       setTemples(filtered);
     } catch (err) {
       console.error("Error filtering temples:", err);
@@ -77,21 +89,39 @@ const TempleSearch = ({ setTemples }) => {
 
   const fetchSuggestions = async (term) => {
     try {
-      const temples = await fetchTemples({
-        searchTerm: term.trim() || undefined,
-      });
-      const uniqueSuggestions = [];
+      if (!term) {
+        setSuggestions([]);
+        return;
+      }
+
+      const temples = await fetchTemples({ searchTerm: term.trim() || undefined });
+      const nameMatches = [];
+      const districtMatches = [];
+      const stateMatches = [];
       const seen = new Set();
+      const lowerTerm = term.toLowerCase();
+
       temples.forEach((t) => {
-        const startsWithMatch =
-          t.name?.toLowerCase().startsWith(term.toLowerCase()) ||
-          t.location?.toLowerCase().startsWith(term.toLowerCase());
-        if (startsWithMatch && !seen.has(t.name + t.location)) {
-          uniqueSuggestions.push(t);
-          seen.add(t.name + t.location);
+        const key = `${t.name}|${t.location?.district}|${t.location?.state}`;
+        if (seen.has(key)) return;
+
+        const name = t.name?.toLowerCase() || "";
+        const district = t.location?.district?.toLowerCase() || "";
+        const state = t.location?.state?.toLowerCase() || "";
+
+        if (name.startsWith(lowerTerm)) {
+          nameMatches.push(t);
+          seen.add(key);
+        } else if (district.startsWith(lowerTerm)) {
+          districtMatches.push(t);
+          seen.add(key);
+        } else if (state.startsWith(lowerTerm)) {
+          stateMatches.push(t);
+          seen.add(key);
         }
       });
-      setSuggestions(uniqueSuggestions.slice(0, 6));
+
+      setSuggestions([...nameMatches, ...districtMatches, ...stateMatches]);
       setSuggestionsLoaded(true);
     } catch (err) {
       console.error("Suggestion fetch error:", err);
@@ -111,23 +141,24 @@ const TempleSearch = ({ setTemples }) => {
 
     const delayDebounce = setTimeout(() => {
       fetchSuggestions(searchTerm);
-    }, 400);
+    }, 300);
 
     return () => clearTimeout(delayDebounce);
   }, [searchTerm, suppressSuggestions]);
 
   const handleSuggestionClick = (temple) => {
-    setSearchTerm(temple.name || "");
-    setCategory(temple.deity || "");
-    if (temple.location) {
-      const parts = temple.location.split(",");
-      setState(parts[parts.length - 1].trim());
-    }
+    setSearchTerm(
+      temple.name || temple.location?.district || temple.location?.state || ""
+    );
+    setCategory(temple.deity || ""); 
+    setSelectedState(temple.location?.state || "");
     setSuggestions([]);
     setSuggestionsLoaded(false);
     setSuppressSuggestions(true);
     setShowSuggestions(false);
-    fetchAndSetTemples(temple.name);
+    fetchAndSetTemples(
+      temple.name || temple.location?.district || temple.location?.state
+    );
   };
 
   useEffect(() => {
@@ -147,29 +178,10 @@ const TempleSearch = ({ setTemples }) => {
     const loadFilters = async () => {
       try {
         const temples = await fetchTemples({});
-        const deityMap = {};
-        temples.forEach((t) => {
-          if (!t.deity) return;
-          const words = t.deity.split(" ");
-          const key = words.slice(0, 2).join(" ");
-          if (!deityMap[key]) deityMap[key] = [];
-          deityMap[key].push(t.deity);
-        });
-        const uniqueDeities = Object.keys(deityMap);
-
-        const uniqueStates = [
-          ...new Set(
-            temples
-              .map((t) => {
-                if (t.location) {
-                  const parts = t.location.split(",");
-                  return parts[parts.length - 1].trim();
-                }
-                return null;
-              })
-              .filter(Boolean)
-          ),
-        ];
+        const uniqueDeities = [...new Set(temples.map(t => t.deity).filter(Boolean))];
+        const uniqueStates = [...new Set(
+          temples.map((t) => t.location?.state || null).filter(Boolean)
+        )];
 
         setDeities(uniqueDeities);
         setStates(uniqueStates);
@@ -194,8 +206,13 @@ const TempleSearch = ({ setTemples }) => {
             const value = e.target.value;
             setSearchTerm(value);
             setCategory("");
-            setState("");
+            setSelectedState("");
             setShowSuggestions(true);
+            setSuppressSuggestions(false);
+            if (value.trim() === "") {
+              setSuggestions([]);
+              setSuggestionsLoaded(false);
+            }
           }}
           onKeyDown={(e) => {
             if (e.key === "Enter") fetchAndSetTemples();
@@ -239,7 +256,7 @@ const TempleSearch = ({ setTemples }) => {
                 onClick={() => handleSuggestionClick(t)}
               >
                 {t.name}
-                {t.location ? `, ${t.location}` : ""}
+                {t.location ? `, ${t.location.district}, ${t.location.state}` : ""}
               </li>
             ))
           ) : (
@@ -257,7 +274,7 @@ const TempleSearch = ({ setTemples }) => {
         onChange={(e) => {
           const selected = e.target.value;
           setCategory(selected);
-          filterTemples(selected, state);
+          filterTemples(selected, selectedState);
         }}
         className="temple-search-select"
       >
@@ -270,10 +287,10 @@ const TempleSearch = ({ setTemples }) => {
       </select>
 
       <select
-        value={state}
+        value={selectedState}
         onChange={(e) => {
           const selected = e.target.value;
-          setState(selected);
+          setSelectedState(selected);
           filterTemples(category, selected);
         }}
         className="temple-search-select"

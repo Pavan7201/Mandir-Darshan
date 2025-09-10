@@ -188,7 +188,6 @@ const Header = () => {
             </div>
           )}
 
-          {/* Mobile Header */}
           {isMobile && (
             <div className="mobile-header-actions fade-in delay-3">
               {!loading && user ? (
@@ -267,7 +266,6 @@ const Header = () => {
             </div>
           )}
 
-          {/* Navigation Menu */}
           <nav
             ref={menuRef}
             id="main-navigation"
@@ -306,7 +304,6 @@ const Header = () => {
             )}
           </nav>
 
-          {/* Desktop Header Actions */}
           {!isMobile && !isAdmin && (
             <div className="header-actions">
               <div className="toggle fade-in delay-5">

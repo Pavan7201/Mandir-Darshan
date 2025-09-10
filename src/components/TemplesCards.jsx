@@ -17,6 +17,12 @@ const TemplesCards = ({ temples = [] }) => {
     }
   };
 
+  const formatLocation = (location) => {
+    if (!location) return "";
+    const { district, state } = location;
+    return [district, state].filter(Boolean).join(", ");
+  };
+
   return (
     <section className="temples" id="temples">
       <div className="temple-section-container">
@@ -33,8 +39,14 @@ const TemplesCards = ({ temples = [] }) => {
             <div key={index} className="temple-card">
               <div className="temple-card-image">
                 <img
-                  src={brokenImages[index] ? noImage : temple.image}
-                  alt={temple.name}
+                  src={
+                    temple.image && temple.image.trim() !== ""
+                      ? brokenImages[index]
+                        ? noImage
+                        : temple.image
+                      : noImage
+                  }
+                  alt={temple.name || "Temple Image"}
                   onError={() =>
                     setBrokenImages((prev) => ({ ...prev, [index]: true }))
                   }
@@ -47,7 +59,9 @@ const TemplesCards = ({ temples = [] }) => {
                 <p className="temple-card-caption">{temple.caption}</p>
               )}
               {temple.location && (
-                <p className="temple-card-location">{temple.location}</p>
+                <p className="temple-card-location">
+                  {formatLocation(temple.location)}
+                </p>
               )}
 
               {temple.hours && (

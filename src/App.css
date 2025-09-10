@@ -10,30 +10,30 @@ body.dark {
   --link-hover: #fff;
   --box-shadow: 0 4px 12px #f1efea2b;
   --card-shadow: 0 6px 15px rgb(5, 5, 5);
-  --card-hover-shadow:0 10px 20px #f0e6bd2e;
-  --card-title-color:#dfd6b5;
-  --description-color:#8b8981;
-  --card-boder-animate:conic-gradient(#f7edd6 90deg, transparent 90deg);
+  --card-hover-shadow: 0 10px 20px #f0e6bd2e;
+  --card-title-color: #dfd6b5;
+  --description-color: #8b8981;
+  --card-boder-animate: conic-gradient(#f7edd6 90deg, transparent 90deg);
   --devote-card-icon-filter: brightness(83.5%) saturate(100%) invert(100%) hue-rotate(0deg) contrast(100%);
-  --button-bg-color:rgb(77, 75, 73);
-  --diety-color:rgba(246, 181, 136, 0.649);
-  --location-color:rgb(229, 229, 168);
-  --faq-q-color:black;
-  --q-hover-focus-bg-color:#f7edd6;
-  --q-hover-focus-color:maroon;
-  --login-color:#f7edd6;
-  --signup-bg:transparent;
-  --small-circle:yellow, orange, red;
-  --medium-circle:rgb(240, 200, 0), rgba(143, 13, 13, 0.651), rgb(14, 7, 8);
-  --large-circle:red, rgb(255, 238, 1), rgb(226, 21, 21), rgb(35, 31, 31);
-  --logout-signup-hover-bg-btn:rgb(63, 59, 59);
-  --visit-link:#f7edd6;
-  --pe-avatar-edit-delete:#f0e6bd ;
-  --radio-color:orange;
-  --edit-bg:rgba(242, 213, 179, 0.6);
-  --ts-hover-color:#f7edd6;
-  --search-scroll-color:#f7edd6a3;
-  --suggestions-hover-color:maroon;
+  --button-bg-color: rgb(77, 75, 73);
+  --diety-color: rgba(246, 181, 136, 0.649);
+  --location-color: rgb(229, 229, 168);
+  --faq-q-color: black;
+  --q-hover-focus-bg-color: #f7edd6;
+  --q-hover-focus-color: maroon;
+  --login-color: #f7edd6;
+  --signup-bg: transparent;
+  --small-circle: yellow, orange, red;
+  --medium-circle: rgb(240, 200, 0), rgba(143, 13, 13, 0.651), rgb(14, 7, 8);
+  --large-circle: red, rgb(255, 238, 1), rgb(226, 21, 21), rgb(35, 31, 31);
+  --logout-signup-hover-bg-btn: rgb(63, 59, 59);
+  --visit-link: #f7edd6;
+  --pe-avatar-edit-delete: #f0e6bd;
+  --radio-color: orange;
+  --edit-bg: rgba(242, 213, 179, 0.6);
+  --ts-hover-color: #f7edd6;
+  --search-scroll-color: #f7edd6a3;
+  --suggestions-hover-color: maroon;
 
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -41,41 +41,41 @@ body.dark {
 
 body {
   --bg-color: #f7edd6;
-  --header-color:rgba(128, 0, 0, 0.811);
+  --header-color: rgba(128, 0, 0, 0.811);
   --text-color: #333;
-  --heading-color:#a84300;
+  --heading-color: #a84300;
   --card-color: rgb(255, 242, 213);
   --primary-color: maroon;
   --secondary-color: #f7edd6;
   --faq-color: maroon;
   --link-hover: black;
-  --box-shadow:0 4px 12px rgba(0, 0, 0, 0.1);
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   --card-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-  --card-hover-shadow:0 10px 20px rgba(0, 0, 0, 0.15);
-  --card-title-color:#d32f2f;
-  --description-color:#333;
-  --card-boder-animate:conic-gradient(maroon 90deg, transparent 90deg);
+  --card-hover-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  --card-title-color: #d32f2f;
+  --description-color: #333;
+  --card-boder-animate: conic-gradient(maroon 90deg, transparent 90deg);
   --devote-card-icon-filter: sepia(1) saturate(5) hue-rotate(-50deg);
-  --button-bg-color:rgb(248, 221, 169);
-  --diety-color:black;
-  --location-color:#222121;
-  --faq-q-color:rgb(249, 231, 200);
-  --q-hover-focus-bg-color:maroon;
-  --q-hover-focus-color:rgb(238, 208, 152);
-  --login-color:maroon;
-  --signup-bg:rgba(232, 167, 118, 0.78) 0%, white 100%;
-  --small-circle:rgb(54, 169, 211), violet, rgb(243, 158, 172);
-  --medium-circle:rgb(124, 124, 224), rgba(238, 86, 238, 0.651), rgba(255, 192, 203, 0.695);
-  --large-circle:rgb(136, 136, 223), purple, violet, pink;
-  --signup-bg-button:rgb(210, 18a7, 210);
-  --logout-signup-hover-bg-btn:maroon;
-  --visit-link:orange;
+  --button-bg-color: rgb(248, 221, 169);
+  --diety-color: black;
+  --location-color: #222121;
+  --faq-q-color: rgb(249, 231, 200);
+  --q-hover-focus-bg-color: maroon;
+  --q-hover-focus-color: rgb(238, 208, 152);
+  --login-color: maroon;
+  --signup-bg: rgba(232, 167, 118, 0.78) 0%, white 100%;
+  --small-circle: rgb(54, 169, 211), violet, rgb(243, 158, 172);
+  --medium-circle: rgb(124, 124, 224), rgba(238, 86, 238, 0.651), rgba(255, 192, 203, 0.695);
+  --large-circle: rgb(136, 136, 223), purple, violet, pink;
+  --signup-bg-button: rgb(210, 18a7, 210);
+  --logout-signup-hover-bg-btn: maroon;
+  --visit-link: orange;
   --pe-avatar-edit-delete: maroon;
-  --radio-color:maroon;
-  --edit-bg:rgba(0,0,0,0.6);
-  --ts-hover-color:orange;
-  --search-scroll-color:rgba(128, 0, 0, 0.725);
-  --suggestions-hover-color:orange;
+  --radio-color: maroon;
+  --edit-bg: rgba(0, 0, 0, 0.6);
+  --ts-hover-color: orange;
+  --search-scroll-color: rgba(128, 0, 0, 0.725);
+  --suggestions-hover-color: orange;
 
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -100,7 +100,8 @@ footer {
   box-sizing: border-box;
 }
 
-html,body {
+html,
+body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   scroll-behavior: smooth;
 }

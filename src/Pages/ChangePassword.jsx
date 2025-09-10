@@ -43,26 +43,26 @@ const ChangePassword = () => {
   };
 
   const validate = () => {
-  if (formData.currentPassword === formData.newPassword) {
-    showMessage("error", "New password cannot be the same as the current password");
-    return false;
-  }
+    if (formData.currentPassword === formData.newPassword) {
+      showMessage("error", "New password cannot be the same as the current password");
+      return false;
+    }
 
-  if (!StrongPassword.test(formData.newPassword)) {
-    showMessage(
-      "error",
-      "Password must be 8+ chars with uppercase, lowercase, number, and special char."
-    );
-    return false;
-  }
+    if (!StrongPassword.test(formData.newPassword)) {
+      showMessage(
+        "error",
+        "Password must be 8+ chars with uppercase, lowercase, number, and special char."
+      );
+      return false;
+    }
 
-  if (formData.newPassword !== formData.confirmNewPassword) {
-    showMessage("error", "Passwords do not match");
-    return false;
-  }
+    if (formData.newPassword !== formData.confirmNewPassword) {
+      showMessage("error", "Passwords do not match");
+      return false;
+    }
 
-  return true;
-};
+    return true;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,17 +90,17 @@ const ChangePassword = () => {
   };
 
   if (showSuccessAnim) {
-  return (
-    <div className="success-container">
-      <Lottie
-        animationData={successAnim}
-        loop={false}
-        className="lottie-animation"
-      />
-      <p className="success-text">Password changed successfully 🎉</p>
-    </div>
-  );
-}
+    return (
+      <div className="success-container">
+        <Lottie
+          animationData={successAnim}
+          loop={false}
+          className="lottie-animation"
+        />
+        <p className="success-text">Password changed successfully 🎉</p>
+      </div>
+    );
+  }
 
   return (
     <form className="cp-form" onSubmit={handleSubmit}>

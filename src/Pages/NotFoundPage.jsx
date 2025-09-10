@@ -10,9 +10,9 @@ function UnderConstruction() {
 
   return (
     <div className="under-construction-container">
-      <Lottie 
-        animationData={theme === "dark" ? darkAnimation : lightAnimation} 
-        loop={true} 
+      <Lottie
+        animationData={theme === "dark" ? darkAnimation : lightAnimation}
+        loop={true}
         className="under-construction-animation"
       />
     </div>

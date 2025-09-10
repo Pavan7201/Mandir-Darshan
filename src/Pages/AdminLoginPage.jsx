@@ -15,22 +15,22 @@ const AdminLoginPage = () => {
   const navigate = useNavigate();
 
   const handlePasscodeChange = (e, idx) => {
-  const val = e.target.value;
-  if (/^\d?$/.test(val)) {
-    const newPasscodeDigits = [...passcodeDigits];
-    newPasscodeDigits[idx] = val;
-    setPasscodeDigits(newPasscodeDigits);
+    const val = e.target.value;
+    if (/^\d?$/.test(val)) {
+      const newPasscodeDigits = [...passcodeDigits];
+      newPasscodeDigits[idx] = val;
+      setPasscodeDigits(newPasscodeDigits);
 
-    const newMasked = [...maskedDigits];
-    newMasked[idx] = val ? "*" : "";
-    setMaskedDigits(newMasked);
+      const newMasked = [...maskedDigits];
+      newMasked[idx] = val ? "*" : "";
+      setMaskedDigits(newMasked);
 
-    if (val && idx < passcodeDigits.length - 1) {
-      const nextInput = document.getElementById(`passcode-${idx + 1}`);
-      if (nextInput) nextInput.focus();
+      if (val && idx < passcodeDigits.length - 1) {
+        const nextInput = document.getElementById(`passcode-${idx + 1}`);
+        if (nextInput) nextInput.focus();
+      }
     }
-  }
-};
+  };
 
   const handlePasscodeKeyDown = (e, idx) => {
     if (e.key === "Backspace") {
@@ -96,26 +96,23 @@ const AdminLoginPage = () => {
                 <div className="passcode-input-group">
                   {passcodeDigits.map((digit, idx) => (
                     <input
-                    key={idx}
-                    id={`passcode-${idx}`}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength="1"
-                    value={maskedDigits[idx]}
-                    onChange={(e) => handlePasscodeChange(e, idx)}
-                    onKeyDown={(e) => handlePasscodeKeyDown(e, idx)}
-                    required
-                    autoComplete="one-time-code"
-                    className="passcode-digit"
-                    aria-label={`Passcode digit ${idx + 1}`}
-/>
-
+                      key={idx}
+                      id={`passcode-${idx}`}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength="1"
+                      value={maskedDigits[idx]}
+                      onChange={(e) => handlePasscodeChange(e, idx)}
+                      onKeyDown={(e) => handlePasscodeKeyDown(e, idx)}
+                      required
+                      autoComplete="one-time-code"
+                      className="passcode-digit"
+                      aria-label={`Passcode digit ${idx + 1}`}
+                    />
                   ))}
                 </div>
               </label>
-
               {error && <p className="error-message">{error}</p>}
-
               <button type="submit" disabled={loading}>
                 {loading ? "Logging in..." : "Login"}
               </button>

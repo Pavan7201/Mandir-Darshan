@@ -1,16 +1,30 @@
 .admin-form-section{
   display: flex;
   flex-direction: column;
-  justify-content: center; 
+  justify-content:center; 
   align-items: center;     
   min-height: 100vh;
 }
 
 .admin-form-container {
-  max-width: 900px;
+  max-width: 822px;
   margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.admin-form-header {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.admin-form-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .admin-form-container h2 {
@@ -25,10 +39,28 @@
   color: #444;
 }
 
+.temple-preview-placeholder {
+  width: 100%;
+  min-width: 800px;
+  min-height: 220px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: var(--bg-color);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  transition: background 0.8s ease-in-out;
+}
+
 .temple-preview-card {
+  min-width: 800px;
+  min-height: 220px;
   display: flex;
   align-items: flex-start;
-  gap: 20px;
+  justify-content:flex-start;
+  gap: 1.3rem;
   border: 1px solid #ddd;
   border-radius: 12px;
   padding: 15px;
@@ -68,8 +100,8 @@
 
 .image-wrapper {
   position: relative;
-  width: 200px;
-  height: 150px;
+  width: 180px;
+  height: 188px;
   border-radius: 8px;
   overflow: hidden;
 }
@@ -118,6 +150,9 @@
   font-size: 14px;
   outline: none;
   transition: border-color 0.2s;
+  height: 40px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .admin-form-grid input:focus {
@@ -140,30 +175,18 @@
   border-radius: 6px;
   font-size: 14px;
   cursor: pointer;
-  transition: background 1s,color 1s ease-in-out, transform 0.1s;
+  transition: background 0.7s,color 1s ease-in-out, transform 0.1s;
 }
 
-.update-btn {
+.update-btn, .clear-btn {
   background:var(--faq-color);
   color: var(--q-hover-focus-color);
 }
 
-.update-btn:hover {
+.update-btn:hover,.clear-btn:hover   {
   background:transparent;
   color: var(--faq-color);
   border: 1px solid var(--faq-color);
-  transform: scale(1.05);
-}
-
-.clear-btn {
-  background:var(--faq-color);
-  color: var(--q-hover-focus-color);
-}
-
-.clear-btn:hover {
-  background: transparent;
-  color: var(--faq-color);
-  transform: scale(1.05);
 }
 
 .status {
@@ -177,12 +200,21 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  min-width: 800px;
+  min-height: 220px;
   width: 100%;
   height: 150px;
   border: 1px solid #ddd;
   border-radius: 12px;
   background: var(--bg-color);
   margin-bottom: 20px;
+}
+
+.update-btn:disabled,
+.clear-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {

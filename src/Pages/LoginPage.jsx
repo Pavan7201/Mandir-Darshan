@@ -26,7 +26,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     const fetchFaqs = async () => {
-    const cachedAssets = sessionStorage.getItem("assets");
+      const cachedAssets = sessionStorage.getItem("assets");
 
       if (cachedAssets) {
         const data = JSON.parse(cachedAssets);
@@ -35,7 +35,7 @@ const LoginPage = () => {
         if (faqData && faqData.items) {
           setFaqs(faqData.items.slice(12));
         }
-        if(bannerData && bannerData.items && bannerData.items.length > 0){
+        if (bannerData && bannerData.items && bannerData.items.length > 0) {
           setBanner(bannerData.items[0].bannerUrl)
         }
       }
@@ -49,7 +49,7 @@ const LoginPage = () => {
         if (faqData && faqData.items) {
           setFaqs(faqData.items.slice(12));
         }
-        if(bannerData && bannerData.items && bannerData.items.length > 0){
+        if (bannerData && bannerData.items && bannerData.items.length > 0) {
           setBanner(bannerData.items[0].bannerUrl)
         }
       } catch (err) {

@@ -6,7 +6,7 @@ import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 const MediaRoomPage = () => {
   const [mediaData, setMediaData] = useState([]);
-  const [faqData, setFaqData] = useState([]); 
+  const [faqData, setFaqData] = useState([]);
   useScrollAnimation([mediaData, faqData]);
   const sectionRef = useRef(null);
 
@@ -19,18 +19,18 @@ const MediaRoomPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
 
     const fetchAssets = async () => {
-    const cachedAssets = sessionStorage.getItem("assets");
-    if (cachedAssets) {
-      const data = JSON.parse(cachedAssets);
+      const cachedAssets = sessionStorage.getItem("assets");
+      if (cachedAssets) {
+        const data = JSON.parse(cachedAssets);
 
-      const mediaCategory = data.find((m) => m.category === "media");
-      setMediaData(mediaCategory ? mediaCategory.items : []);
+        const mediaCategory = data.find((m) => m.category === "media");
+        setMediaData(mediaCategory ? mediaCategory.items : []);
 
-      const faqCategory = data.find((f) => f.category === "faq");
-      setFaqData(faqCategory ? faqCategory.items.slice(6, 9) : []);
+        const faqCategory = data.find((f) => f.category === "faq");
+        setFaqData(faqCategory ? faqCategory.items.slice(6, 9) : []);
 
-      return;
-    }
+        return;
+      }
       try {
         const res = await fetch(`${API_BASE_URL}/api/assets`);
         const data = await res.json();

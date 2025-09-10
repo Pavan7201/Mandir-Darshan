@@ -58,7 +58,6 @@ async function connectDB() {
 }
 connectDB();
 
-// Helper to escape regex special chars in user input
 function escapeRegexSafe(str = "") {
   return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -172,12 +171,12 @@ app.get("/api/temples", async (req, res) => {
       const term = escapeRegexSafe(searchTerm.trim());
       const startsRegex = new RegExp("^" + term, "i");
 
-      results = results.filter(
-        (t) =>
-          startsRegex.test(t.name || "") ||
-          startsRegex.test(t.location || "") ||
-          startsRegex.test(t.deity || "")
-      );
+      // Priority matching: name > district > state
+      const nameMatches = results.filter(t => startsRegex.test(t.name || "") || startsRegex.test(t.deity || ""));
+      const districtMatches = results.filter(t => startsRegex.test(t.location?.district || "") && !nameMatches.includes(t));
+      const stateMatches = results.filter(t => startsRegex.test(t.location?.state || "") && !nameMatches.includes(t) && !districtMatches.includes(t));
+
+      results = [...nameMatches, ...districtMatches, ...stateMatches];
     }
 
     if (category && typeof category === "string" && category.trim()) {
@@ -188,7 +187,7 @@ app.get("/api/temples", async (req, res) => {
     if (state && typeof state === "string" && state.trim()) {
       const stateTerm = escapeRegexSafe(state.trim().replace(/-/g, " "));
       const stateRegex = new RegExp(stateTerm, "i");
-      results = results.filter((t) => stateRegex.test(t.location || ""));
+      results = results.filter((t) => stateRegex.test(t.location?.state || ""));
     }
 
     const sortKey = sortBy || (results[0]?.id ? "id" : "");
@@ -196,7 +195,10 @@ app.get("/api/temples", async (req, res) => {
       if (sortKey === "name") {
         results.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
       } else if (sortKey === "location") {
-        results.sort((a, b) => (a.location || "").localeCompare(b.location || ""));
+        results.sort((a, b) => 
+          (a.location?.state || "").localeCompare(b.location?.state || "") || 
+          (a.location?.district || "").localeCompare(b.location?.district || "")
+        );
       } else if (sortKey === "popularity" && results[0]?.popularity !== undefined) {
         results.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
       } else if (sortKey === "id") {
@@ -215,6 +217,7 @@ app.get("/api/temples", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch temples" });
   }
 });
+
 
 // Admin login 
 const storage = multer.memoryStorage();
@@ -236,7 +239,7 @@ app.post("/api/admin/login", async (req, res) => {
     if (!passcodeMatches) {
       return res.status(401).json({ error: "Invalid UserID or Passcode" });
     }
-    
+
     const token = jwt.sign(
       { _id: adminUser._id.toString(), userId: adminUser.userId, role: "admin" },
       JWT_SECRET,
@@ -271,7 +274,7 @@ app.put("/api/editprofile", authenticateUserMiddleware, upload.single("avatar"),
       gender,
       currentPassword,
       newPassword,
-      removeAvatar 
+      removeAvatar
     } = req.body;
 
     const user = await usersCollection.findOne({ _id: userId });
@@ -426,7 +429,7 @@ app.put("/api/assets/temple/:id/image", authenticateUserMiddleware, async (req, 
     if (!image || typeof image !== "string") {
       return res.status(400).json({ error: "New image URL is required." });
     }
-    
+
     const templeDocument = await assetsCollection.findOne({ category: "temple" });
     if (!templeDocument) {
       return res.status(404).json({ error: "Temple category document not found" });
@@ -463,7 +466,10 @@ app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) =
     const itemId = req.params.id;
     const updatedData = req.body;
 
+    // Get the temple category
     const templeDocument = await assetsCollection.findOne({ category: "temple" });
+
+    // If temple category doesn't exist yet, create it
     if (!templeDocument) {
       const newItem = { ...updatedData, id: itemId };
       await assetsCollection.insertOne({
@@ -476,9 +482,11 @@ app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) =
       });
     }
 
+    // Check if the item already exists by id
     const itemIndex = templeDocument.items.findIndex((item) => item.id === itemId);
 
     if (itemIndex === -1) {
+      // If item doesn't exist, create a new one
       const newItem = { ...updatedData, id: itemId };
       templeDocument.items.push(newItem);
       await assetsCollection.updateOne(
@@ -491,9 +499,10 @@ app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) =
       });
     }
 
+    // If item exists, update the existing item
     templeDocument.items[itemIndex] = {
-      ...templeDocument.items[itemIndex],
-      ...updatedData,
+      ...templeDocument.items[itemIndex], // keep existing data
+      ...updatedData, // overwrite with updated fields
     };
 
     await assetsCollection.updateOne(
@@ -508,6 +517,36 @@ app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) =
   } catch (err) {
     console.error("Error upserting temple info:", err);
     res.status(500).json({ error: "Failed to upsert temple info" });
+  }
+});
+
+// DELETE temple by ID
+app.delete("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) => {
+  try {
+    // Only admin can delete
+    if (!req.user.role || req.user.role !== "admin") {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const itemId = req.params.id;
+
+    const templeDoc = await assetsCollection.findOne({ category: "temple" });
+    if (!templeDoc) return res.status(404).json({ error: "Temple category not found" });
+
+    const index = templeDoc.items.findIndex((item) => item.id === itemId);
+    if (index === -1) return res.status(404).json({ error: "Temple not found" });
+
+    templeDoc.items.splice(index, 1);
+
+    await assetsCollection.updateOne(
+      { _id: templeDoc._id },
+      { $set: { items: templeDoc.items } }
+    );
+
+    res.json({ message: "Temple deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting temple:", err);
+    res.status(500).json({ error: "Failed to delete temple" });
   }
 });
 
