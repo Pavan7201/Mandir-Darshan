@@ -1,21 +1,14 @@
 import { useContext, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import lineDecor from "../HeadingDesign/HeadingDesign.png";
 import noImage from "../assets/no-image.webp";
 import { AuthContext } from "../AuthContext";
+import CascadingCarousel from "./CascadingCarousel";
 import "../css/TemplesCards.css";
 
 const TemplesCards = ({ temples = [] }) => {
   const { auth } = useContext(AuthContext);
-  const navigate = useNavigate();
   const [brokenImages, setBrokenImages] = useState({});
-
-  const handleClick = (e, link) => {
-    if (!auth?.user && link !== "/notfound") {
-      e.preventDefault();
-      navigate("/SignUp");
-    }
-  };
 
   const formatLocation = (location) => {
     if (!location) return "";
@@ -33,62 +26,64 @@ const TemplesCards = ({ temples = [] }) => {
           className="line-decor-img"
           loading="lazy"
         />
-        <div className="temple-cards-container">
-          {temples.length === 0 && <p>No temples found</p>}
-          {temples.map((temple, index) => (
-            <div key={index} className="temple-card">
-              <div className="temple-card-image">
-                <img
-                  src={
-                    temple.image && temple.image.trim() !== ""
-                      ? brokenImages[index]
-                        ? noImage
-                        : temple.image
-                      : noImage
-                  }
-                  alt={temple.name || "Temple Image"}
-                  onError={() =>
-                    setBrokenImages((prev) => ({ ...prev, [index]: true }))
-                  }
-                />
-              </div>
 
-              <h3 className="temple-card-title">{temple.name}</h3>
-              {temple.deity && <p className="temple-card-deity">{temple.deity}</p>}
-              {temple.caption && (
-                <p className="temple-card-caption">{temple.caption}</p>
-              )}
-              {temple.location && (
-                <p className="temple-card-location">
-                  {formatLocation(temple.location)}
-                </p>
-              )}
-
-              {temple.hours && (
-                <div className="temple-card-footer">
-                  <p className="temple-card-time">
-                    <span className="clock">&#128339;</span>{" "}
-                    <span className="time-list">
-                      {temple.hours.split(",").map((time, i) => (
-                        <span key={i} className="time-item">
-                          {time.trim()}
-                          <br />
-                        </span>
-                      ))}
-                    </span>
-                  </p>
-                  <NavLink
-                    to={temple.link || "/notfound"}
-                    onClick={(e) => handleClick(e, temple.link)}
-                    className="Visit-link"
-                  >
-                    Visit Temple
-                  </NavLink>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        {temples.length === 0 ? (
+          <p>No temples found</p>
+        ) : (
+          <CascadingCarousel
+            items={temples}
+            visibleCount={2}
+            loop={true}
+            activeCardWidth={280}
+            activeCardHeight={370}
+            nearCardWidth={280}
+            nearCardHeight={360}
+            cornerCardWidth={280}
+            cornerCardHeight={360}
+            activeCardWidthMobile={240}
+            activeCardHeightMobile={260}
+            nearCardWidthMobile={200}
+            nearCardHeightMobile={240}
+            renderItem={(temple, index, isActive) => {
+              // Determine destination based on auth
+              const toPath = temple.link || "/notfound";
+              return (
+                <NavLink
+                  to={toPath}
+                  className="temple-card"
+                  style={{ cursor: "pointer" }}
+                  onClick={(e) => {
+                    if (!auth?.user && toPath !== "/notfound") {
+                      // Redirect unauthenticated users to signup
+                      e.preventDefault();
+                      window.location.href = "/Mandir-Darshan/signup";
+                    }
+                  }}
+                >
+                  <img
+                    src={
+                      temple.image && temple.image.trim() !== ""
+                        ? brokenImages[index]
+                          ? noImage
+                          : temple.image
+                        : noImage
+                    }
+                    alt={temple.name || "Temple Image"}
+                    onError={() =>
+                      setBrokenImages((prev) => ({ ...prev, [index]: true }))
+                    }
+                  />
+                  <div className={`temple-overlay ${isActive ? "active" : "hidden"}`}>
+                    <h3>{temple.name}</h3>
+                    {temple.deity && <p>{temple.deity}</p>}
+                    {temple.location && <p>{formatLocation(temple.location)}</p>}
+                    {temple.hours && <p className="temple-card-time">🕒 {temple.hours}</p>}
+                  </div>
+                </NavLink>
+              );
+            }}
+          />
+        )}
       </div>
     </section>
   );

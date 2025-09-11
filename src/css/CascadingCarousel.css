@@ -1,0 +1,160 @@
+/* ===== BASE (Laptop / Desktop default) ===== */
+.cascade-carousel-wrapper {
+  width: 100%;
+  max-width: 100vw;
+  margin: 0 auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible; /* allow cards to overflow for partial visibility */
+  user-select: none;
+  height: 80vh;
+}
+
+.cascade-nav {
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  transition: transform 0.18s ease, background 0.18s ease;
+  z-index: 2000;
+}
+
+.cascade-nav:hover {
+  transform: scale(1.04);
+}
+
+.cascade-nav.left {
+  margin-right: 12px;
+}
+
+.cascade-nav.right {
+  margin-left: 12px;
+}
+
+.cascade-carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: auto;
+  perspective: 600px;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto; /* center horizontally */
+}
+
+.cascade-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 450ms cubic-bezier(.22, .9, .2, 1);
+}
+
+.cascade-item {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  transform-origin: center bottom;
+  transform-style: preserve-3d;
+  transition: transform 450ms cubic-bezier(.22, .9, .2, 1), opacity 350ms ease;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.5;
+  user-select: none;
+}
+
+.cascade-item.active {
+  opacity: 1;
+  z-index: 1000;
+  pointer-events: auto;
+}
+
+.cascade-item.near {
+  opacity: 0.4;
+}
+
+.cascade-item.corner {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.cascade-item > * {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.cascade-item:not(.active) .temple-card-caption {
+  display: none;
+}
+
+.cascade-carousel.is-dragging .cascade-inner {
+  transition: none !important;
+}
+
+/* ===== TABLET (≤768px) ===== */
+@media (max-width: 768px) {
+  .cascade-carousel-wrapper {
+    height: 80vh; /* smaller than full height */
+  }
+
+  .cascade-nav {
+    width: 42px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .cascade-carousel {
+    perspective: 500px;
+  }
+}
+
+/* ===== MOBILE (≤480px) ===== */
+@media (max-width: 480px) {
+  .cascade-carousel-wrapper {
+    height: 320px; /* smaller carousel height */
+  }
+
+  .cascade-nav {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  .cascade-carousel {
+    perspective: 400px;
+    overflow: hidden; 
+  }
+
+  .cascade-item {
+    opacity: 0.6;
+  }
+
+  .cascade-item.active {
+    opacity: 1;
+  }
+
+  .temple-card-caption {
+    font-size: 0.85rem;
+    line-height: 1.2;
+  }
+
+  .temple-card-title {
+    font-size: 1rem;
+  }
+}
