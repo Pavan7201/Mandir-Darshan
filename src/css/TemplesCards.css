@@ -24,12 +24,12 @@
   transition: color 0.8s ease-in-out;
 }
 
-.line-decor-img {
+/*.line-decor-img {
   display: block;
   text-align: center;
   margin: 0 auto 1.5rem auto;
   max-width: 200px;
-}
+}*/
 
 .temple-card {
   width: 100%;

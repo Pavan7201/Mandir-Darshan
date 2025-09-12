@@ -23,10 +23,8 @@ const TemplesCards = ({ temples = [] }) => {
         <img
           src={lineDecor}
           alt="decorative line"
-          className="line-decor-img"
-          loading="lazy"
+          className={`line-decor-img ${className}`}
         />
-
         {temples.length === 0 ? (
           <p>No temples found</p>
         ) : (
