@@ -9,10 +9,6 @@
 }
 
 .temple-section-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
   overflow-x: hidden;
   width: 100%;
   height: 100%;
@@ -41,84 +37,79 @@
   border-radius: 16px;
   overflow: hidden;
   position: relative;
-  /* Keep hover scale but remove details reveal */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.temple-card:hover {
-  transform: scale(1.02);
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.22);
 }
 
 .temple-card img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* fills the card without distortion */
+  object-fit: cover;
   display: block;
 }
 
-/* Hide details overlay by default */
 .temple-overlay {
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.6);
+  height: 60%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
   color: white;
   box-sizing: border-box;
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
-
+  padding: 1rem;
   opacity: 0;
-  transform: translateY(100%); /* start hidden below */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  pointer-events: none; 
+  transform: translateY(100%) scale(0.95);
   transition: transform 0.4s ease, opacity 0.4s ease;
-  pointer-events: none; /* prevent interaction when hidden */
 }
 
 .temple-overlay.active {
   opacity: 1;
-  transform: translateY(0); /* slide up and appear */
-  pointer-events: auto; /* enable interaction */
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
 }
 
-/* Remove hover-triggered display */
-.temple-card:hover .temple-overlay {
-  /* No styles here to prevent showing overlay on hover */
+.temple-overlay.near {
+  opacity: 0.85;
+  pointer-events: none;
+  transform: translateY(20%) scale(0.9);
+}
+
+.temple-overlay.corner {
+  opacity: 0.7;
+  pointer-events: none;
+  transform: translateY(40%) scale(0.85);
+}
+
+.temple-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(100%) scale(0.95);
 }
 
 .temple-overlay h3 {
+  position: relative;
   font-family: "Playfair Display", serif;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
 }
 
 .temple-overlay p {
+  position: relative;
   margin: 0.25rem 0;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   font-family: "Roboto", sans-serif;
 }
 
 .temple-card-time {
-  font-size: 0.85rem;
-  margin-top: 0.5rem;
-}
-
-.visit-link {
-  display: inline-block;
-  margin-top: 0.75rem;
-  padding: 6px 12px;
-  background: #fbbf24;
-  color: #000;
-  font-weight: bold;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background 0.3s ease;
-}
-
-.visit-link:hover {
-  background: #f59e0b;
+  position: relative;
+  font-size: 0.65rem;
 }
 
 @media (max-width: 768px) {

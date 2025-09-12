@@ -14,8 +14,8 @@ const CascadingCarousel = ({
   cornerCardHeight = 360,
   activeCardWidthMobile = 250,
   activeCardHeightMobile = 300,
-  nearCardWidthMobile = 230,
-  nearCardHeightMobile = 280,
+  nearCardWidthMobile = 200,
+  nearCardHeightMobile = 220,
   cornerCardWidthMobile = 180,
   cornerCardHeightMobile = 240,
 }) => {
@@ -23,6 +23,7 @@ const CascadingCarousel = ({
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
   const [cardWidthState, setCardWidthState] = useState(activeCardWidth);
   const [cardHeightState, setCardHeightState] = useState(activeCardHeight);
+  const [dragOffset, setDragOffset] = useState(0);
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -76,8 +77,8 @@ const CascadingCarousel = ({
     if (!el) return;
 
     const wheelRef = { accum: 0, cooldown: false, cooldownTimer: null };
-    const WHEEL_THRESHOLD = 80;
-    const WHEEL_COOLDOWN_MS = 350;
+    const WHEEL_THRESHOLD = 220;
+    const WHEEL_COOLDOWN_MS = 600;
 
     const onWheel = (e) => {
       if (Math.abs(e.deltaX) < 1) return;
@@ -120,6 +121,39 @@ const CascadingCarousel = ({
     return () => window.removeEventListener("keydown", onKey);
   }, [prev, next]);
 
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    let startX = 0;
+    let endX = 0;
+
+    const onTouchStart = (e) => {
+      startX = e.touches[0].clientX;
+    };
+
+    const onTouchMove = (e) => {
+      endX = e.touches[0].clientX;
+    };
+
+    const onTouchEnd = () => {
+      const diff = startX - endX;
+      const THRESHOLD = 30;
+      if (diff > THRESHOLD) next();
+      else if (diff < -THRESHOLD) prev();
+    };
+
+    el.addEventListener("touchstart", onTouchStart);
+    el.addEventListener("touchmove", onTouchMove);
+    el.addEventListener("touchend", onTouchEnd);
+
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+    };
+  }, [next, prev]);
+
   const getOffset = (index) => {
     if (!loop) return index - activeIndex;
     const n = items.length;
@@ -130,18 +164,15 @@ const CascadingCarousel = ({
 
   return (
     <div className="cascade-carousel-wrapper">
-      <button
-        aria-label="Previous"
-        className="cascade-nav left"
-        onClick={() => setActiveIndex((i) => clampIndex(i - 1))}
-        type="button"
-        disabled={!loop && activeIndex === 0}
+      <div
+        className="cascade-carousel"
+        ref={containerRef}
+        style={{ overflow: "visible" }}
       >
-        ‹
-      </button>
-
-      <div className="cascade-carousel" ref={containerRef} style={{ overflow: "visible" }}>
-        <div className="cascade-inner" style={{ position: "relative", height: "100%", width: "100%" }}>
+        <div
+          className="cascade-inner"
+          style={{ position: "relative", height: "100%", width: "100%" }}
+        >
           {items.map((item, index) => {
             const offset = getOffset(index);
             const absOffset = Math.abs(offset);
@@ -155,14 +186,14 @@ const CascadingCarousel = ({
                 offset === 0
                   ? activeCardWidthMobile
                   : offset === visibleCount
-                    ? cornerCardWidthMobile
-                    : nearCardWidthMobile;
+                  ? cornerCardWidthMobile
+                  : nearCardWidthMobile;
               height =
                 offset === 0
                   ? activeCardHeightMobile
                   : offset === visibleCount
-                    ? cornerCardHeightMobile
-                    : nearCardHeightMobile;
+                  ? cornerCardHeightMobile
+                  : nearCardHeightMobile;
               transform = `translateX(calc(-50% + ${baseTranslate}px)) translateY(0)`;
               opacity = offset === 0 ? 1 : absOffset === 1 ? 0.85 : 0.7;
             } else {
@@ -170,30 +201,30 @@ const CascadingCarousel = ({
                 offset === 0
                   ? activeCardWidth
                   : absOffset === visibleCount
-                    ? cornerCardWidth
-                    : nearCardWidth;
+                  ? cornerCardWidth
+                  : nearCardWidth;
               height =
                 offset === 0
                   ? activeCardHeight
                   : absOffset === visibleCount
-                    ? cornerCardHeight
-                    : nearCardHeight;
+                  ? cornerCardHeight
+                  : nearCardHeight;
 
               const translateYMap = {
-                "-2": 110,
-                "-1": 40,
-                "0": 10,
-                "1": 40,
-                "2": 110,
+                "-2": 200,
+                "-1": 90,
+                "0": 20,
+                "1": 90,
+                "2": 200,
               };
               const translateY = translateYMap[offset] ?? 80;
 
               const rotateMap = {
-                "-2": -15,
-                "-1": -15,
+                "-2": -30,
+                "-1": -30,
                 "0": 0,
-                "1": 15,
-                "2": 15,
+                "1": 30,
+                "2": 30,
               };
               const rotate = rotateMap[offset] ?? 0;
 
@@ -201,8 +232,8 @@ const CascadingCarousel = ({
                 "0": 1,
                 "-1": 0.85,
                 "1": 0.85,
-                "-2": 0.7,
-                "2": 0.7,
+                "-2": 0.75,
+                "2": 0.75,
               };
               const scale = scaleMap[offset] ?? 0;
 
@@ -215,12 +246,18 @@ const CascadingCarousel = ({
             return (
               <div
                 key={index}
-                className={`cascade-item ${offset === 0 ? "active" : absOffset === 1 ? "near" : absOffset === visibleCount ? "corner" : ""
-                  }`}
+                className={`cascade-item ${
+                  offset === 0
+                    ? "active"
+                    : absOffset === 1
+                    ? "near"
+                    : absOffset === visibleCount
+                    ? "corner"
+                    : ""
+                }`}
                 style={{
                   transform,
                   zIndex,
-                  opacity,
                   width,
                   height,
                   pointerEvents: isVisible ? "auto" : "none",
@@ -233,16 +270,6 @@ const CascadingCarousel = ({
           })}
         </div>
       </div>
-
-      <button
-        aria-label="Next"
-        className="cascade-nav right"
-        onClick={() => setActiveIndex((i) => clampIndex(i + 1))}
-        type="button"
-        disabled={!loop && activeIndex === items.length - 1}
-      >
-        ›
-      </button>
     </div>
   );
 };

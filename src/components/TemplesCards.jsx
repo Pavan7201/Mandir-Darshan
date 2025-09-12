@@ -40,12 +40,11 @@ const TemplesCards = ({ temples = [] }) => {
             nearCardHeight={360}
             cornerCardWidth={280}
             cornerCardHeight={360}
-            activeCardWidthMobile={240}
-            activeCardHeightMobile={260}
-            nearCardWidthMobile={200}
-            nearCardHeightMobile={240}
+            activeCardWidthMobile={250}
+            activeCardHeightMobile={270}
+            nearCardWidthMobile={210}
+            nearCardHeightMobile={220}
             renderItem={(temple, index, isActive) => {
-              // Determine destination based on auth
               const toPath = temple.link || "/notfound";
               return (
                 <NavLink
@@ -54,7 +53,6 @@ const TemplesCards = ({ temples = [] }) => {
                   style={{ cursor: "pointer" }}
                   onClick={(e) => {
                     if (!auth?.user && toPath !== "/notfound") {
-                      // Redirect unauthenticated users to signup
                       e.preventDefault();
                       window.location.href = "/Mandir-Darshan/signup";
                     }

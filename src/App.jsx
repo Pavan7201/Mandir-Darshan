@@ -1,6 +1,5 @@
 import { useContext, useState, useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-
 import Homepage from "./Pages/Homepage";
 import TemplesPage from "./Pages/TemplesPage";
 import Footer from "./components/Footer";

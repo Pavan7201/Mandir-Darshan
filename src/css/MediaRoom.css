@@ -35,12 +35,6 @@
   margin: 1rem 0 0;
 }
 
-.line-decor-img {
-  max-width: 300px;
-  height: auto;
-  margin: 0;
-}
-
 .media-room {
   display: flex;
   flex-wrap: wrap;

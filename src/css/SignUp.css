@@ -168,24 +168,58 @@
   }
 }
 
-.signup-button[type="submit"] {
-  width: 100%;
-  padding: 10px;
+.signup-button {
+  position: relative;
+  padding: 12px 35px;
   background: var(--faq-color);
-  border-radius: 6px;
-  color: var(--bg-color);
   font-size: 14px;
   font-weight: 600;
+  color: var(--bg-color);
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s ease;
-  margin-top: 10px;
+  transition: all 0.3s ease-in-out;
+  width: 30%;   
+  overflow: visible;
+  display: block;
+  border: 1px solid var(--faq-color);
+  margin: 20px auto;     
+}
+
+.signup-button:hover {
+  background: transparent;
+  color: var(--faq-color);
+  box-shadow: 0 0 15px var(--faq-color);
   border: 1px solid var(--faq-color);
 }
 
-.signup-button[type="submit"]:hover {
-  background: transparent;
-  border: 1px solid var(--faq-color);
-  color: var(--signup-button);
+.signup-button .star-1,
+.signup-button .star-2,
+.signup-button .star-3,
+.signup-button .star-4,
+.signup-button .star-5,
+.signup-button .star-6 {
+  position: absolute;
+  filter: drop-shadow(0 0 0 var(--faq-color));
+  z-index: -5;
+  transition: all 0.8s ease;
+}
+
+.signup-button .star-1 { top: 20%; left: 20%; width: 20px; }
+.signup-button .star-2 { top: 45%; left: 45%; width: 15px; }
+.signup-button .star-3 { top: 40%; left: 40%; width: 5px; }
+.signup-button .star-4 { top: 20%; left: 40%; width: 8px; }
+.signup-button .star-5 { top: 25%; left: 45%; width: 15px; }
+.signup-button .star-6 { top: 5%; left: 50%; width: 5px; }
+
+.signup-button:hover .star-1 { top: 50%; left: -15%; filter: drop-shadow(0 0 10px var(--faq-color)); z-index: 2; }
+.signup-button:hover .star-2 { top: -25%; left: 0%; filter: drop-shadow(0 0 10px var(--faq-color)); z-index: 2; }
+.signup-button:hover .star-3 { top: 55%; left: 25%; filter: drop-shadow(0 0 10px var(--faq-color)); z-index: 2; }
+.signup-button:hover .star-4 { top: 50%; left: 80%; filter: drop-shadow(0 0 10px var(--faq-color)); z-index: 2; }
+.signup-button:hover .star-5 { top: 25%; left: 100%; filter: drop-shadow(0 0 10px var(--faq-color)); z-index: 2; }
+.signup-button:hover .star-6 { top: -45%; left: 60%; filter: drop-shadow(0 0 10px var(--faq-color)); z-index: 2; }
+
+.fil0 {
+  fill: var(--faq-color);
 }
 
 .signup-divider {
@@ -353,6 +387,7 @@
   .signup-button[type="submit"] {
     font-size: 1rem;
     padding: 10px;
+    width: 100%;
   }
 
   .circle-large {
