@@ -6,7 +6,7 @@ import { AuthContext } from "../AuthContext";
 import CascadingCarousel from "./CascadingCarousel";
 import "../css/TemplesCards.css";
 
-const TemplesCards = ({ temples = [] }) => {
+const TemplesCards = ({ temples = [], className = "" }) => {
   const { auth } = useContext(AuthContext);
   const [brokenImages, setBrokenImages] = useState({});
 
