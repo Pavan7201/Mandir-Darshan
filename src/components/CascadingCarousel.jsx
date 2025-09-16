@@ -163,7 +163,8 @@ const CascadingCarousel = ({
 
             let transform = "";
             let opacity = 0;
-            let zIndex = 1000 - absOffset;
+            // let zIndex = 1000 - absOffset;
+            let zIndex = offset === 0 ? 3000 : absOffset === 1 ? 2000 : 1000;
             let cardW = cardWidthState;
             let cardH = cardHeightState;
 
