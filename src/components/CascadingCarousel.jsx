@@ -126,7 +126,7 @@ const CascadingCarousel = ({
 
     const onTouchEnd = () => {
       const diff = startX - endX;
-      const THRESHOLD = 50;
+      const THRESHOLD = 30;
       if (diff > THRESHOLD) next();
       else if (diff < -THRESHOLD) prev();
 
@@ -163,8 +163,7 @@ const CascadingCarousel = ({
 
             let transform = "";
             let opacity = 0;
-            // let zIndex = 1000 - absOffset;
-            let zIndex = offset === 0 ? 3000 : absOffset === 1 ? 2000 : 1000;
+            let zIndex = 1000 - absOffset;
             let cardW = cardWidthState;
             let cardH = cardHeightState;
 
