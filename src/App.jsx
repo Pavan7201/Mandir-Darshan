@@ -21,15 +21,15 @@ import "./App.css";
 import TempleLoader from "./loader/TempleLoader";
 import AdminPage from "./Pages/AdminPage";
 
-const PrivateRoute = ({ children }) => {
-  const { user, loading } = useContext(AuthContext);
-  const location = useLocation();
+// const PrivateRoute = ({ children }) => {
+//   const { user, loading } = useContext(AuthContext);
+//   const location = useLocation();
 
-  if (loading) return <TempleLoader />;
-  if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
+//   if (loading) return <TempleLoader />;
+//   if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
 
-  return children;
-};
+//   return children;
+// };
 
 function AppRoutes() {
   const { user, loading, isAdmin } = useContext(AuthContext);
@@ -85,6 +85,21 @@ function AppRoutes() {
               <TempleLoader />
             ) : isAdmin || localStorage.getItem("isAdmin") === "true" ? (
               <Navigate to="/admin" replace />
+            ) : (
+              <Homepage />
+            )
+          }
+        />
+
+        {/* uncomment this when user should definetly signup and navigate to "/" or login and navigate to "/"(homepage) */}
+{/* -----------------------------------------------------------------------------------------------------------------------
+        <Route
+          path="/"
+          element={
+            loading ? (
+              <TempleLoader />
+            ) : isAdmin || localStorage.getItem("isAdmin") === "true" ? (
+              <Navigate to="/admin" replace />
             ) : user ? (
               <Homepage />
             ) : sessionStorage.getItem("redirectAfterLogout") === "login" ? (
@@ -94,6 +109,7 @@ function AppRoutes() {
             )
           }
         />
+----------------------------------------------------------------------------------------------------------------------- */}
         <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
         <Route path="/signup" element={user ? <Navigate to="/" replace /> : <SignUpPage />} />
 
@@ -102,9 +118,9 @@ function AppRoutes() {
           element={isAdmin ? <Navigate to="/admin" replace /> : <AdminLoginPage />}
         />
 
-        <Route path="/temples" element={<PrivateRoute><TemplesPage /></PrivateRoute>} />
-        <Route path="/sevas-&-booking" element={<PrivateRoute><Sevas /></PrivateRoute>} />
-        <Route path="/donation" element={<PrivateRoute><DonationPage /></PrivateRoute>} />
+        <Route path="/temples" element={<TemplesPage />} />
+        <Route path="/sevas-&-booking" element={<Sevas />} />
+        <Route path="/donation" element={<DonationPage />} />
         <Route path="/admin" element={<AdminPage />} />
 
         <Route path="/media" element={<MediaRoomPage />} />

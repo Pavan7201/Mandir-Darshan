@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import "../css/CascadingCarousel.css";
+import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 const CascadingCarousel = ({
   items = [],
@@ -8,22 +9,22 @@ const CascadingCarousel = ({
   loop = true,
   activeCardWidth = 280,
   activeCardHeight = 370,
-  nearCardWidth = 280,
-  nearCardHeight = 360,
-  cornerCardWidth = 280,
-  cornerCardHeight = 360,
+  // nearCardWidth = 280,
+  // nearCardHeight = 360,
+  // cornerCardWidth = 280,
+  // cornerCardHeight = 360,
   activeCardWidthMobile = 250,
   activeCardHeightMobile = 300,
-  nearCardWidthMobile = 200,
-  nearCardHeightMobile = 220,
-  cornerCardWidthMobile = 180,
-  cornerCardHeightMobile = 240,
+  // nearCardWidthMobile = 200,
+  // nearCardHeightMobile = 220,
+  // cornerCardWidthMobile = 180,
+  // cornerCardHeightMobile = 240,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
   const [cardWidthState, setCardWidthState] = useState(activeCardWidth);
   const [cardHeightState, setCardHeightState] = useState(activeCardHeight);
-  const [dragOffset, setDragOffset] = useState(0);
+  const [isScrolling, setIsScrolling] = useState(false);
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -49,10 +50,6 @@ const CascadingCarousel = ({
     activeCardHeightMobile,
   ]);
 
-  const spacing = isMobile
-    ? Math.round(cardWidthState * 1)
-    : Math.round(cardWidthState * 0.95);
-
   const clampIndex = useCallback(
     (idx) => {
       if (loop) {
@@ -65,12 +62,15 @@ const CascadingCarousel = ({
     [items.length, loop]
   );
 
-  const prev = useCallback(() => setActiveIndex((i) => clampIndex(i - 1)), [
-    clampIndex,
-  ]);
-  const next = useCallback(() => setActiveIndex((i) => clampIndex(i + 1)), [
-    clampIndex,
-  ]);
+  const prev = useCallback(() => {
+    setIsScrolling(true);
+    setActiveIndex((i) => clampIndex(i - 1));
+  }, [clampIndex]);
+
+  const next = useCallback(() => {
+    setIsScrolling(true);
+    setActiveIndex((i) => clampIndex(i + 1));
+  }, [clampIndex]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -130,6 +130,7 @@ const CascadingCarousel = ({
 
     const onTouchStart = (e) => {
       startX = e.touches[0].clientX;
+      setIsScrolling(true);
     };
 
     const onTouchMove = (e) => {
@@ -138,9 +139,11 @@ const CascadingCarousel = ({
 
     const onTouchEnd = () => {
       const diff = startX - endX;
-      const THRESHOLD = 30;
+      const THRESHOLD = 80;
       if (diff > THRESHOLD) next();
       else if (diff < -THRESHOLD) prev();
+
+      setTimeout(() => setIsScrolling(false), 800);
     };
 
     el.addEventListener("touchstart", onTouchStart);
@@ -164,110 +167,88 @@ const CascadingCarousel = ({
 
   return (
     <div className="cascade-carousel-wrapper">
-      <div
-        className="cascade-carousel"
-        ref={containerRef}
-        style={{ overflow: "visible" }}
-      >
-        <div
-          className="cascade-inner"
-          style={{ position: "relative", height: "100%", width: "100%" }}
-        >
+      <div className="cascade-carousel" ref={containerRef} style={{ overflow: "visible" }}>
+        <div className="cascade-inner" style={{ position: "relative", height: "100%", width: "100%" }}>
           {items.map((item, index) => {
             const offset = getOffset(index);
             const absOffset = Math.abs(offset);
             const isVisible = absOffset <= visibleCount;
-            const baseTranslate = offset * spacing;
 
-            let transform, opacity, width, height;
+            let transform = "";
+            let opacity = 0;
+            let zIndex = 1000 - absOffset;
+            let cardW = cardWidthState;
+            let cardH = cardHeightState;
 
-            if (isMobile) {
-              width =
-                offset === 0
-                  ? activeCardWidthMobile
-                  : offset === visibleCount
-                  ? cornerCardWidthMobile
-                  : nearCardWidthMobile;
-              height =
-                offset === 0
-                  ? activeCardHeightMobile
-                  : offset === visibleCount
-                  ? cornerCardHeightMobile
-                  : nearCardHeightMobile;
-              transform = `translateX(calc(-50% + ${baseTranslate}px)) translateY(0)`;
-              opacity = offset === 0 ? 1 : absOffset === 1 ? 0.85 : 0.7;
+            if (!isScrolling) {
+              const stackSpacingY = 20;
+              if (offset === 0) {
+                transform = `translateX(-50%) translateY(0)`;
+                opacity = 1;
+              } else if (offset === 1) {
+                cardW = Math.round(cardWidthState * 0.9);
+                cardH = Math.round(cardHeightState * 0.9);
+                transform = `translateX(-50%) translateY(-${stackSpacingY}px)`;
+                opacity = 0.85;
+              } else if (offset === -1) {
+                cardW = Math.round(cardWidthState * 0.9);
+                cardH = Math.round(cardHeightState * 0.9);
+                transform = `translateX(-50%) translateY(-${stackSpacingY * 1}px)`;
+                opacity = 0.85;
+              } else if (absOffset <= visibleCount) {
+                const factor = 0.9 - (absOffset - 1) * 0.05;
+                cardW = Math.round(cardWidthState * factor);
+                cardH = Math.round(cardHeightState * factor);
+                transform = `translateX(-50%) translateY(-${stackSpacingY * absOffset}px)`;
+                opacity = 0.7 - (absOffset - 2) * 0.1;
+              } else {
+                opacity = 0;
+                zIndex = 0;
+              }
             } else {
-              width =
-                offset === 0
-                  ? activeCardWidth
-                  : absOffset === visibleCount
-                  ? cornerCardWidth
-                  : nearCardWidth;
-              height =
-                offset === 0
-                  ? activeCardHeight
-                  : absOffset === visibleCount
-                  ? cornerCardHeight
-                  : nearCardHeight;
+              const spacing = isMobile ? Math.round(cardW * 1) : Math.round(cardW * 0.95);
+              const baseTranslate = offset * spacing;
+              const translateYMap = { "-2": 200, "-1": 90, "0": 20, "1": 90, "2": 200 };
+              const rotateMap = { "-2": -30, "-1": -30, "0": 0, "1": 30, "2": 30 };
+              const scaleMap = { "0": 1, "-1": 0.85, "1": 0.85, "-2": 0.75, "2": 0.75 };
 
-              const translateYMap = {
-                "-2": 200,
-                "-1": 90,
-                "0": 20,
-                "1": 90,
-                "2": 200,
-              };
               const translateY = translateYMap[offset] ?? 80;
-
-              const rotateMap = {
-                "-2": -30,
-                "-1": -30,
-                "0": 0,
-                "1": 30,
-                "2": 30,
-              };
               const rotate = rotateMap[offset] ?? 0;
-
-              const scaleMap = {
-                "0": 1,
-                "-1": 0.85,
-                "1": 0.85,
-                "-2": 0.75,
-                "2": 0.75,
-              };
               const scale = scaleMap[offset] ?? 0;
 
-              opacity = offset === 0 ? 1 : absOffset === 1 ? 0.85 : 0.5;
               transform = `translateX(calc(-50% + ${baseTranslate}px)) translateY(${translateY}px) rotate(${rotate}deg) scale(${scale})`;
+              opacity = offset === 0 ? 1 : absOffset === 1 ? 0.85 : 0.5;
             }
-
-            const zIndex = 1000 - absOffset;
 
             return (
               <div
                 key={index}
-                className={`cascade-item ${
-                  offset === 0
-                    ? "active"
-                    : absOffset === 1
-                    ? "near"
-                    : absOffset === visibleCount
-                    ? "corner"
-                    : ""
-                }`}
+                className={`cascade-item ${offset === 0 ? "active" : absOffset === 1 ? "near" : "corner"}`}
                 style={{
                   transform,
+                  width: cardW,
+                  height: cardH,
                   zIndex,
-                  width,
-                  height,
+                  opacity,
                   pointerEvents: isVisible ? "auto" : "none",
-                  ...(isMobile && offset === 0 && { left: "50%" }),
                 }}
               >
                 {renderItem(item, index, offset === 0)}
               </div>
             );
           })}
+        </div>
+        <div className="cascade-dots">
+          {items
+            .map((item, idx) => ({ idx, offset: getOffset(idx) }))
+            .filter(({ offset }) => Math.abs(offset) <= visibleCount)
+            .map(({ idx }) => (
+              <span
+                key={idx}
+                className={`dot ${idx === activeIndex ? "active" : ""}`}
+                onClick={() => setActiveIndex(idx)}
+              />
+            ))}
         </div>
       </div>
     </div>

@@ -2,7 +2,8 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background-color: var(--bg-color);
+  /* background-color: var(--bg-color); */
+  background: var(--templePage-bg);
   text-align: center;
   transition: background-color 0.8s ease-in-out;
   width: 100%;

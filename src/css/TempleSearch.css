@@ -6,7 +6,8 @@
   padding: 1.2rem 2rem;
   justify-content: center;
   align-items: center;
-  background-color: var(--bg-color);
+  /* background-color: var(--bg-color); */
+  background: var(--templePage-bg);
   border-radius: 12px;
   margin: 3rem 0 0 0;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);

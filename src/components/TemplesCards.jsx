@@ -39,9 +39,9 @@ const TemplesCards = ({ temples = [], className = "" }) => {
             cornerCardWidth={280}
             cornerCardHeight={360}
             activeCardWidthMobile={250}
-            activeCardHeightMobile={270}
-            nearCardWidthMobile={210}
-            nearCardHeightMobile={220}
+            activeCardHeightMobile={300}
+            // nearCardWidthMobile={210}
+            // nearCardHeightMobile={220}
             renderItem={(temple, index, isActive) => {
               const toPath = temple.link || "/notfound";
               return (

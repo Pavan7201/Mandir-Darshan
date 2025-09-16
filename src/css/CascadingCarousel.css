@@ -63,7 +63,7 @@
 
 .cascade-item {
   position: absolute;
-  top: 0;
+  top: 7%;
   left: 50%;
   transform: translateX(-50%);
   transform-origin: center bottom;
@@ -74,8 +74,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  opacity: 0.5;
   user-select: none;
+  opacity: 0;
+  transform: translateY(100px) scale(0.9);
 }
 
 .cascade-item.active {
@@ -114,6 +115,64 @@
   transition: none !important;
 }
 
+.animate-on-scroll.visible .cascade-item {
+  animation: cardReveal 1s ease-out forwards;
+}
+
+@keyframes cardReveal {
+  from {
+    opacity: 0;
+    transform: translateY(100px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-on-scroll.visible .cascade-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.animate-on-scroll.visible .cascade-item:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.animate-on-scroll.visible .cascade-item:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.animate-on-scroll.visible .cascade-item:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.cascade-dots {
+  position: absolute;
+  bottom:80px; 
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap:10px;
+  z-index: 2000;
+}
+
+.cascade-dots .dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: transform 0.3s ease, background 0.3s ease, width 0.3s ease, height 0.3s ease;
+}
+
+.cascade-dots .dot.active {
+  width: 0.6rem;
+  height: 0.6rem;
+  background: rgb(185, 0, 247);
+  box-shadow: 0 0 6px rgba(188, 61, 234, 0.92);
+  transform: scale(1.2);
+}
+
+.animate-on-scroll.visible .cascade-item {
+  animation: cardReveal 1s ease-out forwards;
+}
 
 @media (max-width: 768px) {
   .cascade-carousel-wrapper {
@@ -133,7 +192,7 @@
 
 @media (max-width: 480px) {
   .cascade-carousel-wrapper {
-    height: 340px;
+    height: 370px;
   }
 
   .cascade-carousel {
@@ -142,6 +201,7 @@
   }
 
   .cascade-item {
+    top: 0%;
     opacity: 0.6;
   }
 
@@ -167,4 +227,21 @@
   .temple-card-title {
     font-size: 1rem;
   }
+
+  .cascade-dots {
+    bottom: 1.7rem;
+  }
+
+  .cascade-dots .dot {
+  width: 0.3rem;
+  height: 0.3rem;
+}
+
+.cascade-dots .dot.active {
+  width: 0.4rem;
+  height: 0.4rem;
+  background: rgb(185, 0, 247);
+  box-shadow: 0 0 6px rgba(188, 61, 234, 0.92);
+  transform: scale(1.2);
+}
 }
