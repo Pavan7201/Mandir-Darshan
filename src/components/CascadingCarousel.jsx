@@ -126,7 +126,7 @@ const CascadingCarousel = ({
 
     const onTouchEnd = () => {
       const diff = startX - endX;
-      const THRESHOLD =30;
+      const THRESHOLD = 50;
       if (diff > THRESHOLD) next();
       else if (diff < -THRESHOLD) prev();
 
@@ -169,21 +169,15 @@ const CascadingCarousel = ({
 
             if (!isScrolling) {
               if (isMobile) {
-                // ✅ Mobile: flat layout
                 if (offset === 0) {
                   transform = `translateX(-50%) translateY(0)`;
                   opacity = 1;
-                } else if (absOffset <= visibleCount) {
-                  transform = `translateX(-50%) translateY(0)`;
-                  opacity = 0.7;
-                  cardW = Math.round(cardWidthState * 0.9);
-                  cardH = Math.round(cardHeightState * 0.9);
+                  zIndex = 1000;
                 } else {
                   opacity = 0;
                   zIndex = 0;
                 }
               } else {
-                // ✅ Desktop: stacked layout
                 const stackSpacingY = 20;
                 if (offset === 0) {
                   transform = `translateX(-50%) translateY(0)`;
