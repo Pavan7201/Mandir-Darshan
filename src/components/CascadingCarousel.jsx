@@ -9,16 +9,8 @@ const CascadingCarousel = ({
   loop = true,
   activeCardWidth = 280,
   activeCardHeight = 370,
-  // nearCardWidth = 280,
-  // nearCardHeight = 360,
-  // cornerCardWidth = 280,
-  // cornerCardHeight = 360,
   activeCardWidthMobile = 250,
   activeCardHeightMobile = 300,
-  // nearCardWidthMobile = 200,
-  // nearCardHeightMobile = 220,
-  // cornerCardWidthMobile = 180,
-  // cornerCardHeightMobile = 240,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
@@ -43,12 +35,7 @@ const CascadingCarousel = ({
     updateLayout();
     window.addEventListener("resize", updateLayout);
     return () => window.removeEventListener("resize", updateLayout);
-  }, [
-    activeCardWidth,
-    activeCardHeight,
-    activeCardWidthMobile,
-    activeCardHeightMobile,
-  ]);
+  }, [activeCardWidth, activeCardHeight, activeCardWidthMobile, activeCardHeightMobile]);
 
   const clampIndex = useCallback(
     (idx) => {
@@ -139,7 +126,7 @@ const CascadingCarousel = ({
 
     const onTouchEnd = () => {
       const diff = startX - endX;
-      const THRESHOLD = 80;
+      const THRESHOLD =30;
       if (diff > THRESHOLD) next();
       else if (diff < -THRESHOLD) prev();
 
@@ -181,29 +168,46 @@ const CascadingCarousel = ({
             let cardH = cardHeightState;
 
             if (!isScrolling) {
-              const stackSpacingY = 20;
-              if (offset === 0) {
-                transform = `translateX(-50%) translateY(0)`;
-                opacity = 1;
-              } else if (offset === 1) {
-                cardW = Math.round(cardWidthState * 0.9);
-                cardH = Math.round(cardHeightState * 0.9);
-                transform = `translateX(-50%) translateY(-${stackSpacingY}px)`;
-                opacity = 0.85;
-              } else if (offset === -1) {
-                cardW = Math.round(cardWidthState * 0.9);
-                cardH = Math.round(cardHeightState * 0.9);
-                transform = `translateX(-50%) translateY(-${stackSpacingY * 1}px)`;
-                opacity = 0.85;
-              } else if (absOffset <= visibleCount) {
-                const factor = 0.9 - (absOffset - 1) * 0.05;
-                cardW = Math.round(cardWidthState * factor);
-                cardH = Math.round(cardHeightState * factor);
-                transform = `translateX(-50%) translateY(-${stackSpacingY * absOffset}px)`;
-                opacity = 0.7 - (absOffset - 2) * 0.1;
+              if (isMobile) {
+                // ✅ Mobile: flat layout
+                if (offset === 0) {
+                  transform = `translateX(-50%) translateY(0)`;
+                  opacity = 1;
+                } else if (absOffset <= visibleCount) {
+                  transform = `translateX(-50%) translateY(0)`;
+                  opacity = 0.7;
+                  cardW = Math.round(cardWidthState * 0.9);
+                  cardH = Math.round(cardHeightState * 0.9);
+                } else {
+                  opacity = 0;
+                  zIndex = 0;
+                }
               } else {
-                opacity = 0;
-                zIndex = 0;
+                // ✅ Desktop: stacked layout
+                const stackSpacingY = 20;
+                if (offset === 0) {
+                  transform = `translateX(-50%) translateY(0)`;
+                  opacity = 1;
+                } else if (offset === 1) {
+                  cardW = Math.round(cardWidthState * 0.9);
+                  cardH = Math.round(cardHeightState * 0.9);
+                  transform = `translateX(-50%) translateY(-${stackSpacingY}px)`;
+                  opacity = 0.85;
+                } else if (offset === -1) {
+                  cardW = Math.round(cardWidthState * 0.9);
+                  cardH = Math.round(cardHeightState * 0.9);
+                  transform = `translateX(-50%) translateY(-${stackSpacingY}px)`;
+                  opacity = 0.85;
+                } else if (absOffset <= visibleCount) {
+                  const factor = 0.9 - (absOffset - 1) * 0.05;
+                  cardW = Math.round(cardWidthState * factor);
+                  cardH = Math.round(cardHeightState * factor);
+                  transform = `translateX(-50%) translateY(-${stackSpacingY * absOffset}px)`;
+                  opacity = 0.7 - (absOffset - 2) * 0.1;
+                } else {
+                  opacity = 0;
+                  zIndex = 0;
+                }
               }
             } else {
               const spacing = isMobile ? Math.round(cardW * 1) : Math.round(cardW * 0.95);
