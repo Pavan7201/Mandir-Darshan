@@ -1,25 +1,52 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, PlayCircle, Gift, BookOpen, Image, MapPin } from "lucide-react";
 import "../css/TempleDetails.css";
 
 const FlowersBackground = () => {
+  const [visible, setVisible] = useState(true);
+  const [fadeOut, setFadeOut] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFadeOut(true);
+      
+      setTimeout(() => setVisible(false), 3000);
+    }, 30000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!visible) return null;
+
   const flowers = Array.from({ length: 20 });
+
   return (
-    <div className="temple-flowers-background">
-      {flowers.map((_, i) => (
-        <motion.div
-          key={i}
-          initial={{ y: "-10vh", x: `${Math.random() * 100}vw`, opacity: 0 }}
-          animate={{ y: "110vh", opacity: [0, 1, 1, 0] }}
-          transition={{ duration: 10 + Math.random() * 10, repeat: Infinity, delay: i * 0 }}
-          className="temple-flower"
-        >
-          🏵️
-        </motion.div>
-      ))}
-    </div>
+    <AnimatePresence>
+      <motion.div
+        className="temple-flowers-background"
+        initial={{ opacity: 1 }}
+        animate={{ opacity: fadeOut ? 0 : 1 }}
+        transition={{ duration: 3, ease: "easeInOut" }}
+      >
+        {flowers.map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{ y: "-10vh", x: `${Math.random() * 100}vw`, opacity: 0 }}
+            animate={{ y: "350vh", opacity: [1, 0.7, 0.5, 0] }}
+            transition={{
+              duration: 10 + Math.random() * 10,
+              repeat: Infinity,
+              delay: i * 0.5,
+            }}
+            className="temple-flower"
+          >
+            🏵️
+          </motion.div>
+        ))}
+      </motion.div>
+    </AnimatePresence>
   );
 };
 
@@ -65,6 +92,7 @@ export default function TempleDetails() {
 
   return (
     <div className="temple-details-page">
+      <div className="temple-flowers-wrapper">
       <FlowersBackground />
 
       <section
@@ -199,6 +227,7 @@ export default function TempleDetails() {
           </div>
         )}
       </main>
+      </div>
     </div>
   );
 }

@@ -59,46 +59,56 @@ const CascadingCarousel = ({
   }, [clampIndex]);
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
+  const el = containerRef.current;
+  if (!el) return;
 
-    let cooldown = false;
-    const COOLDOWN_MS = 300;
-    let accum = 0;
+  let cooldown = false;
+  const COOLDOWN_MS = 300;
 
-    const onWheel = (e) => {
-      // Normalize scroll delta: use vertical scroll if horizontal scroll is small
-      const delta = Math.abs(e.deltaX) > 1 ? e.deltaX : e.deltaY;
+  const onWheel = (e) => {
+    
+    const isMouseWheel = e.deltaX === 0 && Math.abs(e.deltaY) >= 50;
 
-      if (Math.abs(delta) < 15) return; // ignore very small scrolls
+    const isTouchpadHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY);
 
+    if (isTouchpadHorizontal) {
+      
+      const delta = e.deltaX;
+      if (Math.abs(delta) < 20) return;
       e.preventDefault();
-
       if (cooldown) return;
 
-      accum += delta;
-
-      const THRESHOLD = 80;
-
-      if (Math.abs(accum) > THRESHOLD) {
-        if (accum > 0) {
-          prev();
-        } else {
-          next();
-        }
-        accum = 0;
-        cooldown = true;
-        setTimeout(() => {
-          cooldown = false;
-        }, COOLDOWN_MS);
+      if (delta > 0) {
+        next(); 
+      } else {
+        prev(); 
       }
-    };
 
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => {
-      el.removeEventListener("wheel", onWheel);
-    };
-  }, [prev, next]);
+      cooldown = true;
+      setTimeout(() => (cooldown = false), COOLDOWN_MS);
+    } else if (isMouseWheel) {
+    
+      const delta = e.deltaY;
+      e.preventDefault();
+      if (cooldown) return;
+
+      if (delta > 0) {
+        next();
+      } else {
+        prev(); 
+      }
+
+      cooldown = true;
+      setTimeout(() => (cooldown = false), COOLDOWN_MS);
+    }
+  };
+
+  el.addEventListener("wheel", onWheel, { passive: false });
+  return () => {
+    el.removeEventListener("wheel", onWheel);
+  };
+}, [prev, next]);
+
 
   useEffect(() => {
     const onKey = (e) => {
