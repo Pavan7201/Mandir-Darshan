@@ -29,6 +29,7 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
+    "framer-motion": "^12.23.22",
     "fullpage.js": "^4.0.37",
     "jsonwebtoken": "^9.0.2",
     "lottie-react": "^2.4.1",

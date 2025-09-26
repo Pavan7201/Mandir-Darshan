@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import multer from "multer";
+import fetch from "node-fetch";
 
 dotenv.config();
 
@@ -170,8 +171,6 @@ app.get("/api/temples", async (req, res) => {
     if (searchTerm && typeof searchTerm === "string" && searchTerm.trim()) {
       const term = escapeRegexSafe(searchTerm.trim());
       const startsRegex = new RegExp("^" + term, "i");
-
-      // Priority matching: name > district > state
       const nameMatches = results.filter(t => startsRegex.test(t.name || "") || startsRegex.test(t.deity || ""));
       const districtMatches = results.filter(t => startsRegex.test(t.location?.district || "") && !nameMatches.includes(t));
       const stateMatches = results.filter(t => startsRegex.test(t.location?.state || "") && !nameMatches.includes(t) && !districtMatches.includes(t));
@@ -466,10 +465,8 @@ app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) =
     const itemId = req.params.id;
     const updatedData = req.body;
 
-    // Get the temple category
     const templeDocument = await assetsCollection.findOne({ category: "temple" });
 
-    // If temple category doesn't exist yet, create it
     if (!templeDocument) {
       const newItem = { ...updatedData, id: itemId };
       await assetsCollection.insertOne({
@@ -481,12 +478,10 @@ app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) =
         createdItem: newItem,
       });
     }
-
-    // Check if the item already exists by id
     const itemIndex = templeDocument.items.findIndex((item) => item.id === itemId);
 
     if (itemIndex === -1) {
-      // If item doesn't exist, create a new one
+
       const newItem = { ...updatedData, id: itemId };
       templeDocument.items.push(newItem);
       await assetsCollection.updateOne(
@@ -499,10 +494,10 @@ app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) =
       });
     }
 
-    // If item exists, update the existing item
+
     templeDocument.items[itemIndex] = {
-      ...templeDocument.items[itemIndex], // keep existing data
-      ...updatedData, // overwrite with updated fields
+      ...templeDocument.items[itemIndex], 
+      ...updatedData,
     };
 
     await assetsCollection.updateOne(
@@ -523,7 +518,7 @@ app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) =
 // DELETE temple by ID
 app.delete("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) => {
   try {
-    // Only admin can delete
+    
     if (!req.user.role || req.user.role !== "admin") {
       return res.status(403).json({ error: "Forbidden" });
     }
@@ -547,6 +542,41 @@ app.delete("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res
   } catch (err) {
     console.error("Error deleting temple:", err);
     res.status(500).json({ error: "Failed to delete temple" });
+  }
+});
+
+app.post("/api/openai", async (req, res) => {
+  try {
+    const { userInput } = req.body;
+    if (!userInput) return res.status(400).json({ error: "userInput required" });
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4",
+        messages: [
+          {
+            role: "system",
+            content: "You are a helpful assistant for Mandir Darshan, answering questions about temples, locations, darshan, etc."
+          },
+          { role: "user", content: userInput }
+        ],
+        temperature: 0.7,
+        max_tokens: 300
+      })
+    });
+
+    const data = await response.json();
+    const answer = data?.choices?.[0]?.message?.content || "Sorry, I don't know.";
+    res.json({ answer });
+
+  } catch (err) {
+    console.error("OpenAI proxy error:", err);
+    res.status(500).json({ error: "Failed to get response from OpenAI" });
   }
 });
 

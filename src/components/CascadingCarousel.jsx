@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import "../css/CascadingCarousel.css";
-import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 const CascadingCarousel = ({
   items = [],
@@ -63,41 +62,43 @@ const CascadingCarousel = ({
     const el = containerRef.current;
     if (!el) return;
 
-    const wheelRef = { accum: 0, cooldown: false, cooldownTimer: null };
-    const WHEEL_THRESHOLD = 220;
-    const WHEEL_COOLDOWN_MS = 600;
+    let cooldown = false;
+    const COOLDOWN_MS = 300;
+    let accum = 0;
 
     const onWheel = (e) => {
-      if (Math.abs(e.deltaX) < 1) return;
+      // Normalize scroll delta: use vertical scroll if horizontal scroll is small
+      const delta = Math.abs(e.deltaX) > 1 ? e.deltaX : e.deltaY;
+
+      if (Math.abs(delta) < 15) return; // ignore very small scrolls
+
       e.preventDefault();
-      if (wheelRef.cooldown) return;
 
-      const value = e.deltaX;
+      if (cooldown) return;
 
-      if (wheelRef.accum !== 0 && Math.sign(wheelRef.accum) !== Math.sign(value)) {
-        wheelRef.accum = value;
-      } else {
-        wheelRef.accum += value;
-      }
+      accum += delta;
 
-      if (Math.abs(wheelRef.accum) >= WHEEL_THRESHOLD) {
-        if (wheelRef.accum > 0) next();
-        else prev();
-        wheelRef.accum = 0;
-        wheelRef.cooldown = true;
-        if (wheelRef.cooldownTimer) clearTimeout(wheelRef.cooldownTimer);
-        wheelRef.cooldownTimer = setTimeout(() => {
-          wheelRef.cooldown = false;
-        }, WHEEL_COOLDOWN_MS);
+      const THRESHOLD = 80;
+
+      if (Math.abs(accum) > THRESHOLD) {
+        if (accum > 0) {
+          prev();
+        } else {
+          next();
+        }
+        accum = 0;
+        cooldown = true;
+        setTimeout(() => {
+          cooldown = false;
+        }, COOLDOWN_MS);
       }
     };
 
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => {
       el.removeEventListener("wheel", onWheel);
-      if (wheelRef.cooldownTimer) clearTimeout(wheelRef.cooldownTimer);
     };
-  }, [next, prev]);
+  }, [prev, next]);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -236,7 +237,8 @@ const CascadingCarousel = ({
             );
           })}
         </div>
-        <div className="cascade-dots">
+        {/* Uncomment below for dots navigation if needed */}
+        {/* <div className="cascade-dots">
           {items
             .map((item, idx) => ({ idx, offset: getOffset(idx) }))
             .filter(({ offset }) => Math.abs(offset) <= visibleCount)
@@ -247,7 +249,7 @@ const CascadingCarousel = ({
                 onClick={() => setActiveIndex(idx)}
               />
             ))}
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import lineDecor from "../HeadingDesign/HeadingDesign.png";
 import noImage from "../assets/no-image.webp";
 import { AuthContext } from "../AuthContext";
@@ -9,6 +9,7 @@ import "../css/TemplesCards.css";
 const TemplesCards = ({ temples = [], className = "" }) => {
   const { auth } = useContext(AuthContext);
   const [brokenImages, setBrokenImages] = useState({});
+  const navigate = useNavigate();
 
   const formatLocation = (location) => {
     if (!location) return "";
@@ -40,21 +41,22 @@ const TemplesCards = ({ temples = [], className = "" }) => {
             cornerCardHeight={360}
             activeCardWidthMobile={250}
             activeCardHeightMobile={300}
-            // nearCardWidthMobile={210}
-            // nearCardHeightMobile={220}
             renderItem={(temple, index, isActive) => {
-              const toPath = temple.link || "/notfound";
+              const templePath = `/temples${temple.link}`;
+              const handleClick = () => {
+                if (!auth?.user) {
+                  navigate("/signup");
+                } else {
+                  navigate(templePath);
+                }
+              };
               return (
                 <NavLink
-                  to={toPath}
+                  key={temple.id || index}
+                  to={templePath}
                   className="temple-card"
                   style={{ cursor: "pointer" }}
-                  onClick={(e) => {
-                    if (!auth?.user && toPath !== "/notfound") {
-                      e.preventDefault();
-                      window.location.href = "/Mandir-Darshan/signup";
-                    }
-                  }}
+                  onClick={handleClick}
                 >
                   <img
                     src={

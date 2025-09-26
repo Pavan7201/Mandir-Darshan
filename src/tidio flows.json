@@ -1,0 +1,76 @@
+{
+  "name": "Mandir Darshan Chatbot",
+  "nodes": [
+    {
+      "id": "trigger_open_chat",
+      "type": "trigger",
+      "trigger_type": "visitor_opens_chat",
+      "next": ["message_welcome"]
+    },
+    {
+      "id": "message_welcome",
+      "type": "send_message",
+      "message": "Hi there! 🙏 Welcome to Mandir Darshan.",
+      "next": ["ask_name"]
+    },
+    {
+      "id": "ask_name",
+      "type": "user_input",
+      "question": "Please tell me your Name so I can assist you better.",
+      "variable_name": "userName",
+      "next": ["check_name"]
+    },
+    {
+      "id": "check_name",
+      "type": "decision",
+      "conditions": [
+        {
+          "condition": "userName != ''",
+          "next": "quick_reply_main"
+        },
+        {
+          "condition": "userName == ''",
+          "next": "ask_name_fail"
+        }
+      ]
+    },
+    {
+      "id": "ask_name_fail",
+      "type": "send_message",
+      "message": "🤔 That doesn't seem like a valid name. Please enter your name.",
+      "next": ["ask_name"]
+    },
+    {
+      "id": "quick_reply_main",
+      "type": "quick_reply",
+      "message": "I can help you with:",
+      "buttons": [
+        {"text": "Find a Temple", "next": "search_temple"},
+        {"text": "Know Temple Timings", "next": "search_temple"},
+        {"text": "Learn about Deity and Rituals", "next": "search_temple"},
+        {"text": "Plan a Darshan", "next": "search_temple"}
+      ]
+    },
+    {
+      "id": "search_temple",
+      "type": "user_input",
+      "question": "Please enter the temple name, district, or state you would like to know about.",
+      "variable_name": "searchTerm",
+      "next": ["api_fetch_temple"]
+    },
+    {
+      "id": "api_fetch_temple",
+      "type": "api_call",
+      "method": "GET",
+      "url": "https://mandir-darshan.onrender.com/api/temples?searchTerm={{searchTerm}}",
+      "save_response_to": "templeResults",
+      "next": ["display_temple_info"]
+    },
+    {
+      "id": "display_temple_info",
+      "type": "send_message",
+      "message": "Here’s what I found for \"{{searchTerm}}\":\n\nName: {{templeResults[0].name}}\nLocation: {{templeResults[0].location.district}}, {{templeResults[0].location.state}}\nDeity: {{templeResults[0].deity}}\nTimings: {{templeResults[0].timings}}\nDarshan Info: {{templeResults[0].darshan}}",
+      "next": ["quick_reply_main"]
+    }
+  ]
+}

@@ -20,6 +20,7 @@ import { AuthContext } from "./AuthContext";
 import "./App.css";
 import TempleLoader from "./loader/TempleLoader";
 import AdminPage from "./Pages/AdminPage";
+import TempleDetails from "./components/TempleDetails";
 
 // const PrivateRoute = ({ children }) => {
 //   const { user, loading } = useContext(AuthContext);
@@ -125,6 +126,8 @@ function AppRoutes() {
 
         <Route path="/media" element={<MediaRoomPage />} />
         <Route path="/support" element={<SupportPage />} />
+
+        <Route path="/temples/:templeLink" element={<TempleDetails />} />
 
         <Route path="/editprofile" element={<ProfileEdit />} />
         <Route path="/changepassword" element={<ChangePassword />} />

@@ -9,7 +9,7 @@ body {
   --faq-color: maroon;
   --link-hover: black;
   --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --card-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  --card-shadow: 0 6px 15px rgba(0, 0, 0, 0.118);
   --card-hover-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
   --card-title-color: #d32f2f;
   --description-color: #333;
@@ -52,7 +52,7 @@ body.dark {
   --faq-color: #f0e6bd;
   --link-hover: #fff;
   --box-shadow: 0 4px 12px #f1efea2b;
-  --card-shadow: 0 6px 15px rgb(5, 5, 5);
+  --card-shadow: 0 6px 15px rgba(246, 199, 160, 0.426);
   --card-hover-shadow: 0 10px 20px #f0e6bd2e;
   --card-title-color: #dfd6b5;
   --description-color: #8b8981;

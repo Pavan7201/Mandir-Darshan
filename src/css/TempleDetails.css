@@ -1,0 +1,375 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700&display=swap');
+
+.temple-details-page {
+  font-family: 'Lato', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  overflow-x: hidden;
+}
+
+h1{
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: var(--faq-color);
+}
+
+p {
+  line-height: 1.6;
+}
+
+.temple-flowers-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.temple-flower {
+  position: absolute;
+  font-size: 2rem;
+  animation-name: fall;
+  animation-timing-function: linear;
+  opacity: 0;
+}
+
+.temple-hero-section {
+  position: relative;
+  height: 70vh;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: var(--light-text);
+  padding: 2rem;
+  box-shadow: inset 0 -50px 50px rgba(0, 0, 0, 0.2);
+}
+
+.temple-hero-section h1 {
+  font-size: clamp(2rem, 8vw, 5rem);
+  color: var(--faq-color);
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+  margin-bottom: 0.5rem;
+  letter-spacing: 2px;
+}
+
+.temple-hero-section p {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: 400;
+  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+  margin-top: 0;
+  color:var(--secondary-color) ;
+}
+
+.temple-main-section {
+  background-color: var(--bg-color);
+  padding: 2rem 5%;
+  position: relative;
+  z-index: 1;
+}
+
+.tc, .temple-section {
+  background-color: var(--card-color);
+  border-radius: 12px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.temple-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: var(--faq-color);
+}
+
+.temple-icon {
+  color: var(--faq-color);
+}
+
+.temple-book-btn, .temple-readmore-btn, .temple-add-calendar-btn {
+  padding: 0.75rem 2rem;
+  font-family: 'Lato', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 50px;
+  transition: all 0.3s ease-in-out;
+  text-transform: uppercase;
+}
+
+.temple-book-btn {
+  background-color: var(--faq-color);
+  color: var(--bg-color);
+  border: 2px solid var(--faq-color);
+  margin-top: 1.5rem;
+}
+
+.temple-book-btn:hover {
+  background-color: transparent;
+  color: var(--faq-color);
+  transform: scale(1.05);
+}
+
+.temple-readmore-btn {
+  background-color: transparent;
+  color: var(--faq-color);
+  border: 1px solid var(--faq-color);
+  padding: 0.5rem 1rem;
+  margin-top: 1rem;
+  display: block;
+}
+
+.temple-readmore-btn:hover {
+  background-color: var(--faq-color);
+  color: var(--q-hover-focus-color);
+}
+
+.temple-add-calendar-btn {
+  background-color: var(--faq-color);
+  color: var(--q-hover-focus-color);
+  border: none;
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+}
+
+.temple-video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.temple-video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.temple-events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.temple-event-card {
+  background-color: var(--bg-color);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.temple-event-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.temple-event-name {
+  font-weight: 700;
+  color: var(--faq-color);
+}
+
+.temple-event-date {
+  font-size: 0.9rem;
+  color: var(--faq-color);
+  margin-bottom: 1rem;
+}
+
+.temple-card-map .temple-map-wrapper {
+  margin-top: 1rem;
+  height: 350px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.temple-card-map .temple-map-wrapper iframe {
+  width: 100%;
+  height: 100%;
+}
+
+.temple-highlight {
+  font-weight: 700;
+  color: var(--faq-color);
+}
+
+.temple-rituals-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.temple-ritual-card {
+  background-color: var(--bg-color);
+  border: 1px solid var(--faq-color);
+  border-radius: 20px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+}
+
+.temple-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.temple-gallery-img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.3s ease-in-out;
+  cursor: zoom-in;
+}
+
+.temple-gallery-img:hover {
+  transform: scale(1.03);
+}
+
+@media (max-width: 768px) {
+  .temple-hero-section {
+    height: 60vh;
+    padding: 1.5rem;
+  }
+
+  .temple-hero-section h1 {
+    font-size: clamp(1.8rem, 6vw, 3.5rem);
+  }
+
+  .temple-hero-section p {
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+  }
+
+  .temple-main-section {
+    padding: 2rem 3%;
+  }
+
+  .temple-section-title {
+    font-size: 1.5rem;
+  }
+
+  .temple-events-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .temple-rituals-grid {
+    gap: 0.8rem;
+    flex-direction: column;
+  }
+
+  .temple-gallery-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.8rem;
+  }
+
+  .temple-book-btn,
+  .temple-readmore-btn,
+  .temple-add-calendar-btn {
+    padding: 0.65rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .temple-event-card {
+    padding: 1.2rem;
+  }
+
+  .temple-ritual-card {
+    padding: 0.65rem 1rem;
+  }
+
+
+  .temple-gallery-img {
+    height: 130px;
+  }
+
+  
+  .temple-card-map .temple-map-wrapper {
+    height: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .temple-hero-section {
+    height: 50vh;
+    padding: 1rem;
+  }
+
+  .temple-hero-section h1 {
+    font-size: clamp(1.5rem, 7vw, 2.5rem);
+  }
+
+  .temple-hero-section p {
+    font-size: clamp(0.9rem, 3vw, 1rem);
+  }
+
+
+  .temple-main-section {
+    padding: 1.5rem 2%;
+  }
+  .temple-section-title {
+    font-size: 1.3rem;
+    gap: 0.5rem;
+  }
+
+
+  .temple-events-grid {
+    grid-template-columns: 1fr; 
+    gap: 0.8rem;
+  }
+
+  .temple-rituals-grid {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .temple-gallery-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+
+  .temple-book-btn,
+  .temple-readmore-btn,
+  .temple-add-calendar-btn {
+    padding: 0.55rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .temple-event-card {
+    padding: 1rem;
+  }
+
+  .temple-ritual-card {
+    padding: 0.55rem 1rem;
+  }
+
+  .temple-gallery-img {
+    height: 120px;
+  }
+
+  .temple-card-map .temple-map-wrapper {
+    height: 220px;
+  }
+}

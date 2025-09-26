@@ -71,12 +71,15 @@ const TempleSearch = ({ setTemples }) => {
     try {
       const temples = await fetchTemples({});
       const filtered = temples.filter((t) => {
-        const tState = t.location?.state || "";
+        const tDeity = t.deity?.toLowerCase() || "";
+        const tState = t.location?.state?.toLowerCase() || "";
+
         const deityMatch = selectedDeity
-          ? t.deity?.toLowerCase() === selectedDeity.toLowerCase()
+          ? tDeity.startsWith(selectedDeity.toLowerCase())
           : true;
+
         const stateMatch = selectedState
-          ? tState.toLowerCase() === selectedState.toLowerCase()
+          ? tState === selectedState.toLowerCase()
           : true;
         return deityMatch && stateMatch;
       });
@@ -150,7 +153,7 @@ const TempleSearch = ({ setTemples }) => {
     setSearchTerm(
       temple.name || temple.location?.district || temple.location?.state || ""
     );
-    setCategory(temple.deity || ""); 
+    setCategory(temple.deity || "");
     setSelectedState(temple.location?.state || "");
     setSuggestions([]);
     setSuggestionsLoaded(false);
@@ -178,7 +181,11 @@ const TempleSearch = ({ setTemples }) => {
     const loadFilters = async () => {
       try {
         const temples = await fetchTemples({});
-        const uniqueDeities = [...new Set(temples.map(t => t.deity).filter(Boolean))];
+        const normalizedDeities = temples
+          .map(t => t.deity ? t.deity.split("(")[0].trim() : null)
+          .filter(Boolean);
+
+        const uniqueDeities = [...new Set(normalizedDeities)];
         const uniqueStates = [...new Set(
           temples.map((t) => t.location?.state || null).filter(Boolean)
         )];
@@ -189,6 +196,7 @@ const TempleSearch = ({ setTemples }) => {
         console.error("Error fetching filters:", err);
       }
     };
+
     loadFilters();
   }, [fetchTemples]);
 
