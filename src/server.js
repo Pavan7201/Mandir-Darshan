@@ -18,6 +18,11 @@ const MONGODB_URI = process.env.MONGODB_URI || "";
 const DB_NAME = process.env.DB_NAME || "test";
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(",").filter(Boolean);
 
+const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || "";
+const OTP_TTL_MINUTES = Number(process.env.OTP_TTL_MINUTES || 10);
+const OTP_LENGTH = Number(process.env.OTP_LENGTH || 6);
+const OTP_RESEND_COOLDOWN_SECONDS = Number(process.env.OTP_RESEND_COOLDOWN_SECONDS || 30);
+
 app.use(express.json());
 
 app.use(
@@ -34,10 +39,9 @@ app.use(
   })
 );
 
-let usersCollection, blacklistedTokensCollection, assetsCollection;
+let usersCollection, blacklistedTokensCollection, assetsCollection, emailOtpsCollection;
 const client = new MongoClient(MONGODB_URI);
 
-// Db connection
 async function connectDB() {
   try {
     await client.connect();
@@ -45,11 +49,10 @@ async function connectDB() {
     usersCollection = db.collection("users");
     blacklistedTokensCollection = db.collection("blacklistedtokens");
     assetsCollection = db.collection("assets");
+    emailOtpsCollection = db.collection("emailotps");
 
-    await blacklistedTokensCollection.createIndex(
-      { expiresAt: 1 },
-      { expireAfterSeconds: 0 }
-    );
+    await blacklistedTokensCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+    await emailOtpsCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
     console.log("✅ Connected to MongoDB Atlas");
   } catch (err) {
@@ -63,7 +66,6 @@ function escapeRegexSafe(str = "") {
   return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-// Middleware
 const authenticateUserMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -72,8 +74,7 @@ const authenticateUserMiddleware = async (req, res, next) => {
 
     const token = authHeader.substring(7);
     const blacklisted = await blacklistedTokensCollection.findOne({ token });
-    if (blacklisted)
-      return res.status(401).json({ error: "Token has been invalidated" });
+    if (blacklisted) return res.status(401).json({ error: "Token has been invalidated" });
 
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
@@ -84,34 +85,110 @@ const authenticateUserMiddleware = async (req, res, next) => {
   }
 };
 
+function isValidEmailSimple(email = "") {
+  return /^\S+@\S+\.\S+$/.test(String(email).trim());
+}
+
+function generateNumericOtp(length = 6) {
+  const max = 10 ** length;
+  const num = Math.floor(Math.random() * (max - 10 ** (length - 1))) + 10 ** (length - 1);
+  return String(num).slice(0, length);
+}
+
+async function fireN8nWebhook(payload) {
+  if (!N8N_WEBHOOK_URL) {
+    console.warn("N8N_WEBHOOK_URL not configured, skipping webhook call.");
+    return;
+  }
+  try {
+    await fetch(N8N_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    console.log("✔️ Fired n8n webhook");
+  } catch (err) {
+    console.warn("Failed to call n8n webhook:", err.message || err);
+  }
+}
+
 app.get("/", (_req, res) => res.send("Backend is running 🚀"));
 
-// User Signup
 app.post("/api/signup", async (req, res) => {
   try {
-    const { firstName, middleName, lastName, mobile, password, gender } = req.body;
-    if (!firstName || !lastName || !mobile || !password || !gender) {
+    const { firstName, middleName, lastName, mobile, password, gender, email } = req.body;
+
+    if (!firstName || !lastName || !mobile || !password || !gender || !email) {
       return res.status(400).json({ error: "All required fields must be filled." });
+    }
+
+    if (!isValidEmailSimple(email)) {
+      return res.status(400).json({ error: "Please provide a valid email address." });
     }
 
     const existingMobile = await usersCollection.findOne({ mobile });
     if (existingMobile) return res.status(400).json({ error: "User already exists" });
 
+    const existingEmail = await usersCollection.findOne({ email: email.toLowerCase() });
+    if (existingEmail) return res.status(400).json({ error: "Email already registered" });
+
     const passwordHash = await bcrypt.hash(password, 10);
-    const newUser = { firstName, middleName, lastName, mobile, passwordHash, gender };
+    const newUser = {
+      firstName,
+      middleName,
+      lastName,
+      mobile,
+      email: email.toLowerCase(),
+      passwordHash,
+      gender,
+      emailVerified: false,
+      createdAt: new Date()
+    };
 
     const { insertedId } = await usersCollection.insertOne(newUser);
 
     const token = jwt.sign(
-      { _id: insertedId.toString(), firstName, mobile, gender },
+      { _id: insertedId.toString(), firstName, mobile, gender, email: email.toLowerCase() },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
 
+    const otp = generateNumericOtp(OTP_LENGTH);
+    const otpHash = await bcrypt.hash(otp, 10);
+    const expiresAt = new Date(Date.now() + OTP_TTL_MINUTES * 60 * 1000);
+
+    await emailOtpsCollection.insertOne({
+      email: email.toLowerCase(),
+      otpHash,
+      createdAt: new Date(),
+      expiresAt,
+      attempts: 0,
+    });
+
+    const webhookPayload = {
+      type: "email_otp",
+      email: email.toLowerCase(),
+      firstName,
+      otp,
+      expiresAt: expiresAt.toISOString(),
+      meta: { origin: "signup" }
+    };
+
+    fireN8nWebhook(webhookPayload);
+
     res.status(201).json({
-      message: "User created",
+      message: "User created. OTP sent to email for verification.",
       token,
-      user: { _id: insertedId.toString(), firstName, middleName, lastName, mobile, gender },
+      user: {
+        _id: insertedId.toString(),
+        firstName,
+        middleName,
+        lastName,
+        mobile,
+        gender,
+        email: email.toLowerCase(),
+        emailVerified: false
+      }
     });
   } catch (err) {
     console.error("Signup error:", err);
@@ -119,12 +196,90 @@ app.post("/api/signup", async (req, res) => {
   }
 });
 
-// User login
+app.post("/api/resend-otp", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email || !isValidEmailSimple(email)) {
+      return res.status(400).json({ error: "Valid email required" });
+    }
+    const lowEmail = email.toLowerCase();
+
+    const user = await usersCollection.findOne({ email: lowEmail });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    const lastOtp = await emailOtpsCollection.findOne({ email: lowEmail }, { sort: { createdAt: -1 } });
+    if (lastOtp && lastOtp.createdAt) {
+      const secondsSince = (Date.now() - new Date(lastOtp.createdAt).getTime()) / 1000;
+      if (secondsSince < OTP_RESEND_COOLDOWN_SECONDS) {
+        return res.status(429).json({ error: `Please wait ${Math.ceil(OTP_RESEND_COOLDOWN_SECONDS - secondsSince)}s before resending OTP` });
+      }
+    }
+
+    const otp = generateNumericOtp(OTP_LENGTH);
+    const otpHash = await bcrypt.hash(otp, 10);
+    const expiresAt = new Date(Date.now() + OTP_TTL_MINUTES * 60 * 1000);
+
+    await emailOtpsCollection.insertOne({
+      email: lowEmail,
+      otpHash,
+      createdAt: new Date(),
+      expiresAt,
+      attempts: 0,
+    });
+
+    const webhookPayload = {
+      type: "email_otp",
+      email: lowEmail,
+      firstName: user.firstName || "",
+      otp,
+      expiresAt: expiresAt.toISOString(),
+      meta: { origin: "resend" }
+    };
+
+    fireN8nWebhook(webhookPayload);
+
+    res.json({ message: "OTP resent to email" });
+  } catch (err) {
+    console.error("Resend OTP error:", err);
+    res.status(500).json({ error: "Failed to resend OTP" });
+  }
+});
+
+app.post("/api/verify-email", async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) return res.status(400).json({ error: "Email and OTP are required" });
+    const lowEmail = String(email).toLowerCase();
+
+    const otpDoc = await emailOtpsCollection.findOne({ email: lowEmail }, { sort: { createdAt: -1 } });
+    if (!otpDoc) return res.status(400).json({ error: "No OTP found for this email" });
+
+    if (otpDoc.expiresAt && new Date() > new Date(otpDoc.expiresAt)) {
+      return res.status(400).json({ error: "OTP has expired" });
+    }
+
+    const match = await bcrypt.compare(String(otp), otpDoc.otpHash);
+    if (!match) {
+      await emailOtpsCollection.updateOne({ _id: otpDoc._id }, { $inc: { attempts: 1 } });
+      return res.status(400).json({ error: "Invalid OTP" });
+    }
+
+    await usersCollection.updateOne({ email: lowEmail }, { $set: { emailVerified: true } });
+    await emailOtpsCollection.deleteMany({ email: lowEmail });
+
+    res.json({ message: "Email verified successfully" });
+  } catch (err) {
+    console.error("Verify OTP error:", err);
+    res.status(500).json({ error: "Failed to verify OTP" });
+  }
+});
+
+// ----------------- rest of your existing endpoints (kept mostly unchanged) -----------------
+
 app.post("/api/login", async (req, res) => {
   try {
     const { mobile, password } = req.body;
-    if (!mobile || !password)
-      return res.status(400).json({ error: "Mobile and password required" });
+    if (!mobile || !password) return res.status(400).json({ error: "Mobile and password required" });
 
     const user = await usersCollection.findOne({ mobile });
     if (!user) return res.status(401).json({ error: "User not found" });
@@ -135,7 +290,7 @@ app.post("/api/login", async (req, res) => {
     await blacklistedTokensCollection.deleteMany({ userId: user._id });
 
     const token = jwt.sign(
-      { _id: user._id.toString(), firstName: user.firstName, mobile: user.mobile, gender: user.gender },
+      { _id: user._id.toString(), firstName: user.firstName, mobile: user.mobile, gender: user.gender, email: user.email },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -150,6 +305,8 @@ app.post("/api/login", async (req, res) => {
         lastName: user.lastName,
         mobile: user.mobile,
         gender: user.gender,
+        email: user.email,
+        emailVerified: !!user.emailVerified
       },
     });
   } catch (err) {
@@ -158,11 +315,9 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// searching Temple
 app.get("/api/temples", async (req, res) => {
   try {
     const { searchTerm, category, state, sortBy } = req.query;
-
     const templeDoc = await assetsCollection.findOne({ category: "temple" });
     if (!templeDoc) return res.json([]);
 
@@ -174,7 +329,6 @@ app.get("/api/temples", async (req, res) => {
       const nameMatches = results.filter(t => startsRegex.test(t.name || "") || startsRegex.test(t.deity || ""));
       const districtMatches = results.filter(t => startsRegex.test(t.location?.district || "") && !nameMatches.includes(t));
       const stateMatches = results.filter(t => startsRegex.test(t.location?.state || "") && !nameMatches.includes(t) && !districtMatches.includes(t));
-
       results = [...nameMatches, ...districtMatches, ...stateMatches];
     }
 
@@ -194,8 +348,8 @@ app.get("/api/temples", async (req, res) => {
       if (sortKey === "name") {
         results.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
       } else if (sortKey === "location") {
-        results.sort((a, b) => 
-          (a.location?.state || "").localeCompare(b.location?.state || "") || 
+        results.sort((a, b) =>
+          (a.location?.state || "").localeCompare(b.location?.state || "") ||
           (a.location?.district || "").localeCompare(b.location?.district || "")
         );
       } else if (sortKey === "popularity" && results[0]?.popularity !== undefined) {
@@ -217,8 +371,6 @@ app.get("/api/temples", async (req, res) => {
   }
 });
 
-
-// Admin login 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
@@ -261,7 +413,6 @@ app.post("/api/admin/login", async (req, res) => {
   }
 });
 
-// User Profile Edit 
 app.put("/api/editprofile", authenticateUserMiddleware, upload.single("avatar"), async (req, res) => {
   try {
     const userId = new ObjectId(req.user._id);
@@ -322,7 +473,6 @@ app.put("/api/editprofile", authenticateUserMiddleware, upload.single("avatar"),
   }
 });
 
-// User logout 
 app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
@@ -346,7 +496,6 @@ app.post("/api/logout", authenticateUserMiddleware, async (req, res) => {
   }
 });
 
-// User fetching
 app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
   try {
     const user = await usersCollection.findOne(
@@ -367,7 +516,6 @@ app.get("/api/me", authenticateUserMiddleware, async (req, res) => {
   }
 });
 
-// User delete account 
 app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) => {
   try {
     const userId = new ObjectId(req.user._id);
@@ -379,7 +527,6 @@ app.delete("/api/delete-account", authenticateUserMiddleware, async (req, res) =
   }
 });
 
-// assets fetching 
 app.get("/api/assets", async (_req, res) => {
   try {
     const assets = await assetsCollection.find().toArray();
@@ -390,7 +537,6 @@ app.get("/api/assets", async (_req, res) => {
   }
 });
 
-// admin uploading assets 
 app.post("/api/assets", authenticateUserMiddleware, async (req, res) => {
   try {
     if (!req.user.role || req.user.role !== "admin") {
@@ -419,7 +565,6 @@ app.post("/api/assets", authenticateUserMiddleware, async (req, res) => {
   }
 });
 
-// admin updating temple image
 app.put("/api/assets/temple/:id/image", authenticateUserMiddleware, async (req, res) => {
   try {
     const itemId = req.params.id;
@@ -455,7 +600,6 @@ app.put("/api/assets/temple/:id/image", authenticateUserMiddleware, async (req, 
   }
 });
 
-// temple updation and new temple adding by admin 
 app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) => {
   try {
     if (!req.user.role || req.user.role !== "admin") {
@@ -481,7 +625,6 @@ app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) =
     const itemIndex = templeDocument.items.findIndex((item) => item.id === itemId);
 
     if (itemIndex === -1) {
-
       const newItem = { ...updatedData, id: itemId };
       templeDocument.items.push(newItem);
       await assetsCollection.updateOne(
@@ -494,9 +637,8 @@ app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) =
       });
     }
 
-
     templeDocument.items[itemIndex] = {
-      ...templeDocument.items[itemIndex], 
+      ...templeDocument.items[itemIndex],
       ...updatedData,
     };
 
@@ -515,10 +657,8 @@ app.put("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) =
   }
 });
 
-// DELETE temple by ID
 app.delete("/api/assets/temple/:id", authenticateUserMiddleware, async (req, res) => {
   try {
-    
     if (!req.user.role || req.user.role !== "admin") {
       return res.status(403).json({ error: "Forbidden" });
     }
