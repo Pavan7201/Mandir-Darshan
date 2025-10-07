@@ -17,11 +17,10 @@ const JWT_SECRET = process.env.JWT_SECRET || "changeme";
 const MONGODB_URI = process.env.MONGODB_URI || "";
 const DB_NAME = process.env.DB_NAME || "test";
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(",").filter(Boolean);
-
-const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || "";
-const OTP_TTL_MINUTES = Number(process.env.OTP_TTL_MINUTES || 10);
-const OTP_LENGTH = Number(process.env.OTP_LENGTH || 6);
-const OTP_RESEND_COOLDOWN_SECONDS = Number(process.env.OTP_RESEND_COOLDOWN_SECONDS || 30);
+const N8N_WEBHOOK_URL = process.env.REACT_APP_WEBHOOK_URL || "";
+const OTP_TTL_MINUTES = Number(process.env.OTP_TTL_MINUTES);
+const OTP_LENGTH = Number(process.env.OTP_LENGTH);
+const OTP_RESEND_COOLDOWN_SECONDS = Number(process.env.OTP_RESEND_COOLDOWN_SECONDS);
 
 app.use(express.json());
 
@@ -33,9 +32,6 @@ app.use(
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    optionsSuccessStatus: 200,
   })
 );
 
@@ -50,10 +46,8 @@ async function connectDB() {
     blacklistedTokensCollection = db.collection("blacklistedtokens");
     assetsCollection = db.collection("assets");
     emailOtpsCollection = db.collection("emailotps");
-
     await blacklistedTokensCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
     await emailOtpsCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-
     console.log("✅ Connected to MongoDB Atlas");
   } catch (err) {
     console.error("❌ MongoDB connection error:", err);
@@ -66,25 +60,6 @@ function escapeRegexSafe(str = "") {
   return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-const authenticateUserMiddleware = async (req, res, next) => {
-  try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer "))
-      return res.status(401).json({ error: "Unauthorized" });
-
-    const token = authHeader.substring(7);
-    const blacklisted = await blacklistedTokensCollection.findOne({ token });
-    if (blacklisted) return res.status(401).json({ error: "Token has been invalidated" });
-
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    console.log("Auth error:", err.message);
-    return res.status(401).json({ error: "Invalid or expired token" });
-  }
-};
-
 function isValidEmailSimple(email = "") {
   return /^\S+@\S+\.\S+$/.test(String(email).trim());
 }
@@ -95,43 +70,75 @@ function generateNumericOtp(length = 6) {
   return String(num).slice(0, length);
 }
 
+function formatDateForDisplay(date) {
+    return new Intl.DateTimeFormat('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: true,
+        timeZone: 'Asia/Kolkata'
+    }).format(date).replace(',', '');
+}
+
 async function fireN8nWebhook(payload) {
   if (!N8N_WEBHOOK_URL) {
-    console.warn("N8N_WEBHOOK_URL not configured, skipping webhook call.");
+    console.error("❌ CRITICAL: N8N_WEBHOOK_URL is not defined in your .env file!");
     return;
   }
+  
+  console.log("--- Firing n8n Webhook ---");
+  console.log("Payload Sent (ExpiresAt shown in IST):", {
+      ...payload,
+      expiresAt: formatDateForDisplay(new Date(payload.expiresAt))
+  });
+
   try {
-    await fetch(N8N_WEBHOOK_URL, {
+    const response = await fetch(N8N_WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    console.log("✔️ Fired n8n webhook");
+    const responseBody = await response.json();
+    if (!response.ok) {
+      console.error("n8n workflow returned an error:", responseBody);
+    } else {
+      console.log("✅ Successfully sent data to n8n webhook.");
+    }
   } catch (err) {
-    console.warn("Failed to call n8n webhook:", err.message || err);
+    console.error("❌ FAILED to call n8n webhook. Error:", err.message || err);
   }
 }
+
+const authenticateUserMiddleware = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer "))
+      return res.status(401).json({ error: "Unauthorized" });
+    const token = authHeader.substring(7);
+    const blacklisted = await blacklistedTokensCollection.findOne({ token });
+    if (blacklisted) return res.status(401).json({ error: "Token has been invalidated" });
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Invalid or expired token" });
+  }
+};
 
 app.get("/", (_req, res) => res.send("Backend is running 🚀"));
 
 app.post("/api/signup", async (req, res) => {
   try {
     const { firstName, middleName, lastName, mobile, password, gender, email } = req.body;
-
-    if (!firstName || !lastName || !mobile || !password || !gender || !email) {
+    if (!firstName || !lastName || !mobile || !password || !gender || !email)
       return res.status(400).json({ error: "All required fields must be filled." });
-    }
-
-    if (!isValidEmailSimple(email)) {
-      return res.status(400).json({ error: "Please provide a valid email address." });
-    }
-
+    if (!isValidEmailSimple(email)) return res.status(400).json({ error: "Invalid email." });
     const existingMobile = await usersCollection.findOne({ mobile });
-    if (existingMobile) return res.status(400).json({ error: "User already exists" });
-
+    if (existingMobile) return res.status(400).json({ error: "Mobile number already exists" });
     const existingEmail = await usersCollection.findOne({ email: email.toLowerCase() });
     if (existingEmail) return res.status(400).json({ error: "Email already registered" });
-
     const passwordHash = await bcrypt.hash(password, 10);
     const newUser = {
       firstName,
@@ -141,54 +148,19 @@ app.post("/api/signup", async (req, res) => {
       email: email.toLowerCase(),
       passwordHash,
       gender,
-      emailVerified: false,
-      createdAt: new Date()
+      emailVerified: true,
+      createdAt: new Date(),
     };
-
     const { insertedId } = await usersCollection.insertOne(newUser);
-
     const token = jwt.sign(
       { _id: insertedId.toString(), firstName, mobile, gender, email: email.toLowerCase() },
       JWT_SECRET,
       { expiresIn: "1h" }
     );
-
-    const otp = generateNumericOtp(OTP_LENGTH);
-    const otpHash = await bcrypt.hash(otp, 10);
-    const expiresAt = new Date(Date.now() + OTP_TTL_MINUTES * 60 * 1000);
-
-    await emailOtpsCollection.insertOne({
-      email: email.toLowerCase(),
-      otpHash,
-      createdAt: new Date(),
-      expiresAt,
-      attempts: 0,
-    });
-
-    const webhookPayload = {
-      type: "email_otp",
-      email: email.toLowerCase(),
-      firstName,
-      otp,
-      expiresAt: expiresAt.toISOString(),
-      meta: { origin: "signup" }
-    };
-
-    fireN8nWebhook(webhookPayload);
-
     res.status(201).json({
-      message: "User created. OTP sent to email for verification.",
+      message: "User created successfully.",
       token,
-      user: {
-        _id: insertedId.toString(),
-        firstName,
-        middleName,
-        lastName,
-        mobile,
-        gender,
-        email: email.toLowerCase(),
-        emailVerified: false
-      }
+      user: { _id: insertedId.toString(), firstName, middleName, lastName, mobile, gender, email: email.toLowerCase(), emailVerified: true },
     });
   } catch (err) {
     console.error("Signup error:", err);
@@ -198,47 +170,47 @@ app.post("/api/signup", async (req, res) => {
 
 app.post("/api/resend-otp", async (req, res) => {
   try {
-    const { email } = req.body;
-    if (!email || !isValidEmailSimple(email)) {
+    const { email, firstName } = req.body;
+    if (!email || !isValidEmailSimple(email))
       return res.status(400).json({ error: "Valid email required" });
-    }
     const lowEmail = email.toLowerCase();
-
-    const user = await usersCollection.findOne({ email: lowEmail });
-    if (!user) return res.status(404).json({ error: "User not found" });
-
+    const existingUser = await usersCollection.findOne({ email: lowEmail });
+    if (existingUser) {
+      return res.status(400).json({ error: "This email is already registered. Please log in." });
+    }
     const lastOtp = await emailOtpsCollection.findOne({ email: lowEmail }, { sort: { createdAt: -1 } });
     if (lastOtp && lastOtp.createdAt) {
       const secondsSince = (Date.now() - new Date(lastOtp.createdAt).getTime()) / 1000;
-      if (secondsSince < OTP_RESEND_COOLDOWN_SECONDS) {
-        return res.status(429).json({ error: `Please wait ${Math.ceil(OTP_RESEND_COOLDOWN_SECONDS - secondsSince)}s before resending OTP` });
-      }
+      if (secondsSince < OTP_RESEND_COOLDOWN_SECONDS)
+        return res.status(429).json({
+          error: `Please wait ${Math.ceil(OTP_RESEND_COOLDOWN_SECONDS - secondsSince)}s before resending OTP`,
+        });
     }
+    await emailOtpsCollection.deleteMany({ email: lowEmail });
 
     const otp = generateNumericOtp(OTP_LENGTH);
     const otpHash = await bcrypt.hash(otp, 10);
-    const expiresAt = new Date(Date.now() + OTP_TTL_MINUTES * 60 * 1000);
-
+    const createdAt = new Date();
+    const expiresAt = new Date(createdAt.getTime() + OTP_TTL_MINUTES * 60 * 1000);
+    
     await emailOtpsCollection.insertOne({
       email: lowEmail,
       otpHash,
-      createdAt: new Date(),
+      createdAt,
       expiresAt,
       attempts: 0,
     });
 
-    const webhookPayload = {
+    await fireN8nWebhook({
       type: "email_otp",
       email: lowEmail,
-      firstName: user.firstName || "",
+      firstName: firstName || "User",
       otp,
+      subject: "Your Mandir Darshan Verification Code",
       expiresAt: expiresAt.toISOString(),
-      meta: { origin: "resend" }
-    };
-
-    fireN8nWebhook(webhookPayload);
-
-    res.json({ message: "OTP resent to email" });
+      meta: { origin: "resend" },
+    });
+    res.json({ message: "OTP sent to email" });
   } catch (err) {
     console.error("Resend OTP error:", err);
     res.status(500).json({ error: "Failed to resend OTP" });
@@ -248,25 +220,19 @@ app.post("/api/resend-otp", async (req, res) => {
 app.post("/api/verify-email", async (req, res) => {
   try {
     const { email, otp } = req.body;
-    if (!email || !otp) return res.status(400).json({ error: "Email and OTP are required" });
-    const lowEmail = String(email).toLowerCase();
-
-    const otpDoc = await emailOtpsCollection.findOne({ email: lowEmail }, { sort: { createdAt: -1 } });
-    if (!otpDoc) return res.status(400).json({ error: "No OTP found for this email" });
-
-    if (otpDoc.expiresAt && new Date() > new Date(otpDoc.expiresAt)) {
+    if (!email || !otp)
+      return res.status(400).json({ error: "Email and OTP required" });
+    const lowEmail = email.toLowerCase();
+    const otpDoc = await emailOtpsCollection.findOne({ email: lowEmail });
+    if (!otpDoc) return res.status(400).json({ error: "OTP is expired or invalid. Please request a new one." });
+    if (otpDoc.expiresAt < new Date())
       return res.status(400).json({ error: "OTP has expired" });
-    }
-
     const match = await bcrypt.compare(String(otp), otpDoc.otpHash);
     if (!match) {
       await emailOtpsCollection.updateOne({ _id: otpDoc._id }, { $inc: { attempts: 1 } });
       return res.status(400).json({ error: "Invalid OTP" });
     }
-
-    await usersCollection.updateOne({ email: lowEmail }, { $set: { emailVerified: true } });
     await emailOtpsCollection.deleteMany({ email: lowEmail });
-
     res.json({ message: "Email verified successfully" });
   } catch (err) {
     console.error("Verify OTP error:", err);
@@ -274,41 +240,20 @@ app.post("/api/verify-email", async (req, res) => {
   }
 });
 
-// ----------------- rest of your existing endpoints (kept mostly unchanged) -----------------
-
 app.post("/api/login", async (req, res) => {
   try {
     const { mobile, password } = req.body;
     if (!mobile || !password) return res.status(400).json({ error: "Mobile and password required" });
-
     const user = await usersCollection.findOne({ mobile });
     if (!user) return res.status(401).json({ error: "User not found" });
-
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) return res.status(401).json({ error: "Invalid credentials" });
-
+    if (!user.emailVerified) {
+      return res.status(401).json({ error: "Please verify your email before logging in." });
+    }
     await blacklistedTokensCollection.deleteMany({ userId: user._id });
-
-    const token = jwt.sign(
-      { _id: user._id.toString(), firstName: user.firstName, mobile: user.mobile, gender: user.gender, email: user.email },
-      JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    res.json({
-      message: "Login successful",
-      token,
-      user: {
-        _id: user._id.toString(),
-        firstName: user.firstName,
-        middleName: user.middleName,
-        lastName: user.lastName,
-        mobile: user.mobile,
-        gender: user.gender,
-        email: user.email,
-        emailVerified: !!user.emailVerified
-      },
-    });
+    const token = jwt.sign({ _id: user._id.toString(), firstName: user.firstName, mobile: user.mobile, gender: user.gender, email: user.email }, JWT_SECRET, { expiresIn: "1h" });
+    res.json({ message: "Login successful", token, user: { _id: user._id.toString(), firstName: user.firstName, middleName: user.middleName, lastName: user.lastName, mobile: user.mobile, gender: user.gender, email: user.email, emailVerified: !!user.emailVerified } });
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ error: "Internal server error" });

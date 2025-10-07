@@ -13,16 +13,19 @@
 
 .signup-page {
   display: flex;
-  gap: 0;
+  gap: 2rem; 
   align-items: center;
   justify-content: space-around;
-  width: 80%;
+  width: 70%;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
 .signup-left {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 1rem;
   flex: 0.5;
 }
 
@@ -252,7 +255,7 @@
 
 .signup-button {
   position: relative;
-  padding: 12px 35px;
+  padding: 12px;
   background: var(--faq-color);
   font-size: 14px;
   font-weight: 600;
@@ -708,6 +711,19 @@
   color: #888;
   cursor: not-allowed;
 }
+
+.otp-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+}
+.otp-dialog { position: relative;}  
+
 
 @media screen and (max-width: 1024px) {
   .signup-page {
