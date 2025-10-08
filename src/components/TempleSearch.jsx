@@ -23,22 +23,37 @@ const TempleSearch = ({ setTemples }) => {
 
   const [showCustomPlaceholder, setShowCustomPlaceholder] = useState(true);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [prevPlaceholder, setPrevPlaceholder] = useState(null);
   const placeholders = ['"Temple Name"', '"District"', '"State"'];
 
   const { fetchTemples } = useContext(AuthContext);
 
-  useEffect(() => {
-    if (!showCustomPlaceholder) return;
-    const interval = setInterval(() => {
-      setPlaceholderIndex((prev) => (prev + 1) % placeholders.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [showCustomPlaceholder]);
+useEffect(() => {
+  if (!showCustomPlaceholder) return;
 
-  useEffect(() => {
-    setShowCustomPlaceholder(searchTerm.length === 0);
-  }, [searchTerm]);
+  const totalDuration = 2500;
+  const step = totalDuration;
 
+  const interval = setInterval(() => {
+    setPlaceholderIndex((prev) => {
+      setPrevPlaceholder(placeholders[prev]);
+      return (prev + 1) % placeholders.length;
+    });
+    
+    setTimeout(() => {
+      setPrevPlaceholder(null);
+    }, totalDuration);
+  }, step);
+
+  return () => {
+    clearInterval(interval);
+  };
+}, [showCustomPlaceholder]);
+
+useEffect(() => {
+  setShowCustomPlaceholder(searchTerm.length === 0);
+}, [searchTerm]);
+  
   const fetchAndSetTemples = async (term = searchTerm) => {
     setLoading(true);
     try {
