@@ -31,7 +31,7 @@ const TempleSearch = ({ setTemples }) => {
     if (!showCustomPlaceholder) return;
     const interval = setInterval(() => {
       setPlaceholderIndex((prev) => (prev + 1) % placeholders.length);
-    }, 2500);
+    }, 3000);
     return () => clearInterval(interval);
   }, [showCustomPlaceholder]);
 
