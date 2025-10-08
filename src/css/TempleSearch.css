@@ -160,7 +160,7 @@
   color: var(--search-scroll-color);
   font-weight: 500;
   display: inline-block;
-  animation: slideUp 2.5s ease-in-out forwards;
+  animation: slideUp 2.5s ease-in-out infinite;
 }
 
 @keyframes slideUp {
@@ -177,7 +177,7 @@
     opacity: 1;
   }
   100% {
-    transform: translateY(-40%);
+    transform: translateY(-100%);
     opacity: 0;
   }
 }
