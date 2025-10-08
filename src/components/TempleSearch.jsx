@@ -249,16 +249,25 @@ useEffect(() => {
           autoComplete="off"
         />
         {showCustomPlaceholder && (
-          <div className="scroll-placeholder-wrapper">
-            <span className="scroll-placeholder-static">Search by</span>
-            <span
-              key={placeholderIndex}
-              className="scroll-placeholder-animated"
-            >
-              {placeholders[placeholderIndex]}
-            </span>
-          </div>
-        )}
+  <div className="scroll-placeholder-wrapper" aria-hidden>
+    <span className="scroll-placeholder-static">Search by</span>
+    {prevPlaceholder && (
+      <span
+        className="scroll-placeholder-animated exit"
+        key={"prev-" + prevPlaceholder}
+      >
+        {prevPlaceholder}
+      </span>
+    )}
+    <span
+      className="scroll-placeholder-animated enter"
+      key={placeholderIndex}
+    >
+      {placeholders[placeholderIndex]}
+    </span>
+  </div>
+)}
+
         <button
           className="temple-search-icon-button"
           onClick={() => fetchAndSetTemples()}
