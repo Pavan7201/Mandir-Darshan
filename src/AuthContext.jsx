@@ -212,6 +212,15 @@ export const AuthProvider = ({ children }) => {
       return data.user;
     });
 
+  const loginWithToken = (token, user) => withLoader(async () => {
+    setUser(user);
+    setWelcomeMessage(`Welcome ${user.firstName || ""}`);
+    setToken(token);
+    sessionStorage.setItem("token", token);
+    return user;
+  });
+
+
   const fetchTemples = async ({ searchTerm = "", category = "", state = "", sortBy = "" }) => {
     try {
       const queryParams = new URLSearchParams();
@@ -336,6 +345,7 @@ export const AuthProvider = ({ children }) => {
     setUser,
     signup,
     login,
+    loginWithToken,
     fetchTemples,
     adminLogin,
     editProfile,
