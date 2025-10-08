@@ -160,19 +160,19 @@
   color: var(--search-scroll-color);
   font-weight: 500;
   display: inline-block;
-  animation: slideUp 2.5s ease-in-out infinite;
+  animation: slideUp 3s ease-in-out forwards;
 }
 
 @keyframes slideUp {
   0% {
-    transform: translateY(40%);
+    transform: translateY(100%);
     opacity: 0;
   }
-  20% {
+  10% {
     transform: translateY(0);
     opacity: 1;
   }
-  80% {
+  90% {
     transform: translateY(0);
     opacity: 1;
   }
