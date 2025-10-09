@@ -36,6 +36,8 @@ body {
   --search-scroll-color: rgba(128, 0, 0, 0.725);
   --suggestions-hover-color: orange;
   --templePage-bg:rgba(229, 198, 240, 0.878);
+  --skeleton-base-color: #EAE2CF;
+  --skeleton-shimmer-color: #FBF7EE;
 
   background-color: var(--bg-color);
   color: var(--text-color);
@@ -52,7 +54,7 @@ body.dark {
   --faq-color: #f0e6bd;
   --link-hover: #fff;
   --box-shadow: 0 4px 12px #f1efea2b;
-  --card-shadow: 0 6px 15px rgba(246, 199, 160, 0.426);
+  --card-shadow: 0 6px 15px rgba(118, 105, 95, 0.334);
   --card-hover-shadow: 0 10px 20px #f0e6bd2e;
   --card-title-color: #dfd6b5;
   --description-color: #8b8981;
@@ -78,6 +80,8 @@ body.dark {
   --search-scroll-color: #f7edd6a3;
   --suggestions-hover-color: maroon;
   --templePage-bg:var(--bg-color);
+   --skeleton-base-color: #1a1a1a;
+  --skeleton-shimmer-color: #2c2c2c;
 
   background-color: var(--bg-color);
   color: var(--text-color);

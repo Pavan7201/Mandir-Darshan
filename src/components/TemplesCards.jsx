@@ -42,21 +42,13 @@ const TemplesCards = ({ temples = [], className = "" }) => {
             activeCardWidthMobile={250}
             activeCardHeightMobile={300}
             renderItem={(temple, index, isActive) => {
-              const templePath = `/temples${temple.link}`;
-              const handleClick = () => {
-                if (!auth?.user) {
-                  navigate("/signup");
-                } else {
-                  navigate(templePath);
-                }
-              };
+              const templePath = `${temple.link}`;
               return (
                 <NavLink
                   key={temple.id || index}
                   to={templePath}
                   className="temple-card"
                   style={{ cursor: "pointer" }}
-                  onClick={handleClick}
                 >
                   <img
                     src={

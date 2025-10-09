@@ -127,7 +127,7 @@ function AppRoutes() {
         <Route path="/media" element={<MediaRoomPage />} />
         <Route path="/support" element={<SupportPage />} />
 
-        <Route path="/temples/:templeLink" element={<TempleDetails />} />
+        <Route path="Temples/:templeLink" element={<TempleDetails />} />
 
         <Route path="/editprofile" element={<ProfileEdit />} />
         <Route path="/changepassword" element={<ChangePassword />} />

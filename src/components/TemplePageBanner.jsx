@@ -15,6 +15,7 @@ const TemplePageBanner = () => {
   const [paragraph, setParagraph] = useState("");
 
   const [temples, setTemples] = useState([]);
+  
   const { fetchTemples } = useContext(AuthContext);
 
   useEffect(() => {

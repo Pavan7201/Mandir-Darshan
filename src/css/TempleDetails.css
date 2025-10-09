@@ -1,5 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@400;700&display=swap');
 
+:root {
+  --bg-color: #fdfaf6;
+  --text-color: #333;
+  --faq-color: #d55b3e;
+  --secondary-color: #f7f7f7;
+  --card-color: #ffffff;
+  --light-text: #ffffff;
+  --q-hover-focus-color: #ffffff;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --skeleton-base-color: #e0e0e0;
+  --skeleton-shimmer-color: #f0f0f0;
+}
+
 .temple-details-page {
   font-family: 'Lato', sans-serif;
   background-color: var(--bg-color);
@@ -11,13 +24,14 @@
   overflow-x: hidden;
 }
 
-h1{
+h1 {
   font-family: 'Playfair Display', serif;
   font-weight: 700;
   color: var(--faq-color);
 }
 
 p {
+  text-align: justify;
   line-height: 1.6;
 }
 
@@ -59,7 +73,7 @@ p {
   color: var(--light-text);
   padding: 2rem;
   box-shadow: inset 0 -50px 50px rgba(0, 0, 0, 0.2);
-  background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5));
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
   z-index: 0;
 }
 
@@ -76,7 +90,7 @@ p {
   font-weight: 400;
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
   margin-top: 0;
-  color:var(--secondary-color) ;
+  color: var(--secondary-color);
 }
 
 .temple-main-section {
@@ -85,7 +99,8 @@ p {
   z-index: 2;
 }
 
-.tc, .temple-section {
+.tc,
+.temple-section {
   background-color: var(--card-color);
   border-radius: 12px;
   padding: 2.5rem;
@@ -109,7 +124,9 @@ p {
   color: var(--faq-color);
 }
 
-.temple-book-btn, .temple-readmore-btn, .temple-add-calendar-btn {
+.temple-book-btn,
+.temple-readmore-btn,
+.temple-add-calendar-btn {
   padding: 0.75rem 2rem;
   font-family: 'Lato', sans-serif;
   font-size: 1rem;
@@ -214,6 +231,7 @@ p {
 .temple-card-map .temple-map-wrapper iframe {
   width: 100%;
   height: 100%;
+  border: 0;
 }
 
 .temple-highlight {
@@ -254,6 +272,205 @@ p {
   transform: scale(1.03);
 }
 
+.temple-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.temple-translation-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.temple-translating-text {
+  font-size: 0.9rem;
+  color: #888;
+  margin: 0;
+}
+
+.temple-reset-translation-btn {
+  background: var(--bg-color);
+  border: 1px solid var(--faq-color);
+  color: var(--faq-color);
+  padding: 6px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.temple-reset-translation-btn:hover {
+  background-color: orange;
+  color: #333;
+}
+
+.temple-translation-dropdown-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.temple-translation-icon {
+  position: absolute;
+  left: 10px;
+  pointer-events: none;
+  color: var(--faq-color);
+}
+
+.temple-animated-text {
+  position: relative;
+  transition: box-shadow 0.35s ease;
+  padding: 0.25rem 0;
+}
+
+.temple-glow::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 40%;
+
+  height: 100%;
+  transform: skewX(-20deg);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.0), rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.0));
+  animation: shine 2.4s ease-in-out 1;
+}
+
+@keyframes shine {
+  from {
+    left: -50%;
+  }
+
+  to {
+    left: 110%;
+    opacity: 0;
+  }
+}
+
+.temple-translation-icon.spinning {
+  cursor: progress;
+}
+
+.temple-translation-dropdown {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: var(--bg-color);
+  border: 1px solid var(--faq-color);
+  padding: 8px 12px 8px 32px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background-repeat: no-repeat;
+  background-position: right 10px top 50%;
+  background-size: 10px auto;
+  color: var(--faq-color);
+}
+
+.temple-translation-dropdown:hover {
+  border-color: orange;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -800px 0;
+  }
+
+  100% {
+    background-position: 800px 0;
+  }
+}
+
+.skeleton {
+  background-color: var(--skeleton-base-color);
+  background-image: linear-gradient(to right, var(--skeleton-base-color) 0%, var(--skeleton-shimmer-color) 20%, var(--skeleton-base-color) 40%, var(--skeleton-base-color) 100%);
+  background-repeat: no-repeat;
+  background-size: 1600px 100%;
+  display: inline-block;
+  position: relative;
+  animation: shimmer 2s linear infinite;
+  border-radius: 4px;
+  color: transparent !important;
+  border-color: transparent !important;
+  user-select: none;
+}
+
+.skeleton.temple-hero-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.skeleton-hero-title {
+  width: 60%;
+  height: 3.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+}
+
+.skeleton-hero-caption {
+  width: 40%;
+  height: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.skeleton-hero-button {
+  width: 180px;
+  height: 50px;
+  border-radius: 50px;
+}
+
+.skeleton-title {
+  width: 250px;
+  height: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-text {
+  width: 100%;
+  height: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-card {
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.skeleton-button-small {
+  width: 120px;
+  height: 35px;
+  border-radius: 8px;
+}
+
+.skeleton-ritual-chip {
+  width: 100px;
+  height: 40px;
+  border-radius: 20px;
+}
+
+.skeleton-gallery-img {
+  width: 100%;
+  height: 150px;
+  border-radius: 8px;
+}
+
+.skeleton-map {
+  width: 100%;
+  height: 350px;
+  margin-top: 1rem;
+  border-radius: 8px;
+}
+
 @media (max-width: 768px) {
   .temple-hero-section {
     height: 60vh;
@@ -283,7 +500,6 @@ p {
 
   .temple-rituals-grid {
     gap: 0.8rem;
-    flex-direction: column;
   }
 
   .temple-gallery-grid {
@@ -306,20 +522,25 @@ p {
     padding: 0.65rem 1rem;
   }
 
-
   .temple-gallery-img {
     height: 130px;
   }
 
-  
   .temple-card-map .temple-map-wrapper {
+    height: 280px;
+  }
+
+  .skeleton-gallery-img {
+    height: 130px;
+  }
+
+  .skeleton-map {
     height: 280px;
   }
 }
 
 @media (max-width: 480px) {
-
-  .temple-flower{
+  .temple-flower {
     font-size: 1.5rem;
   }
 
@@ -339,13 +560,19 @@ p {
   .temple-main-section {
     padding: 1.5rem 2%;
   }
+
   .temple-section-title {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     gap: 0.5rem;
+    margin-bottom: 0;
+  }
+
+  .temple-card-history {
+    padding: 0.5rem;
   }
 
   .temple-events-grid {
-    grid-template-columns: 1fr; 
+    grid-template-columns: 1fr;
     gap: 0.8rem;
   }
 
@@ -380,5 +607,39 @@ p {
 
   .temple-card-map .temple-map-wrapper {
     height: 220px;
+  }
+
+  .skeleton-hero-title {
+    height: 2.5rem;
+  }
+
+  .skeleton-gallery-img {
+    height: 120px;
+  }
+
+  .skeleton-map {
+    height: 220px;
+  }
+
+  .temple-reset-translation-btn {
+    background: none;
+    border: none;
+    color: var(--faq-color);
+  }
+
+  .temple-translation-controls {
+    gap: 2px;
+  }
+
+  .temple-translation-dropdown {
+    padding: auto;
+  }
+
+  .temple-animated-text p {
+    font-size: 0.75rem;
+  }
+
+  .temple-glow::after {
+    display: none;
   }
 }
