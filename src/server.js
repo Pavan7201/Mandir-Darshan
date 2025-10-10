@@ -373,9 +373,9 @@ app.get("/api/temples", async (req, res) => {
     try {
         const { searchTerm, category, state, sortBy } = req.query;
         const templeDoc = await assetsCollection.findOne({ category: "temple" });
-        if (!templeDoc) return res.json([]);
+        if (!templeDoc) return res.json([]);x
         let results = Array.isArray(templeDoc.items) ? [...templeDoc.items] : [];
-        if (searchTerm && typeof searchTerm === "string" && searchTerm.trim()) {
+        if (searchTerm && typeof searchTerm === "string" && searchTerm.trim()&& searchTerm !== 'undefined') {
             const term = escapeRegexSafe(searchTerm.trim());
             const startsRegex = new RegExp("^" + term, "i");
             const nameMatches = results.filter(t => startsRegex.test(t.name || "") || startsRegex.test(t.deity || ""));
@@ -383,11 +383,11 @@ app.get("/api/temples", async (req, res) => {
             const stateMatches = results.filter(t => startsRegex.test(t.location?.state || "") && !nameMatches.includes(t) && !districtMatches.includes(t));
             results = [...nameMatches, ...districtMatches, ...stateMatches];
         }
-        if (category && typeof category === "string" && category.trim()) {
+        if (category && typeof category === "string" && category.trim()&& category !== 'undefined') {
             const catRegex = new RegExp(escapeRegexSafe(category.trim()), "i");
             results = results.filter((t) => catRegex.test(t.deity || ""));
         }
-        if (state && typeof state === "string" && state.trim()) {
+        if (state && typeof state === "string" && state.trim()&& state !== 'undefined') {
             const stateTerm = escapeRegexSafe(state.trim().replace(/-/g, " "));
             const stateRegex = new RegExp(stateTerm, "i");
             results = results.filter((t) => stateRegex.test(t.location?.state || ""));
