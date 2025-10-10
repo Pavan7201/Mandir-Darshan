@@ -417,6 +417,126 @@ app.get("/api/temples", async (req, res) => {
     }
 });
 
+app.post("/api/availability", async (req, res) => {
+    try {
+        const { temple_id, date, ticket_type } = req.body;
+        if (!temple_id || !date || !ticket_type) {
+            return res.status(400).json({ error: "temple_id, date, and ticket_type are required." });
+        }
+        
+        const availableSlots = [];
+        const openingHour = 8;
+        const closingHour = 20; 
+
+        for (let hour = openingHour; hour < closingHour; hour++) {
+            if (Math.random() > 0.2) {
+                const time = `${String(hour).padStart(2, '0')}:00`;
+                availableSlots.push({
+                    time_slot: time,
+                    
+                    available_tickets: Math.floor(Math.random() * 50) + 10, 
+                });
+            }
+        }
+
+        if (availableSlots.length === 0) {
+            return res.json({ message: "No available slots found for the selected date.", slots: [] });
+        }
+
+        res.json({ slots: availableSlots });
+
+    } catch (err) {
+        console.error("Availability check error:", err);
+        res.status(500).json({ error: "Failed to check availability." });
+    }
+});
+
+app.post("/api/calculate-price", async (req, res) => {
+    try {
+        const { ticket_id, quantity } = req.body;
+        if (!ticket_id || !quantity || isNaN(quantity) || quantity <= 0) {
+            return res.status(400).json({ error: "A valid ticket_id and quantity are required." });
+        }
+
+        const ticket = await ticketsCollection.findOne({ ticket_id });
+        if (!ticket) {
+            return res.status(404).json({ error: "Ticket not found." });
+        }
+
+        const base_price = ticket.price;
+        const total_price = base_price * quantity;
+        const service_fee = 0;
+        const grand_total = total_price + service_fee;
+
+        res.json({
+            breakdown: {
+                base_price: base_price,
+                quantity: quantity,
+                service_fee: service_fee,
+                total_price: total_price
+            },
+            grand_total: grand_total,
+            currency: ticket.currency || "INR"
+        });
+
+    } catch (err) {
+        console.error("Price calculation error:", err);
+        res.status(500).json({ error: "Failed to calculate price." });
+    }
+});
+
+app.post("/api/bookings", authenticateUserMiddleware, async (req, res) => {
+    try {
+        const { temple_id, ticket_id, date, time_slot, quantity, attendees, payment_id } = req.body;
+        
+        if (!temple_id || !ticket_id || !date || !time_slot || !quantity || !attendees || !payment_id) {
+            return res.status(400).json({ error: "Missing required booking information." });
+        }
+
+        const isPaymentValid = true;
+        if (!isPaymentValid) {
+            return res.status(402).json({ error: "Payment verification failed." });
+        }
+
+        const ticket = await ticketsCollection.findOne({ ticket_id });
+        if (!ticket) {
+            return res.status(404).json({ error: "Ticket details not found." });
+        }
+        
+        const newBooking = {
+            booking_id: `BKNG_${Date.now()}`,
+            user_id: new ObjectId(req.user._id),
+            temple_id,
+            ticket_id,
+            booking_date: date,
+            time_slot,
+            quantity,
+            total_amount: ticket.price * quantity,
+            attendees,
+            status: "confirmed",
+            payment_id,
+            created_at: new Date(),
+        };
+
+        const result = await bookingsCollection.insertOne(newBooking);
+
+        res.status(201).json({
+            message: "Booking successful!",
+            confirmation: {
+                booking_id: newBooking.booking_id,
+                temple_id: newBooking.temple_id,
+                date: newBooking.booking_date,
+                time_slot: newBooking.time_slot,
+                status: newBooking.status
+            }
+        });
+
+    } catch (err) {
+        console.error("Booking execution error:", err);
+        res.status(500).json({ error: "Failed to create booking." });
+    }
+});
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
