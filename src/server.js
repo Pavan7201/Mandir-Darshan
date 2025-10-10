@@ -37,7 +37,7 @@ app.use(
   })
 );
 
-let usersCollection, blacklistedTokensCollection, assetsCollection, emailOtpsCollection,mobileOtpsCollection
+let usersCollection, blacklistedTokensCollection, assetsCollection, emailOtpsCollection, mobileOtpsCollection, ticketsCollection, bookingsCollection;
 const client = new MongoClient(MONGODB_URI);
 
 async function connectDB() {
@@ -49,6 +49,8 @@ async function connectDB() {
     assetsCollection = db.collection("assets");
     emailOtpsCollection = db.collection("emailotps");
     mobileOtpsCollection = db.collection("mobileotps");
+    ticketsCollection = db.collection("tickets");
+    bookingsCollection = db.collection("bookings");
     await blacklistedTokensCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
     await emailOtpsCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
     await mobileOtpsCollection.createIndex({expiresAt: 1}, {expireAfterSeconds : 0});
