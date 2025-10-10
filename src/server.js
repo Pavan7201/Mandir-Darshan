@@ -373,15 +373,23 @@ app.get("/api/temples", async (req, res) => {
     try {
         const { searchTerm, category, state, sortBy } = req.query;
         const templeDoc = await assetsCollection.findOne({ category: "temple" });
-        if (!templeDoc) return res.json([]);
-        let results = Array.isArray(templeDoc.items) ? [...templeDoc.items] : [];
+
+        if (!templeDoc || !Array.isArray(templeDoc.items)) {
+            return res.json([]);
+        }
+
+        let results = [...templeDoc.items];
         if (searchTerm && typeof searchTerm === "string" && searchTerm.trim()) {
             const term = escapeRegexSafe(searchTerm.trim());
-            const startsRegex = new RegExp("^" + term, "i");
-            const nameMatches = results.filter(t => startsRegex.test(t.name || "") || startsRegex.test(t.deity || ""));
-            const districtMatches = results.filter(t => startsRegex.test(t.location?.district || "") && !nameMatches.includes(t));
-            const stateMatches = results.filter(t => startsRegex.test(t.location?.state || "") && !nameMatches.includes(t) && !districtMatches.includes(t));
-            results = [...nameMatches, ...districtMatches, ...stateMatches];
+            const regex = new RegExp(term, "i"); // <-- Finds the text *anywhere*, not just at the start.
+
+            results = results.filter(t =>
+                regex.test(t.name || "") ||
+                regex.test(t.deity || "") ||
+                regex.test(t.location?.city || "") || // <-- Now correctly searches the city field.
+                regex.test(t.location?.district || "") ||
+                regex.test(t.location?.state || "")
+            );
         }
         if (category && typeof category === "string" && category.trim()) {
             const catRegex = new RegExp(escapeRegexSafe(category.trim()), "i");
