@@ -373,25 +373,37 @@ app.get("/api/temples", async (req, res) => {
     try {
         const { searchTerm, category, state, sortBy } = req.query;
         const templeDoc = await assetsCollection.findOne({ category: "temple" });
-        if (!templeDoc) return res.json([]);x
-        let results = Array.isArray(templeDoc.items) ? [...templeDoc.items] : [];
-        if (searchTerm && typeof searchTerm === "string" && searchTerm.trim()&& searchTerm !== 'undefined') {
-            const term = escapeRegexSafe(searchTerm.trim());
-            const startsRegex = new RegExp("^" + term, "i");
-            const nameMatches = results.filter(t => startsRegex.test(t.name || "") || startsRegex.test(t.deity || ""));
-            const districtMatches = results.filter(t => startsRegex.test(t.location?.district || "") && !nameMatches.includes(t));
-            const stateMatches = results.filter(t => startsRegex.test(t.location?.state || "") && !nameMatches.includes(t) && !districtMatches.includes(t));
-            results = [...nameMatches, ...districtMatches, ...stateMatches];
+
+        if (!templeDoc || !Array.isArray(templeDoc.items)) {
+            return res.json([]);
         }
-        if (category && typeof category === "string" && category.trim()&& category !== 'undefined') {
+
+        let results = [...templeDoc.items];
+
+        if (searchTerm && typeof searchTerm === "string" && searchTerm.trim() && searchTerm !== 'undefined') {
+            const term = escapeRegexSafe(searchTerm.trim());
+            const regex = new RegExp(term, "i");
+
+            results = results.filter(t =>
+                regex.test(t.name || "") ||
+                regex.test(t.deity || "") ||
+                regex.test(t.location?.city || "") || 
+                regex.test(t.location?.district || "") ||
+                regex.test(t.location?.state || "")
+            );
+        }
+
+        if (category && typeof category === "string" && category.trim() && category !== 'undefined') {
             const catRegex = new RegExp(escapeRegexSafe(category.trim()), "i");
             results = results.filter((t) => catRegex.test(t.deity || ""));
         }
-        if (state && typeof state === "string" && state.trim()&& state !== 'undefined') {
+
+        if (state && typeof state === "string" && state.trim() && state !== 'undefined') {
             const stateTerm = escapeRegexSafe(state.trim().replace(/-/g, " "));
             const stateRegex = new RegExp(stateTerm, "i");
             results = results.filter((t) => stateRegex.test(t.location?.state || ""));
         }
+
         const sortKey = sortBy || (results[0]?.id ? "id" : "");
         if (sortKey) {
             if (sortKey === "name") {
@@ -412,6 +424,7 @@ app.get("/api/temples", async (req, res) => {
                 });
             }
         }
+
         res.json(results);
     } catch (err) {
         console.error("Temple search error:", err);
