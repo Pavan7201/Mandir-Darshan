@@ -4,6 +4,7 @@ import App from "./App";
 import { AuthProvider } from "./AuthContext";
 import { BrowserRouter as Router } from "react-router-dom";
 import TempleLoader from "./loader/TempleLoader";
+import VoiceflowWidget from "./components/VoiceFlowWidget";
 
 const redirect = sessionStorage.redirect;
 if (redirect) {
@@ -18,6 +19,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Suspense fallback={<TempleLoader />}>
         <App />
       </Suspense>
+      <VoiceflowWidget />
     </AuthProvider>
   </Router>
 );

@@ -552,6 +552,24 @@ app.post("/api/bookings", authenticateUserMiddleware, async (req, res) => {
     }
 });
 
+app.get("/api/my-bookings", authenticateUserMiddleware, async (req, res) => {
+    try {
+        const userId = new ObjectId(req.user._id);
+
+        const bookings = await bookingsCollection.find({ user_id: userId }).toArray();
+
+        if (!bookings || bookings.length === 0) {
+            return res.json({ message: "No bookings found for this user.", bookings: [] });
+        }
+
+        res.json({ bookings });
+
+    } catch (err) {
+        console.error("Error fetching user bookings:", err);
+        res.status(500).json({ error: "Failed to fetch bookings." });
+    }
+});
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
