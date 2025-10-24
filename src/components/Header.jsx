@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useContext } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import "../css/header.css";
-import MandirLogo from "../assets/logo.webp";
+// import MandirLogo from "../assets/logo.webp";
 import { faBars, faLock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle } from "@fortawesome/free-regular-svg-icons";
