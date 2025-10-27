@@ -37,7 +37,7 @@ app.use(
     })
 );
 
-let usersCollection, blacklistedTokensCollection, assetsCollection, emailOtpsCollection, mobileOtpsCollection, ticketsCollection, bookingsCollection;
+let usersCollection, blacklistedTokensCollection, assetsCollection, emailOtpsCollection, mobileOtpsCollection, ticketsCollection, bookingsCollection, availabilityCollection;
 const client = new MongoClient(MONGODB_URI);
 
 async function connectDB() {
@@ -51,9 +51,15 @@ async function connectDB() {
         mobileOtpsCollection = db.collection("mobileotps");
         ticketsCollection = db.collection("tickets");
         bookingsCollection = db.collection("bookings");
+        availabilityCollection = db.collection("availability");
+
         await blacklistedTokensCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
         await emailOtpsCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
         await mobileOtpsCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+        await availabilityCollection.createIndex(
+            { temple_id: 1, ticket_id: 1, date: 1 },
+            { unique: true }
+        );
         console.log("✅ Connected to MongoDB Atlas");
     } catch (err) {
         console.error("❌ MongoDB connection error:", err);
@@ -434,38 +440,32 @@ app.get("/api/temples", async (req, res) => {
 
 app.post("/api/availability", async (req, res) => {
     try {
-        const { temple_id, date, ticket_type, limit = 10, page = 1 } = req.body;
-        
-        if (!temple_id || !date || !ticket_type) {
-            return res.status(400).json({ error: "temple_id, date, and ticket_type are required." });
-        }
-        
-        const allAvailableSlots = []; 
-        const openingHour = 8;
-        const closingHour = 20;
+        const { temple_id, date, ticket_id, limit = 10, page = 1 } = req.body;
 
-        for (let hour = openingHour; hour < closingHour; hour++) {
-            if (Math.random() > 0.2) {
-                const startHour = String(hour).padStart(2, '0');
-                const endHour = String(hour + 1).padStart(2, '0');
-                const time = `${startHour}:00-${endHour}:00`;
-
-                allAvailableSlots.push({
-                    time_slot: time,
-                    available_tickets: Math.floor(Math.random() * 50) + 10, 
-                });
-            }
+        if (!temple_id || !date || !ticket_id) {
+            return res.status(400).json({ error: "temple_id, date, and ticket_id are required." });
         }
+
+        const availabilityDoc = await availabilityCollection.findOne({
+            temple_id,
+            ticket_id,
+            date
+        });
+
+        if (!availabilityDoc || !availabilityDoc.slots || availabilityDoc.slots.length === 0) {
+            return res.json({ message: "No available slots found for the selected date.", slots: [] });
+        }
+
+        const allAvailableSlots = availabilityDoc.slots.filter(slot => slot.available_tickets > 0);
 
         if (allAvailableSlots.length === 0) {
-            return res.json({ message: "No available slots found for the selected date.", slots: [] });
+            return res.json({ message: "All slots for this date are sold out.", slots: [] });
         }
 
         const numLimit = Number(limit) || 10;
         const numPage = Number(page) || 1;
-
         const startIndex = (numPage - 1) * numLimit;
-        const endIndex = numPage * numLimit; 
+        const endIndex = numPage * numLimit;
 
         const paginatedSlots = allAvailableSlots.slice(startIndex, endIndex);
 
@@ -473,8 +473,12 @@ app.post("/api/availability", async (req, res) => {
             return res.json({ message: "You have reached the end of the available slots.", slots: [] });
         }
 
-
-        res.json({ slots: paginatedSlots });
+        res.json({
+            slots: paginatedSlots.map(slot => ({
+                time_slot: slot.time_slot,
+                available_tickets: slot.available_tickets
+            }))
+        });
 
     } catch (err) {
         console.error("Availability check error:", err);
@@ -485,7 +489,8 @@ app.post("/api/availability", async (req, res) => {
 app.post("/api/calculate-price", async (req, res) => {
     try {
         const { ticket_id, quantity } = req.body;
-        if (!ticket_id || !quantity || isNaN(quantity) || quantity <= 0) {
+        const numQuantity = Number(quantity);
+        if (!ticket_id || !numQuantity || numQuantity <= 0) {
             return res.status(400).json({ error: "A valid ticket_id and quantity are required." });
         }
 
@@ -495,14 +500,14 @@ app.post("/api/calculate-price", async (req, res) => {
         }
 
         const base_price = ticket.price;
-        const total_price = base_price * quantity;
+        const total_price = base_price * numQuantity;
         const service_fee = 0;
         const grand_total = total_price + service_fee;
 
         res.json({
             breakdown: {
                 base_price: base_price,
-                quantity: quantity,
+                quantity: numQuantity,
                 service_fee: service_fee,
                 total_price: total_price
             },
@@ -519,13 +524,40 @@ app.post("/api/calculate-price", async (req, res) => {
 app.post("/api/bookings", authenticateUserMiddleware, async (req, res) => {
     try {
         const { temple_id, ticket_id, date, time_slot, quantity, attendees, payment_id } = req.body;
+        const numQuantity = Number(quantity);
 
-        if (!temple_id || !ticket_id || !date || !time_slot || !quantity || !attendees || !payment_id) {
-            return res.status(400).json({ error: "Missing required booking information." });
+        if (!temple_id || !ticket_id || !date || !time_slot || !numQuantity || numQuantity <= 0 || !attendees || !Array.isArray(attendees) || !payment_id) {
+            return res.status(400).json({ error: "Missing or invalid booking information." });
+        }
+
+        const updateResult = await availabilityCollection.updateOne(
+            {
+                temple_id,
+                ticket_id,
+                date,
+                "slots": {
+                    "$elemMatch": {
+                        "time_slot": time_slot,
+                        "available_tickets": { "$gte": numQuantity } // Check if tickets >= quantity
+                    }
+                }
+            },
+            {
+                "$inc": { "slots.$.available_tickets": -numQuantity }
+            }
+        );
+
+        if (updateResult.modifiedCount === 0) {
+            console.warn(`Booking failed: No slot found or not enough tickets for ${temple_id}, ${date}, ${time_slot}`);
+            return res.status(409).json({ error: "Not enough tickets available for this slot, or the slot does not exist. Please try again." });
         }
 
         const isPaymentValid = true;
         if (!isPaymentValid) {
+            await availabilityCollection.updateOne(
+                { temple_id, ticket_id, date, "slots.time_slot": time_slot },
+                { "$inc": { "slots.$.available_tickets": numQuantity } }
+            );
             return res.status(402).json({ error: "Payment verification failed." });
         }
 
@@ -541,8 +573,8 @@ app.post("/api/bookings", authenticateUserMiddleware, async (req, res) => {
             ticket_id,
             booking_date: date,
             time_slot,
-            quantity,
-            total_amount: ticket.price * quantity,
+            quantity: numQuantity,
+            total_amount: ticket.price * numQuantity,
             attendees,
             status: "confirmed",
             payment_id,
@@ -623,6 +655,60 @@ app.post("/api/admin/login", async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 });
+
+app.post("/api/admin/availability", authenticateUserMiddleware, async (req, res) => {
+  try {
+    if (!req.user.role || req.user.role !== "admin") {
+      return res.status(403).json({ error: "Forbidden: Admin access required." });
+    }
+
+    const { temple_id, ticket_id, date, slots } = req.body;
+
+    if (!temple_id || !ticket_id || !date || !Array.isArray(slots) || slots.length === 0) {
+      return res.status(400).json({ error: "Missing required fields: temple_id, ticket_id, date, and a non-empty slots array." });
+    }
+
+    const validatedSlots = slots.map(slot => {
+      const total = Number(slot.total_tickets);
+      if (!slot.time_slot || isNaN(total) || total < 0) {
+        throw new Error(`Invalid slot data: ${JSON.stringify(slot)}`);
+      }
+      return {
+        time_slot: slot.time_slot,
+        total_tickets: total,
+        available_tickets: total // On creation, available = total
+      };
+    });
+
+    const result = await availabilityCollection.updateOne(
+      { temple_id, ticket_id, date }, // Filter
+      {
+        $set: {
+          temple_id,
+          ticket_id,
+          date,
+          slots: validatedSlots,
+          last_updated: new Date()
+        }
+      },
+      { upsert: true }
+    );
+
+    if (result.upsertedCount && result.upsertedCount > 0) {
+      res.status(201).json({ message: "Availability created successfully." });
+    } else {
+      res.status(200).json({ message: "Availability updated successfully." });
+    }
+
+  } catch (err) {
+    console.error("Error setting availability:", err);
+    if (err.code === 11000) {
+      return res.status(409).json({ error: "This availability document already exists. Use PUT to modify." });
+    }
+    res.status(500).json({ error: "Failed to set availability." });
+  }
+});
+
 
 app.put("/api/editprofile", authenticateUserMiddleware, upload.single("avatar"), async (req, res) => {
     try {
