@@ -27,53 +27,53 @@ const OTP_RESEND_COOLDOWN_SECONDS = Number(process.env.OTP_RESEND_COOLDOWN_SECON
 app.use(express.json());
 
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-  })
+    cors({
+        origin: (origin, callback) => {
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.includes(origin)) return callback(null, true);
+            return callback(new Error("Not allowed by CORS"));
+        },
+        credentials: true,
+    })
 );
 
 let usersCollection, blacklistedTokensCollection, assetsCollection, emailOtpsCollection, mobileOtpsCollection, ticketsCollection, bookingsCollection;
 const client = new MongoClient(MONGODB_URI);
 
 async function connectDB() {
-  try {
-    await client.connect();
-    const db = client.db(DB_NAME);
-    usersCollection = db.collection("users");
-    blacklistedTokensCollection = db.collection("blacklistedtokens");
-    assetsCollection = db.collection("assets");
-    emailOtpsCollection = db.collection("emailotps");
-    mobileOtpsCollection = db.collection("mobileotps");
-    ticketsCollection = db.collection("tickets");
-    bookingsCollection = db.collection("bookings");
-    await blacklistedTokensCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-    await emailOtpsCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-    await mobileOtpsCollection.createIndex({expiresAt: 1}, {expireAfterSeconds : 0});
-    console.log("✅ Connected to MongoDB Atlas");
-  } catch (err) {
-    console.error("❌ MongoDB connection error:", err);
-    process.exit(1);
-  }
+    try {
+        await client.connect();
+        const db = client.db(DB_NAME);
+        usersCollection = db.collection("users");
+        blacklistedTokensCollection = db.collection("blacklistedtokens");
+        assetsCollection = db.collection("assets");
+        emailOtpsCollection = db.collection("emailotps");
+        mobileOtpsCollection = db.collection("mobileotps");
+        ticketsCollection = db.collection("tickets");
+        bookingsCollection = db.collection("bookings");
+        await blacklistedTokensCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+        await emailOtpsCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+        await mobileOtpsCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+        console.log("✅ Connected to MongoDB Atlas");
+    } catch (err) {
+        console.error("❌ MongoDB connection error:", err);
+        process.exit(1);
+    }
 }
 connectDB();
 
 function escapeRegexSafe(str = "") {
-  return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function isValidEmailSimple(email = "") {
-  return /^\S+@\S+\.\S+$/.test(String(email).trim());
+    return /^\S+@\S+\.\S+$/.test(String(email).trim());
 }
 
 function generateNumericOtp(length = 6) {
-  const max = 10 ** length;
-  const num = Math.floor(Math.random() * (max - 10 ** (length - 1))) + 10 ** (length - 1);
-  return String(num).slice(0, length);
+    const max = 10 ** length;
+    const num = Math.floor(Math.random() * (max - 10 ** (length - 1))) + 10 ** (length - 1);
+    return String(num).slice(0, length);
 }
 
 function formatDateForDisplay(date) {
@@ -89,41 +89,41 @@ function formatDateForDisplay(date) {
 }
 
 async function fireN8nWebhook(webhookUrl, payload) {
-  if (!webhookUrl) {
-    console.error("❌ CRITICAL: The specific n8n Webhook URL is not defined in your .env file!");
-    return;
-  }
-
-  console.log("--- Firing n8n Webhook ---");
-  console.log("Payload Sent (ExpiresAt shown in IST):", {
-    ...payload,
-    expiresAt: formatDateForDisplay(new Date(payload.expiresAt)),
-    });
-
-  try {
-    const response = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (response.headers.get("content-type")?.includes("application/json")) {
-        const responseBody = await response.json();
-        if (!response.ok) {
-            console.error("n8n workflow returned an error:", responseBody);
-        } else {
-            console.log("✅ Successfully sent data to n8n webhook (JSON response).");
-        }
-    } else {
-        const textResponse = await response.text();
-        if (!response.ok) {
-            console.error("n8n workflow returned a non-JSON error:", textResponse);
-        } else {
-            console.log("✅ Successfully sent data to n8n webhook (non-JSON response).");
-        }
+    if (!webhookUrl) {
+        console.error("❌ CRITICAL: The specific n8n Webhook URL is not defined in your .env file!");
+        return;
     }
-  } catch (err) {
-    console.error("❌ FAILED to call n8n webhook. Error:", err.message || err);
-  }
+
+    console.log("--- Firing n8n Webhook ---");
+    console.log("Payload Sent (ExpiresAt shown in IST):", {
+        ...payload,
+        expiresAt: formatDateForDisplay(new Date(payload.expiresAt)),
+    });
+
+    try {
+        const response = await fetch(webhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+        if (response.headers.get("content-type")?.includes("application/json")) {
+            const responseBody = await response.json();
+            if (!response.ok) {
+                console.error("n8n workflow returned an error:", responseBody);
+            } else {
+                console.log("✅ Successfully sent data to n8n webhook (JSON response).");
+            }
+        } else {
+            const textResponse = await response.text();
+            if (!response.ok) {
+                console.error("n8n workflow returned a non-JSON error:", textResponse);
+            } else {
+                console.log("✅ Successfully sent data to n8n webhook (non-JSON response).");
+            }
+        }
+    } catch (err) {
+        console.error("❌ FAILED to call n8n webhook. Error:", err.message || err);
+    }
 }
 
 const authenticateUserMiddleware = async (req, res, next) => {
@@ -291,7 +291,7 @@ app.post("/api/send-login-otp", async (req, res) => {
                 });
             }
         }
-        
+
         const otp = generateNumericOtp(OTP_LENGTH);
         const otpHash = await bcrypt.hash(otp, 10);
         const createdAt = new Date();
@@ -334,7 +334,7 @@ app.post("/api/login-with-otp", async (req, res) => {
             await mobileOtpsCollection.deleteOne({ _id: otpDoc._id });
             return res.status(400).json({ error: "OTP has expired. Please request a new one." });
         }
-        
+
         const trimmedOtp = String(otp).trim();
 
         const match = await bcrypt.compare(trimmedOtp, otpDoc.otpHash);
@@ -355,7 +355,7 @@ app.post("/api/login-with-otp", async (req, res) => {
             JWT_SECRET,
             { expiresIn: "1h" }
         );
-        
+
         res.json({
             message: "Login successful",
             token,
@@ -387,7 +387,7 @@ app.get("/api/temples", async (req, res) => {
             results = results.filter(t =>
                 regex.test(t.name || "") ||
                 regex.test(t.deity || "") ||
-                regex.test(t.location?.city || "") || 
+                regex.test(t.location?.city || "") ||
                 regex.test(t.location?.district || "") ||
                 regex.test(t.location?.state || "")
             );
@@ -434,31 +434,50 @@ app.get("/api/temples", async (req, res) => {
 
 app.post("/api/availability", async (req, res) => {
     try {
-        const { temple_id, date, ticket_type } = req.body;
+        const { temple_id, date, ticket_type, limit = 10, page = 1 } = req.body;
+
         if (!temple_id || !date || !ticket_type) {
             return res.status(400).json({ error: "temple_id, date, and ticket_type are required." });
         }
-        
-        const availableSlots = [];
+
+        const allAvailableSlots = [];
         const openingHour = 8;
-        const closingHour = 20; 
+        const closingHour = 20;
 
         for (let hour = openingHour; hour < closingHour; hour++) {
             if (Math.random() > 0.2) {
-                const time = `${String(hour).padStart(2, '0')}:00`;
-                availableSlots.push({
-                    time_slot: time,
-                    
-                    available_tickets: Math.floor(Math.random() * 50) + 10, 
+                const startHour = String(hour).padStart(2, '0');
+                const endHour = String(hour + 1).padStart(2, '0');
+                const time = `${startHour}:00-${endHour}:00`;
+
+                allAvailableSlots.push({
+                    time_slot: time, 
+                    available_tickets: Math.floor(Math.random() * 50) + 10,
                 });
             }
         }
 
-        if (availableSlots.length === 0) {
+        section
+        if (allAvailableSlots.length === 0) {
             return res.json({ message: "No available slots found for the selected date.", slots: [] });
         }
 
-        res.json({ slots: availableSlots });
+
+        const numLimit = Number(limit) || 10;
+        const numPage = Number(page) || 1;
+
+        const startIndex = (numPage - 1) * numLimit;
+        const endIndex = numPage * numLimit;
+
+        const paginatedSlots = allAvailableSlots.slice(startIndex, endIndex);
+
+        section
+        if (paginatedSlots.length === 0 && numPage > 1) {
+            return res.json({ message: "You have reached the end of the available slots.", slots: [] });
+        }
+
+
+        res.json({ slots: paginatedSlots });
 
     } catch (err) {
         console.error("Availability check error:", err);
@@ -503,7 +522,7 @@ app.post("/api/calculate-price", async (req, res) => {
 app.post("/api/bookings", authenticateUserMiddleware, async (req, res) => {
     try {
         const { temple_id, ticket_id, date, time_slot, quantity, attendees, payment_id } = req.body;
-        
+
         if (!temple_id || !ticket_id || !date || !time_slot || !quantity || !attendees || !payment_id) {
             return res.status(400).json({ error: "Missing required booking information." });
         }
@@ -517,7 +536,7 @@ app.post("/api/bookings", authenticateUserMiddleware, async (req, res) => {
         if (!ticket) {
             return res.status(404).json({ error: "Ticket details not found." });
         }
-        
+
         const newBooking = {
             booking_id: `BKNG_${Date.now()}`,
             user_id: new ObjectId(req.user._id),
