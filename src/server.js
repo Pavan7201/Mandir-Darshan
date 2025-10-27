@@ -435,12 +435,12 @@ app.get("/api/temples", async (req, res) => {
 app.post("/api/availability", async (req, res) => {
     try {
         const { temple_id, date, ticket_type, limit = 10, page = 1 } = req.body;
-
+        
         if (!temple_id || !date || !ticket_type) {
             return res.status(400).json({ error: "temple_id, date, and ticket_type are required." });
         }
-
-        const allAvailableSlots = [];
+        
+        const allAvailableSlots = []; 
         const openingHour = 8;
         const closingHour = 20;
 
@@ -451,27 +451,24 @@ app.post("/api/availability", async (req, res) => {
                 const time = `${startHour}:00-${endHour}:00`;
 
                 allAvailableSlots.push({
-                    time_slot: time, 
-                    available_tickets: Math.floor(Math.random() * 50) + 10,
+                    time_slot: time,
+                    available_tickets: Math.floor(Math.random() * 50) + 10, 
                 });
             }
         }
 
-        section
         if (allAvailableSlots.length === 0) {
             return res.json({ message: "No available slots found for the selected date.", slots: [] });
         }
-
 
         const numLimit = Number(limit) || 10;
         const numPage = Number(page) || 1;
 
         const startIndex = (numPage - 1) * numLimit;
-        const endIndex = numPage * numLimit;
+        const endIndex = numPage * numLimit; 
 
         const paginatedSlots = allAvailableSlots.slice(startIndex, endIndex);
 
-        section
         if (paginatedSlots.length === 0 && numPage > 1) {
             return res.json({ message: "You have reached the end of the available slots.", slots: [] });
         }
