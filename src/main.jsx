@@ -12,8 +12,18 @@ if (redirect) {
   window.history.replaceState(null, null, redirect);
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+const container = document.getElementById("root");
 
+
+let root;
+if (!container._reactRoot) {
+  root = ReactDOM.createRoot(container);
+  container._reactRoot = root;
+} else {
+  root = container._reactRoot;
+}
+
+root.render(
   <Router basename="/Mandir-Darshan">
     <AuthProvider>
       <Suspense fallback={<TempleLoader />}>
