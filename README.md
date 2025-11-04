@@ -4,13 +4,28 @@ Mandir Darshan - A Full-Stack Temple Guide
 A full-stack web application designed to be a virtual guide to Indian temples, featuring OTP authentication, dynamic content, and integrated an voiceflow for chatbot for assistance.
 </p>
 
-<p align="center">
-<img src="https://www.google.com/search?q=https://raw.githubusercontent.com/Pavan7201/Mandir-Darshan/temple/demo/screenshot-home.png" width="80%" alt="Home Page">
-  
-<img src="https://www.google.com/search?q=https://raw.githubusercontent.com/Pavan7201/Mandir-Darshan/main/demo/screenshot-ai.png" width="40%" alt="AI Chat">
-<img src="https://www.google.com/search?q=https://raw.githubusercontent.com/Pavan7201/Mandir-Darshan/main/demo/screenshot-dark.png" width="40%" alt="Dark Mode">
-
-</p>
+<table align="center">
+  <tr>
+    <th>☀️ Light Mode</th>
+    <th>🌙 Dark Mode</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/Pavan7201/Mandir-Darshan/blob/main/Light%20Mode.png?raw=true" width="95%">
+    </td>
+    <td align="center">
+      <img src="https://github.com/Pavan7201/Mandir-Darshan/blob/main/Dark%20Mode.png?raw=true" width="95%">
+    </td>
+  </tr>
+  <tr>
+    <th colspan="2">💬 Voiceflow AI Chat</th>
+  </tr>
+  <tr>
+    <td colspan="2" align="center">
+      <img src="https://github.com/Pavan7201/Mandir-Darshan/blob/main/Voiceflow%20assistant.png?raw=true" width="80%">
+    </td>
+  </tr>
+</table>
 
 🌐 Live Demo
 
