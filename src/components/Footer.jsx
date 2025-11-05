@@ -41,7 +41,7 @@ const Footer = () => {
     <footer className={`footer ${animate ? "animate" : ""}`}>
       <p>© {new Date().getFullYear()} Mandir Darshan. All rights reserved.</p>
       <button
-        className={`scroll-to-top ${showScrollTop ? "show" : ""}`} onClick={scrollToTop}> scroll to Top ↑
+        className={`scroll-to-top ${showScrollTop ? "show" : ""}`} onClick={scrollToTop}>↑
       </button>
     </footer>
   );
